@@ -9,265 +9,105 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,600;1,700&display=swap" rel="stylesheet">
     
     <style>
-.badge-container {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin: 20px 0;
-    flex-wrap: wrap;
-}
+        :root { 
+            --bg-color: #FFF8E7; --card-bg: #FFFFFF; 
+            --primary: #FFB6C1; --primary-dark: #FF9EAA;
+            --success: #A8E6CF; --warning: #FFD54F; --danger: #FF8A80; --info: #81D4FA;
+            --text-main: #4A4A4A; --text-light: #888888;
+            --border-color: #FFB6C1; --extra-bg: #FFF8E7;
+        }
 
-        /* --- DARK MODE OVERRIDES --- */
-body.dark-mode {
-    --bg-color: #121212; 
-    --card-bg: #1E1E1E;  
-    --text-main: #FFFFFF;  /* Đổi từ #000000 sang trắng để hiện rõ trên nền tối */
-    --text-light: #B0B0B0; /* Màu xám nhạt cho các dòng chú thích */
-    --border-color: #444444;
-    
-}
+        /* --- DARK MODE --- */
+        body.dark-mode {
+            --bg-color: #121212; 
+            --card-bg: #1E1E1E;  
+            --text-main: #FFFFFF;
+            --text-light: #B0B0B0;
+            --border-color: #444444;
+        }
 
-/* Riêng ô gõ chữ vẫn giữ màu đen để nhìn rõ trên nền kem sáng */
-body.dark-mode .typing-input-box {
-    color: #000000 !important;
-}
+        body.dark-mode .typing-input-box { color: #000000 !important; }
+        body.dark-mode .mode-fc { background: #7E57C2; }
+        body.dark-mode .mode-qz { background: #F57C00; }
+        body.dark-mode .mode-ls { background: #0097A7; }
+        body.dark-mode .mode-tp { background: #388E3C; }
+        body.dark-mode .mode-mt { background: #1976D2; }
 
-/* Màu nút chế độ học khi ở Dark Mode (Sâu hơn, dịu hơn) */
-body.dark-mode .mode-fc { background: #7E57C2; } /* Tím đậm */
-body.dark-mode .mode-qz { background: #F57C00; } /* Cam đậm */
-body.dark-mode .mode-ls { background: #0097A7; } /* Xanh ngọc đậm */
-body.dark-mode .mode-tp { background: #388E3C; } /* Xanh lá đậm */
-body.dark-mode .mode-mt { background: #1976D2; } /* Xanh dương đậm */
+        /* --- HUY HIỆU (BADGES) --- */
+        .badge-container { display: flex; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap; }
+        .badge-item { width: 75px; text-align: center; filter: grayscale(1) opacity(0.3); transition: 0.5s all; }
+        .badge-item.unlocked { filter: grayscale(0) opacity(1); transform: scale(1.05); }
+        .badge-icon { font-size: 30px; background: rgba(255,255,255,0.1); width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 5px auto; border: 2px solid var(--primary); }
+        .badge-name { font-size: 9px; font-weight: 900; line-height: 1.2; text-transform: uppercase; }
 
-/* Hiệu ứng Phản hồi (Hover) cho cả 2 chế độ */
-.mode-card {
-    transition: transform 0.2s, filter 0.2s, box-shadow 0.2s;
-}
-
-.mode-card:hover {
-    transform: translateY(-5px);
-    filter: brightness(0.9); /* Tăng độ đậm 10% khi di chuột vào */
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-}
-
-.mode-card:active {
-    transform: scale(0.95); /* Hiệu ứng nhấn nút */
-}
-
-.mode-icon {
-    background: rgba(255, 255, 255, 0.2) !important; /* Đổi nền icon thành trắng mờ */
-}
-
-        body { font-family: 'Nunito', sans-serif; background: var(--bg-color); margin: 0; padding: 10px 20px; color: var(--text-main); overflow-x: hidden; transition: background 0.3s; }
-        
+        /* --- CORE STYLES --- */
+        body { font-family: 'Nunito', sans-serif; background: var(--bg-color); margin: 0; padding: 10px 20px; color: var(--text-main); transition: background 0.3s; overflow-x: hidden; }
         .panel-box { max-width: 850px; margin: 15px auto; background: var(--card-bg); padding: 25px 30px; border-radius: 25px; border: 2px dashed var(--border-color); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04); position: relative; transition: background 0.3s; }
-        #toastNotification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: #222; padding: 15px 30px; border-radius: 20px; font-weight: 900; font-size: 16px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); z-index: 999999; display: none; text-align: center; }
-
-        .nav-arrow { background: transparent; border: none; font-size: 45px; font-weight: 900; cursor: pointer; transition: 0.2s; padding: 0 15px; margin: 0; outline: none; color: var(--primary); }
-        .nav-arrow.next { color: var(--warning); }
-        .nav-arrow:hover { transform: scale(1.15); filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
-        .nav-arrow:active { transform: scale(0.9); }
-
-        #loginScreen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-color); z-index: 99999; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: var(--card-bg); padding: 40px 50px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.08); border: 2px solid var(--primary); text-align: center; width: 90%; max-width: 450px; }
-        .login-input { width: 100%; box-sizing: border-box; padding: 15px; border: 2px solid var(--primary); border-radius: 15px; font-size: 16px; font-family: 'Nunito', sans-serif; outline: none; font-weight: 900; background: var(--card-bg); color: var(--text-main); text-transform: uppercase; margin-bottom: 15px; text-align: center; }
-        .login-btn { background: var(--primary); color: white; padding: 15px; width: 100%; border-radius: 15px; font-size: 18px; font-family: 'Nunito', sans-serif; cursor: pointer; border: none; font-weight: 900; transition: 0.2s; }
-
-        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border-bottom: 2px dashed var(--border-color); padding-bottom: 15px; }
-        .header h2 { color: var(--primary); margin: 0; font-weight: 900; font-size: 26px; display: flex; align-items: center; gap: 8px; }
-        .header-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
-        .user-badge { border: 2px solid var(--primary); color: var(--primary); padding: 8px 20px; border-radius: 25px; font-weight: 900; font-size: 14px; white-space: nowrap; }
-        .action-btn { background: var(--card-bg); border: 2px solid var(--primary); color: var(--primary); font-family: 'Nunito', sans-serif; cursor: pointer; border-radius: 20px; padding: 8px 18px; font-size: 14px; font-weight: 900; transition: 0.2s; white-space: nowrap; }
-        .action-btn:hover { background: var(--primary); color: white; }
-        .icon-btn { background: transparent; border: none; font-size: 26px; cursor: pointer; transition: 0.2s; padding: 0 5px; color: var(--text-main); }
-
-        .stats-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 15px; margin-top: 20px; margin-bottom: 25px; }
-        .stat-item { background: var(--card-bg); padding: 15px 5px; border-radius: 15px; border: 2px solid var(--primary); text-align: center; display: flex; flex-direction: column; justify-content: center; }
-        .stat-value { font-size: 20px; font-weight: 900; color: var(--primary); margin-bottom: 5px; }
-        .stat-label { font-size: 11px; color: var(--text-main); font-weight: 900; text-transform: uppercase; }
         
-        /* CĂN CHỈNH ĐỒNG ĐỀU CÁC NÚT MAIN DASHBOARD */
-        .choice-container { display: grid; 
-    grid-template-columns: repeat(3, 1fr); /* Chia đúng 3 cột bằng nhau, mỗi cột chiếm 1 phần (1fr) */
-    gap: 15px; 
-    width: 100%; 
-    margin-top: 20px;
-    box-sizing: border-box; /* Đảm bảo padding không làm tràn khung */}
-        .choice-btn { flex: 1; width: 100%; 
-    min-width: 0; /* Quan trọng: cho phép Grid có thể bóp nhỏ ô nếu màn hình hẹp */
-    padding: 25px 15px; 
-    border-radius: 20px; 
-    border: 2px solid var(--primary); 
-    background: var(--card-bg); 
-    cursor: pointer; 
-    font-family: 'Nunito', sans-serif; 
-    transition: 0.3s; 
-    text-align: center; 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center; 
-    align-items: center;}
-        .choice-btn:hover { background: var(--primary); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255,182,193,0.3); }
-        .choice-icon { font-size: 35px; margin-bottom: 10px; display: block; }
-        .choice-title { font-size: 18px; font-weight: 900; color: var(--text-main); margin: 0 0 5px 0; transition: 0.2s; }
-        .choice-desc { font-size: 13px; color: var(--text-light); margin: 0; font-weight: 700; transition: 0.2s; }
-        .choice-btn:hover .choice-title, .choice-btn:hover .choice-desc { color: white; }
+        .stats-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 25px; }
+        .stat-item { background: var(--card-bg); padding: 12px 5px; border-radius: 15px; border: 2px solid var(--primary); text-align: center; }
+        .stat-value { font-size: 18px; font-weight: 900; color: var(--primary); }
+        .stat-label { font-size: 10px; font-weight: 900; text-transform: uppercase; color: var(--text-light); }
 
-        #modeSelectionArea { background: var(--extra-bg); padding: 30px; border-radius: 25px; margin-top: 20px; display: none; border: 3px dashed var(--primary); }
-        .mode-header { font-size: 22px; font-weight: 900; margin-bottom: 25px; text-align: center; color: var(--primary); }
-        .mode-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; }
-        @media (max-width: 650px) {
-    .choice-container {
-        grid-template-columns: 1fr; /* Chuyển thành 1 cột duy nhất trên mobile */
-    }
-}
-        /* MÀU PASTEL CHUẨN XÁC YÊU CẦU */
-        .mode-card { padding: 20px 10px; border-radius: 15px; border: none; cursor: pointer; text-align: center; transition: 0.3s; position: relative; display: flex; flex-direction: column; align-items: center; font-family: 'Nunito', sans-serif; }
-        .mode-card:hover { transform: translateY(-5px); filter: brightness(0.95); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .mode-icon { font-size: 28px; background: rgba(255,255,255,0.6); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
-        .mode-title { font-size: 17px; font-weight: 900; color: white; margin: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-        .mode-xp { background: rgba(255,255,255,0.9); padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 900; margin-top: 8px; color: #333; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .choice-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .choice-btn { background: var(--card-bg); border: 2px solid var(--primary); border-radius: 20px; padding: 20px 10px; cursor: pointer; transition: 0.3s; text-align: center; }
+        .choice-btn:hover { background: var(--primary); color: white; transform: translateY(-3px); }
+        .choice-btn:hover p { color: white; }
+        .choice-icon { font-size: 30px; display: block; margin-bottom: 5px; }
+        .choice-title { font-size: 15px; font-weight: 900; margin: 0; color: var(--text-main); }
+        .choice-desc { font-size: 11px; margin: 5px 0 0 0; color: var(--text-light); }
+
+        #modeSelectionArea { background: var(--extra-bg); padding: 25px; border-radius: 25px; margin-top: 20px; border: 3px dashed var(--primary); display: none; }
+        .mode-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
+        .mode-card { padding: 15px 5px; border-radius: 15px; border: none; cursor: pointer; transition: 0.3s; color: white; text-align: center; }
+        .mode-card:hover { transform: translateY(-3px); filter: brightness(1.1); }
         
-        /* BẢNG MÀU PASTEL V55 - ANTI-EYE STRAIN */
-.mode-fc { background: #E1BEE7; } /* Flashcard: Tím Lilac dịu dàng */
-.mode-qz { background: #FFE0B2; } /* Quiz: Cam đào nhẹ nhàng */
-.mode-ls { background: #B2EBF2; } /* Listening: Xanh mây nhạt */
-.mode-tp { background: #C8E6C9; } /* Typing: Xanh lá bạc hà */
-.mode-mt { background: #BBDEFB; } /* Matching: Xanh dương tinh khiết */
-        .hot-tag { position: absolute; top: -5px; right: -5px; background: #FFD54F; color: #D81B60; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .review-item { padding: 15px; background: #FFF8E7 !important; border-radius: 15px; border: 1px solid #FFB6C1; margin-bottom: 10px; text-align: left; }
+        .review-item p, .review-item b, .review-item span { color: #121212 !important; }
 
-        select { padding: 15px; border-radius: 15px; border: 2px solid var(--primary); font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 900; width: 100%; max-width: 400px; margin: 20px auto; display: block; color: var(--text-main); background: var(--card-bg); outline: none; }
+        #toastNotification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: #222; padding: 12px 25px; border-radius: 20px; font-weight: 900; z-index: 9999; display: none; }
+        .nav-arrow { background: transparent; border: none; font-size: 40px; cursor: pointer; color: var(--primary); transition: 0.2s; }
+        .nav-arrow:hover { transform: scale(1.2); }
         
-        .progress-container { width: 100%; background: var(--extra-bg); border-radius: 15px; height: 14px; margin-top: 15px; overflow: hidden; border: 1px solid var(--border-color); }
-        .progress-bar { height: 100%; background: var(--primary); border-radius: 15px; width: 0%; transition: width 0.4s ease; }
-
-        /* FLASHCARD CHUẨN - CHIỀU CAO CỐ ĐỊNH, KHÔNG BỊ ÉP NHỎ */
-        .card-scene { width: 100%; height: 480px; perspective: 1000px; margin: 20px 0; }
-        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; cursor: pointer; user-select: none; }
+        /* Flashcard Scene */
+        .card-scene { width: 100%; height: 450px; perspective: 1000px; margin: 20px 0; }
+        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
         .card.is-flipped { transform: rotateY(180deg); }
+        .card__face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 20px; border: 3px solid var(--primary); padding: 25px; background: var(--card-bg); box-sizing: border-box; overflow-y: auto; }
+        .card__face--back { transform: rotateY(180deg); }
         
-        /* Chống tràn chữ, cho phép cuộn */
-        .card__face { position: absolute; top: 0; left: 0; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 20px; border: 3px solid var(--primary); padding: 30px; box-sizing: border-box; background: var(--card-bg); overflow-y: auto; display: flex; flex-direction: column; }
-        
-        .card__face--front { align-items: center; justify-content: center; text-align: center; }
-        .vocab-front { font-size: clamp(35px, 8vw, 60px); color: var(--primary); margin: 0 0 10px 0; font-weight: 900; line-height: 1.2; word-wrap: break-word; overflow-wrap: break-word; width: 100%; }
-        .type-front { font-size: 26px; color: var(--primary-dark); font-weight: 900; margin: 0 0 20px 0; }
-        
-        .card__face--back { transform: rotateY(180deg); justify-content: flex-start; text-align: left; }
-        
-        /* Cấu trúc Info chuẩn */
-        .info-header { text-align: center; width: 100%; border-bottom: 2px dashed var(--border-color); padding-bottom: 15px; margin-bottom: 20px; flex-shrink: 0; }
-        .info-vocab { color: var(--primary); margin: 0 0 5px 0; font-size: clamp(28px, 6vw, 40px); font-weight: 900; line-height: 1.2; word-wrap: break-word; }
-        .info-ipa { font-size: 20px; color: var(--text-light); font-weight: 800; margin: 0; }
-        
-        .info-body { width: 100%; flex-grow: 1; }
-        .info-meaning-line { font-size: 24px; font-weight: 900; color: var(--text-main); margin-bottom: 12px; }
-        .info-type { font-size: 20px; color: var(--primary-dark); font-weight: 900; margin-left: 5px; }
-        .info-ex-en { font-size: 18px; margin-bottom: 5px; color: var(--text-main); line-height: 1.5; font-weight: 800; }
-        .info-ex-vi { color: var(--text-light); font-size: 15px; font-style: italic; line-height: 1.4; margin-bottom: 15px; font-weight: 700; }
-        
-        .extra-info-box {padding: 15px; 
-    background: var(--extra-bg); 
-    border-radius: 15px; 
-    border-left: 5px solid var(--primary); 
-    font-size: 15px; 
-    line-height: 1.6; 
-    color: #444444 !important; /* Sửa thành màu xám đậm cố định để luôn rõ nét */
-    margin-top: 10px;}
-        .extra-info-item { margin-bottom: 8px; font-weight: 700; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 5px; }
-        .extra-info-item:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
-        .extra-info-label {font-weight: 900; 
-    color: #D81B60 !important; /* Ép màu hồng đậm cố định cho nhãn */
-    display: inline-block; 
-    min-width: 120px;}
-
-        .anki-controls { display: none; margin-top: 20px; text-align: center; }
-        .anki-btn-group { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-        .anki-btn { padding: 10px 15px; border: none; border-radius: 15px; font-family: 'Nunito', sans-serif; cursor: pointer; font-weight: 900; font-size: 15px; transition: 0.2s; color: #333; outline: none; flex: 1; min-width: 90px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .anki-btn small { font-size: 12px; font-weight: 700; opacity: 0.8; }
-        .btn-again { background: #FF8A80; color: white; } .btn-again small { opacity: 1; }
-        .btn-hard { background: #FFD54F; } 
-        .btn-good { background: #A8E6CF; } 
-        .btn-easy { background: #81D4FA; }
-        
-        .flip-btn { background: var(--primary); color: white; padding: 15px 40px; border: none; border-radius: 25px; font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 900; cursor: pointer; margin: 0 auto; display: block; outline: none; transition: 0.2s; box-shadow: 0 4px 10px rgba(255,182,193,0.4); }
-        .flip-btn:active { transform: scale(0.95); }
-
-        /* QUIZ */
-        .quiz-sentence { font-size: 24px; line-height: 1.6; margin: 30px 0; font-weight: 900; color: var(--text-main); text-align: center; }
-        .blank { border-bottom: 3px solid var(--primary); padding: 0 25px; font-weight: 900; color: var(--primary); display: inline-block; min-width: 60px; }
-        .quiz-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 25px; }
-        .quiz-btn { background: var(--card-bg); border: 2px solid var(--border-color); padding: 15px 20px; border-radius: 15px; font-size: 16px; font-weight: 900; color: var(--text-light); cursor: pointer; transition: 0.2s; min-width: 150px; flex: 1; max-width: 45%; outline: none; font-family: 'Nunito', sans-serif; touch-action: manipulation; }
-        .quiz-btn.correct-ans { background: var(--success); border-color: var(--success); color: #222; }
-        .quiz-btn.wrong-ans { background: var(--danger); border-color: var(--danger); color: white; }
-
-        /* MATCHING GAME - FIX TOUCH CHẠM 1 LẦN */
-        .game-grid { display: flex; gap: 15px; width: 100%; margin-top: 20px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
-        .game-col { flex: 1; display: flex; flex-direction: column; gap: 12px; min-width: 140px; }
-        .game-item { background: var(--card-bg); border: 2px solid var(--border-color); color: var(--text-main); font-family: 'Nunito', sans-serif; padding: 15px 10px; border-radius: 15px; text-align: center; font-weight: 900; cursor: pointer; font-size: 15px; min-height: 60px; display: flex; align-items: center; justify-content: center; user-select: none; outline: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: transform 0.1s, border 0.2s; }
-        
-        /* Chỉ cho phép hover trên thiết bị dùng chuột (chống lỗi chạm 2 lần trên iOS/Android) */
-        @media (hover: hover) and (pointer: fine) { .game-item:hover { background: var(--extra-bg); } }
-        
-        .game-item:active { transform: scale(0.96); }
-        .game-item.selected { background: var(--primary); color: white; border-color: var(--primary-dark); transform: scale(1.05); }
-        .game-item.matched { background: var(--success); border-color: var(--success); color: #222; opacity: 0; pointer-events: none; }
-        .game-item.wrong { background: var(--danger); border-color: var(--danger); color: white; }
-
-        .full-info-standalone { display: none; background: var(--card-bg); padding: 30px; border-radius: 20px; border: 2px solid var(--primary); margin-top: 20px; text-align: left; }
-
-        /* TYPING */
-        .typing-input-box { width: 80%; max-width: 400px; padding: 15px; font-size: 24px; font-family: 'Nunito', sans-serif; text-align: center; border: 3px solid var(--border-color); border-radius: 15px; outline: none; background: var(--extra-bg); color: var(--text-main); font-weight: 900; margin-bottom: 25px; transition: 0.3s; }
-        .typing-input-box:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(255,182,193,0.5); }
-        .typing-input-box.correct { border-color: var(--success); background: #E8F5E9; color: #2E7D32; }
-        .typing-input-box.wrong { border-color: var(--danger); background: #FFEBEE; color: #C62828; animation: shake 0.4s; }
-
-        /* BIỂU ĐỒ 7 NGÀY - CỘT ĐỨNG VỮNG VÀNG */
-        .history-chart { display: flex; justify-content: space-between; align-items: flex-end; gap: 5px; height: 180px; margin: 20px 0; border-bottom: 2px solid var(--border-color); padding-bottom: 5px; width: 100%; box-sizing: border-box; }
-        .history-bar-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; cursor: pointer; flex: 1; position: relative; }
-        .history-bar { width: 80%; max-width: 35px; background: var(--primary); border-radius: 8px 8px 0 0; min-height: 4px; transition: height 0.5s ease-out; }
-        .history-bar.empty { background: var(--border-color); opacity: 0.2; }
-        .history-day { font-size: 12px; margin-top: 8px; color: var(--text-light); font-weight: 900; white-space: nowrap; }
-        
-        .review-list { text-align: left; margin-top: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .review-item { padding: 15px; background: var(--extra-bg); border-radius: 15px; border: 1px solid var(--border-color); border-left: 6px solid var(--primary); }
-        
-        .overlay-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-color); z-index: 99999; display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 20px; box-sizing: border-box; overflow-y: auto; }
-
-        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
-        .spinner { border: 5px solid var(--extra-bg); border-top: 5px solid var(--primary); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
+        .overlay-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; box-sizing: border-box; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @media (max-width: 600px) { .choice-container { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-    <div id="toastNotification">Thông báo</div>
+<div id="toastNotification">Thông báo</div>
 
-    <div id="loginScreen">
-        <div class="login-box">
-            <h1 class="login-title">CHARNISHERE</h1>
-            <input type="text" id="studentCode" class="login-input" placeholder="MÃ HỌC VIÊN..." onkeypress="if(event.key === 'Enter') login()">
-            <button class="login-btn" id="loginBtnAction" onclick="login()">Vào Học</button>
-        </div>
+<div id="loginScreen">
+    <div class="login-box">
+        <h1 style="color: var(--primary); font-weight: 900;">CHARNISHERE</h1>
+        <input type="text" id="studentCode" class="login-input" placeholder="MÃ HỌC VIÊN..." onkeypress="if(event.key === 'Enter') login()">
+        <button class="login-btn" id="loginBtnAction" onclick="login()">Vào Học</button>
     </div>
+</div>
 
-<div class="container" id="mainAppWrapper" style="display:none; padding:0; background:transparent; box-shadow:none;">
-    
-    <div class="panel-box" style="margin-top: 0;">
+<div id="mainAppWrapper" style="display:none;">
+    <div class="panel-box">
         <div class="header">
-            <div class="header-title-group">
-                <h2>✨ Charnishere <button class="icon-btn" onclick="toggleDarkMode()" id="darkModeBtn" style="margin-left: 5px;">🌙</button></h2>
-            </div>
+            <h2>✨ Charnishere <button class="icon-btn" onclick="toggleDarkMode()" id="darkModeBtn">🌙</button></h2>
             <div class="header-controls">
-                <div class="user-badge"><span id="displayUserName">HV: ---</span> <span id="displayUserLevel" style="color:var(--primary-dark);">(Lv.1)</span></div>
+                <div class="user-badge"><span id="displayUserName">HV: ---</span> <span id="displayUserLevel">(Lv.1)</span></div>
                 <button class="action-btn" onclick="fetchDataFromGoogleSheets(true)">☁️ Nạp Từ</button>
-                <button class="action-btn" style="background: var(--warning); border-color: var(--warning); color: #222;" onclick="openDeviceSyncModal()">📱 Đổi Máy</button>
+                <button class="action-btn" style="background: var(--warning); color: #222;" onclick="openDeviceSyncModal()">📱 Đổi Máy</button>
             </div>
         </div>
 
-        <div id="loadingArea"><div class="spinner"></div><p style="color: var(--text-main); font-weight: 900; font-size: 16px;">Đang tải dữ liệu...</p></div>
+        <div id="loadingArea"><div class="spinner"></div><p style="text-align:center; font-weight:900;">Đang tải từ vựng...</p></div>
 
-<div id="dashboardArea" style="display: none;">
+        <div id="dashboardArea" style="display: none;">
             <div class="stats-dashboard">
                 <div class="stat-item"><div class="stat-value" id="statStreak">0🔥</div><div class="stat-label">Chuỗi ngày</div></div>
                 <div class="stat-item"><div class="stat-value" id="statDailyTime">0s</div><div class="stat-label">Hôm nay</div></div>
@@ -292,170 +132,109 @@ body.dark-mode .mode-mt { background: #1976D2; } /* Xanh dương đậm */
             </div>
 
             <div id="filterArea" style="display:none; text-align: center; margin-top: 30px;">
-                <h3 style="color: var(--primary); font-weight: 900; font-size: 22px;">Chọn bài học</h3>
+                <h3 style="color: var(--primary); font-weight: 900;">Chọn bài học</h3>
                 <select id="groupSelect"></select>
-                <div style="margin-bottom: 20px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <div style="margin-bottom: 20px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px;">
                     <input type="checkbox" id="shuffleCheck" style="transform: scale(1.5); cursor: pointer;"> 
-                    <label for="shuffleCheck" style="cursor: pointer;">Trộn thứ tự từ vựng</label>
+                    <label for="shuffleCheck" style="cursor: pointer;">🔀 Trộn thứ tự từ vựng</label>
                 </div>
-                <div style="display: flex; justify-content: center; gap: 60px; margin-top: 20px;">
-                    <button class="nav-arrow" onclick="returnToMain()">&#10094;</button>
-                    <button class="nav-arrow next" onclick="confirmGroupSelection()">&#10095;</button>
+                <div style="display: flex; justify-content: center; gap: 60px;">
+                    <button class="nav-arrow" onclick="returnToMain()">❮</button>
+                    <button class="nav-arrow" style="color:var(--warning)" onclick="confirmGroupSelection()">❯</button>
                 </div>
             </div>
 
-            <div id="modeSelectionArea" style="display:none; text-align: center; margin-top: 20px;">
-                <h3 style="color: var(--primary); font-weight: 900; font-size: 22px;" id="modeHeaderTitle">Chọn chế độ học</h3>
+            <div id="modeSelectionArea">
+                <h3 id="modeHeaderTitle" style="color: var(--primary); font-weight: 900;">Chọn chế độ học</h3>
                 <div class="mode-grid">
-                    <button class="mode-card mode-fc" onclick="startAppMode('flashcard')"><div class="mode-icon">📇</div><p class="mode-title">Flashcard</p><div class="mode-xp">+5 XP</div></button>
-                    <button class="mode-card mode-qz" onclick="startAppMode('quiz')"><div class="mode-icon">☑️</div><p class="mode-title">Quiz</p><div class="mode-xp">+10 XP</div></button>
-                    <button class="mode-card mode-ls" onclick="startAppMode('listening')"><div class="mode-icon">🎧</div><p class="mode-title">Listening</p><div class="mode-xp">+15 XP</div></button>
-                    <button class="mode-card mode-tp" onclick="startAppMode('typing')"><div class="mode-icon">⌨️</div><p class="mode-title">Typing</p><div class="mode-xp">+10 XP</div></button>
-                    <button class="mode-card mode-mt" onclick="startAppMode('matching')"><div class="mode-icon">🧩</div><p class="mode-title">Ghép cặp</p><div class="mode-xp">+10 XP</div></button>
+                    <button class="mode-card mode-fc" onclick="startAppMode('flashcard')">📇 Flashcard</button>
+                    <button class="mode-card mode-qz" onclick="startAppMode('quiz')">☑️ Quiz</button>
+                    <button class="mode-card mode-ls" onclick="startAppMode('listening')">🎧 Listening</button>
+                    <button class="mode-card mode-tp" onclick="startAppMode('typing')">⌨️ Typing</button>
+                    <button class="mode-card mode-mt" onclick="startAppMode('matching')">🧩 Ghép cặp</button>
                 </div>
-                <br><button class="nav-arrow" style="margin-top: 20px;" onclick="returnToMain()">&#10094;</button>
+                <br><button class="nav-arrow" onclick="returnToMain()">❮</button>
             </div>
-        </div> </div>
+        </div>
+    </div>
 
     <div class="panel-box" id="learningSpace" style="display:none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <button class="nav-arrow" onclick="returnToMain()" style="font-size: 35px;">&#10094;</button>
-            <div class="progress-text" id="progressText" style="margin: 0;">0 / 0 từ</div>
-            <span style="width: 35px;"></span>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <button class="nav-arrow" onclick="returnToMain()">❮</button>
+            <div id="progressText" style="font-weight:900;">0 / 0 từ</div>
+            <span style="width: 40px;"></span>
         </div>
-        <div class="progress-container" style="margin-top: 0; margin-bottom: 25px;"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
 
         <div id="flashcardApp" style="display:none;">
             <div class="card-scene">
                 <div class="card" id="card">
                     <div class="card__face card__face--front">
-                        <span style="position:absolute; top:20px; left:20px; font-weight:900; color:var(--text-light); font-size:15px;" id="displaySrs">Mới học</span>
-                        <h1 class="vocab-front" id="displayVocab"></h1>
-                        <p class="type-front" id="displayTypeFront"></p>
-                        <button onclick="speakWord(document.getElementById('displayVocab').innerText, event)" style="background:none; border:none; cursor:pointer; font-size:50px; outline:none; margin-top:20px; transition: 0.2s;">🔊</button>
+                        <span id="displaySrs" style="font-weight:900; color:var(--text-light);">Mới học</span>
+                        <h1 id="displayVocab" style="color:var(--primary); font-size:45px; margin:20px 0;"></h1>
+                        <p id="displayTypeFront" style="font-weight:800; color:var(--primary-dark);"></p>
+                        <button onclick="speakWord(document.getElementById('displayVocab').innerText, event)" style="background:none; border:none; font-size:40px; cursor:pointer;">🔊</button>
                     </div>
-                    
                     <div class="card__face card__face--back">
-                        <div class="info-header">
-                            <h2 class="info-vocab" id="displayVocabBack"></h2>
-                            <p class="info-ipa" id="displayIpaBack"></p>
-                        </div>
-                        <div class="info-body">
-                            <div class="info-meaning-line">
-                                <span id="displayMeaning"></span> 
-                                <span class="info-type" id="displayTypeBack"></span>
-                            </div>
-                            <div class="info-ex-en" id="displayExEn"></div>
-                            <div class="info-ex-vi" id="displayExVi"></div>
-                            
-                            <div class="extra-info-box" id="displayExtraBox">
-                                <div class="extra-info-item" id="displayPhrasalContainer"><span class="extra-info-label">🌱 Phái sinh:</span> <span id="displayPhrasal"></span></div>
-                                <div class="extra-info-item" id="displaySynAntContainer"><span class="extra-info-label">🔄 Đồng/Trái:</span> <span id="displaySynAnt"></span></div>
-                            </div>
+                        <h2 id="displayVocabBack" style="color:var(--primary); margin:0;"></h2>
+                        <p id="displayIpaBack" style="color:var(--text-light); font-weight:800;"></p>
+                        <hr style="border: 1px dashed var(--border-color);">
+                        <p style="font-size:22px; font-weight:900;"><span id="displayMeaning"></span> <span id="displayTypeBack" style="color:var(--primary-dark)"></span></p>
+                        <p id="displayExEn" style="font-weight:800;"></p>
+                        <p id="displayExVi" style="font-style:italic; color:var(--text-light);"></p>
+                        <div class="extra-info-box" id="displayExtraBox" style="background:#FFF8E7; padding:10px; border-radius:10px; color:#333 !important;">
+                            <div id="displayPhrasalContainer"><b>🌱 Phái sinh:</b> <span id="displayPhrasal"></span></div>
+                            <div id="displaySynAntContainer"><b>🔄 Đồng/Trái:</b> <span id="displaySynAnt"></span></div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div id="flipControls" style="text-align: center;">
-                <button class="flip-btn" onclick="flipAndShowAnki()">Hiện Đáp Án 👁️</button>
-            </div>
-            
-            <div class="anki-controls" id="ankiControls">
-                <p style="margin: 0 0 15px 0; font-weight: 900; font-size: 20px; color: var(--text-main);">Bạn nhớ từ này thế nào?</p>
+            <div id="flipControls" style="text-align: center;"><button class="flip-btn" onclick="flipAndShowAnki()">Hiện Đáp Án 👁️</button></div>
+            <div class="anki-controls" id="ankiControls" style="display:none;">
                 <div class="anki-btn-group">
-                    <button class="anki-btn btn-again" onclick="rateCard(0)">Lại từ đầu<br><small id="time0">&lt; 10p</small></button>
-                    <button class="anki-btn btn-hard" onclick="rateCard(1)">Khó<br><small id="time1">1 ngày</small></button>
-                    <button class="anki-btn btn-good" onclick="rateCard(2)">Tốt<br><small id="time2">3 ngày</small></button>
-                    <button class="anki-btn btn-easy" onclick="rateCard(3)">Rất Dễ<br><small id="time3">7 ngày</small></button>
+                    <button class="anki-btn btn-again" onclick="rateCard(0)">Lại<br><small>&lt;10p</small></button>
+                    <button class="anki-btn btn-hard" onclick="rateCard(1)">Khó<br><small id="time1">1đ</small></button>
+                    <button class="anki-btn btn-good" onclick="rateCard(2)">Tốt<br><small id="time2">3đ</small></button>
+                    <button class="anki-btn btn-easy" onclick="rateCard(3)">Dễ<br><small id="time3">7đ</small></button>
                 </div>
             </div>
         </div>
 
-        <div id="typingApp" style="display:none;">
-            <div style="text-align: center; margin-top: 20px;">
-                <h2 id="typingAppTitle" style="color: var(--primary); margin-top: 0; font-weight: 900; font-size: 28px;">Luyện Gõ Từ Vựng</h2>
-                <button id="typingAudioBtn" class="audio-big-btn" onclick="speakWord(currentSet[currentIndex].vocab, event)" style="display:none; margin: 0 auto 20px auto;">🔊</button>
-                <div class="typing-prompt" id="typingPromptText" style="font-size: 26px; font-weight: 900; color: var(--text-main); margin-bottom: 10px;"></div>
-                <div class="typing-hint" id="typingHintText" style="color: var(--text-light); font-style: italic; margin-bottom: 25px; font-size: 16px; font-weight: 700;"></div>
-                
-                <input type="text" id="typingInput" class="typing-input-box" placeholder="Gõ tiếng Anh..." onkeypress="if(event.key === 'Enter') checkTypingAnswer()" autocomplete="off" spellcheck="false">
-                <br>
-                <button class="flip-btn" id="typingCheckBtn" onclick="checkTypingAnswer()" style="display: inline-block; width: auto;">Kiểm tra ✏️</button>
-                
-                <div id="typingInfoBox" class="full-info-standalone">
-                    <div class="info-header">
-                        <h2 class="info-vocab" id="typingInfoVocab"></h2>
-                        <p class="info-ipa" id="typingInfoIpa"></p>
-                    </div>
-                    <div class="info-body">
-                        <div class="info-meaning-line">
-                            <span id="typingInfoMeaning"></span> 
-                            <span class="info-type" id="typingInfoType"></span>
-                        </div>
-                        <div class="info-ex-en" id="typingInfoExEn"></div>
-                        <div class="info-ex-vi" id="typingInfoExVi"></div>
-
-                        <div class="extra-info-box" id="typingExtraBox">
-                            <div class="extra-info-item" id="typingPhrasalContainer"><span class="extra-info-label">🌱 Phái sinh:</span> <span id="typingInfoPhrasal"></span></div>
-                            <div class="extra-info-item" id="typingSynAntContainer"><span class="extra-info-label">🔄 Đồng/Trái:</span> <span id="typingInfoSynAnt"></span></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="text-align: center; margin-top: 25px;">
-                    <button class="nav-arrow next" id="typingNextBtn" onclick="nextTypingWord()" style="display: none;">&#10095;</button>
-                </div>
-            </div>
+        <div id="typingApp" style="display:none; text-align:center;">
+            <h2 id="typingAppTitle" style="color:var(--primary); font-weight:900;">Luyện Gõ</h2>
+            <div id="typingPromptText" style="font-size:24px; font-weight:900; margin-bottom:10px;"></div>
+            <input type="text" id="typingInput" class="typing-input-box" placeholder="Gõ từ..." onkeypress="if(event.key === 'Enter') checkTypingAnswer()">
+            <br><button class="flip-btn" id="typingCheckBtn" onclick="checkTypingAnswer()">Kiểm tra ✏️</button>
+            <div id="typingInfoBox" class="review-item" style="display:none; margin-top:20px;"></div>
+            <button class="nav-arrow" id="typingNextBtn" style="display:none;" onclick="nextTypingWord()">❯</button>
         </div>
-    </div>
-
-    <div id="allDoneScreen" style="display:none; text-align: center; padding: 50px 0;">
-        <h1 style="font-size: 70px; margin: 0;">🎉</h1>
-        <h2 style="color: var(--success); font-weight: 900; font-size: 36px; margin: 20px 0;" id="doneTitle">Hoàn tất nhiệm vụ!</h2>
-        <button class="nav-arrow" style="margin-top: 30px;" onclick="returnToMain()">&#10094;</button>
-    </div>
-</div>
-
-<div id="deviceSyncModal" class="overlay-screen">
-    <div class="panel-box" style="max-width: 600px; width: 100%; text-align: center;">
-        <h2 style="color: var(--primary); margin-top: 0; font-size: 32px; font-weight: 900;">📱 CHUYỂN THIẾT BỊ</h2>
-        <p style="font-weight: 800; color: var(--text-light); margin-bottom: 20px;">Lưu và chuyển tiến độ học sang máy khác</p>
-        
-        <div style="background: var(--extra-bg); padding: 20px; border-radius: 15px; margin-bottom: 20px; text-align: left;">
-            <button class="action-btn" onclick="generateSyncCode()">1. Lấy Mã Nén</button>
-            <textarea id="exportCodeArea" class="sync-textarea" style="width: 100%; height: 80px; padding: 10px; border-radius: 10px; border: 2px solid var(--border-color); margin-top: 10px; resize: none; font-family: 'Nunito', sans-serif; outline: none; background: var(--card-bg); color: var(--text-main);" readonly></textarea>
-            <button class="action-btn" style="width: 100%; margin-top: 10px;" onclick="copySyncCode()">📋 Chép Mã</button>
-        </div>
-        <div style="background: var(--extra-bg); padding: 20px; border-radius: 15px; text-align: left;">
-            <textarea id="importCodeArea" class="sync-textarea" style="width: 100%; height: 80px; padding: 10px; border-radius: 10px; border: 2px solid var(--border-color); resize: none; font-family: 'Nunito', sans-serif; outline: none; background: var(--card-bg); color: var(--text-main);" placeholder="2. Dán mã từ máy kia vào đây..."></textarea>
-            <button class="action-btn" style="width: 100%; background: var(--success); border-color: var(--success); color: #222; margin-top: 10px;" onclick="importSyncCode()">⬇️ Phục Hồi</button>
-        </div>
-        <button class="nav-arrow" style="margin-top: 25px;" onclick="closeDeviceSyncModal()">&#10094;</button>
     </div>
 </div>
 
 <div id="profileModal" class="overlay-screen">
-    <div class="panel-box" style="max-width: 700px; width: 100%; text-align: center;">
-        <h2 style="color: var(--primary); margin-top: 0; font-size: 32px; font-weight: 900;">🏆 HỒ SƠ THÀNH TÍCH</h2>
+    <div class="panel-box" style="width:100%; max-width:600px; text-align:center;">
+        <h2 style="color:var(--primary); font-weight:900;">🏆 HỒ SƠ</h2>
+        <div id="profLevelTitle" style="font-size:24px; font-weight:900; background:var(--primary); color:white; display:inline-block; padding:5px 20px; border-radius:20px;">Học Giả</div>
+        <p style="font-weight:900; font-size:20px;">Tổng: <span id="profXP">0</span> XP</p>
+        <div class="progress-container"><div class="progress-bar" id="profXpBar" style="background:var(--info)"></div></div>
         
-        <div style="margin: 20px 0;">
-            <div style="display: inline-block; background: var(--primary); color: white; padding: 8px 25px; border-radius: 20px; font-size: 24px; font-weight: 900; margin-bottom: 15px;" id="profLevelTitle">Tân Binh (Lv.1)</div>
-            <p style="font-weight: 900; margin: 0; font-size: 22px; color: var(--text-main);">Tổng Điểm: <span id="profXP" style="color: var(--primary);">0</span> XP</p>
-            
-            <div style="background: var(--extra-bg); height: 20px; border-radius: 10px; margin: 15px auto; width: 90%; overflow: hidden; border: 2px solid var(--border-color);">
-                <div style="background: var(--info); height: 100%; width: 0%; transition: 0.5s;" id="profXpBar"></div>
-            </div>
-            <p style="font-size: 14px; color: var(--text-light); font-weight: 800;" id="profXpNext">Cần 1000 XP để lên cấp</p>
+        <h3 style="margin-top:20px; font-weight:900;">HUY HIỆU</h3>
+        <div class="badge-container">
+            <div class="badge-item" id="badge_streak3"><div class="badge-icon">🔥</div><div class="badge-name">Lửa Cháy</div></div>
+            <div class="badge-item" id="badge_vocab50"><div class="badge-icon">🧠</div><div class="badge-name">Trí Tuệ</div></div>
+            <div class="badge-item" id="badge_xp1000"><div class="badge-icon">⭐</div><div class="badge-name">Ngôi Sao</div></div>
+            <div class="badge-item" id="badge_night"><div class="badge-icon">🦉</div><div class="badge-name">Cú Đêm</div></div>
         </div>
-        
+
+        <h3 style="font-weight:900;">BIỂU ĐỒ 7 NGÀY</h3>
+        <div class="history-chart" id="historyChartArea" style="height:150px; display:flex; align-items:flex-end; gap:5px; border-bottom:2px solid var(--border-color);"></div>
+        <br><button class="nav-arrow" onclick="closeProfile()">❮</button>
+    </div>
+</div>
 
 <div id="matchingGameScreen" class="overlay-screen">
-    <div class="panel-box" style="max-width: 900px; width: 100%; margin-top: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <button class="nav-arrow" onclick="forceExitMatching()">&#10094;</button>
-            <h2 style="color: var(--primary); margin: 0; font-size: 30px; font-weight: 900;" id="matchTitle">🎮 Game Nối Từ</h2>
-            <span style="width: 50px;"></span>
-        </div>
+    <div class="panel-box" style="width:100%; max-width:800px;">
+        <h2 style="text-align:center; color:var(--primary); font-weight:900;">🎮 GHÉP CẶP</h2>
         <div class="game-grid" id="matchGameGrid">
             <div class="game-col" id="colEn"></div>
             <div class="game-col" id="colVi"></div>
@@ -464,752 +243,269 @@ body.dark-mode .mode-mt { background: #1976D2; } /* Xanh dương đậm */
 </div>
 
 <div id="matchResultScreen" class="overlay-screen">
-    <div class="panel-box" style="max-width: 800px; width: 100%; text-align: center;">
-        <h2 style="color: var(--success); margin-top: 0; font-size: 36px; font-weight: 900;">🎉 HOÀN THÀNH</h2>
-        <h3 id="matchResultTime" style="color: var(--primary); margin-bottom: 25px; font-size: 24px; font-weight: 900;">Thời gian: -- giây</h3>
-        
-        <div style="text-align: left; max-height: 50vh; overflow-y: auto; padding-right: 15px;" id="matchResultList"></div>
-        
-        <div style="text-align: center; margin-top: 30px;">
-            <button id="matchResultBtn" class="nav-arrow next">&#10095;</button>
-        </div>
+    <div class="panel-box" style="text-align:center; width:100%; max-width:600px;">
+        <h2 style="color:var(--success); font-weight:900;">🎉 HOÀN THÀNH</h2>
+        <p id="matchResultTime" style="font-weight:900;"></p>
+        <div id="matchResultList" style="max-height:400px; overflow-y:auto;"></div>
+        <button class="nav-arrow" style="color:var(--warning)" id="matchResultBtn">❯</button>
     </div>
 </div>
 
 <div id="finalQuizScreen" class="overlay-screen">
-    <div class="panel-box" style="max-width: 800px; width: 100%; text-align: center;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <button class="nav-arrow" onclick="returnToMain()">&#10094;</button>
-            <h2 id="quizScreenTitle" style="color: var(--primary); margin: 0; font-size: 30px; font-weight: 900;">📝 TRẮC NGHIỆM</h2>
-            <span style="width: 50px;"></span>
-        </div>
-        <p style="font-weight: 900; margin-top: 0; color: var(--text-light); font-size: 18px;" id="quizProgressText">Câu 1/20</p>
-        
-        <div class="quiz-sentence" id="finalQuizSentence"></div>
-        <p style="font-style: italic; margin-bottom: 30px; color: var(--text-light); font-size: 18px; font-weight: 700;" id="finalQuizVi"></p>
+    <div class="panel-box" style="width:100%; max-width:700px; text-align:center;">
+        <h2 id="quizScreenTitle" style="color:var(--primary); font-weight:900;">📝 TRẮC NGHIỆM</h2>
+        <p id="quizProgressText" style="font-weight:900;"></p>
+        <div id="finalQuizSentence" style="font-size:22px; font-weight:900; margin:20px 0;"></div>
+        <p id="finalQuizVi" style="font-style:italic; color:var(--text-light);"></p>
         <div class="quiz-options" id="finalQuizOptions"></div>
-
-        <div id="quizInfoBox" class="full-info-standalone">
-            <div class="info-header">
-                <div style="display: flex; justify-content: center; align-items: center; gap: 15px;">
-                    <h2 class="info-vocab" id="quizInfoVocab" style="margin: 0;"></h2>
-                    <button id="quizSpeakBtn" style="background:none; border:none; cursor:pointer; font-size:32px; outline:none;">🔊</button>
-                </div>
-                <p class="info-ipa" id="quizInfoIpa" style="margin-top: 5px;"></p>
-            </div>
-            <div class="info-body">
-                <div class="info-meaning-line">
-                    <span id="quizInfoMeaning"></span> 
-                    <span class="info-type" id="quizInfoType"></span>
-                </div>
-                <div class="info-ex-en" id="quizInfoExEn"></div>
-                <div class="info-ex-vi" id="quizInfoExVi"></div>
-
-                <div class="extra-info-box" id="quizExtraBox">
-                    <div class="extra-info-item" id="quizPhrasalContainer"><span class="extra-info-label">🌱 Phái sinh:</span> <span id="quizInfoPhrasal"></span></div>
-                    <div class="extra-info-item" id="quizSynAntContainer"><span class="extra-info-label">🔄 Đồng/Trái:</span> <span id="quizInfoSynAnt"></span></div>
-                </div>
-            </div>
-        </div>
-
-        <div style="text-align: center; margin-top: 30px;">
-            <button id="quizNextBtn" class="nav-arrow next" style="display: none;" onclick="nextQuizQuestion()">&#10095;</button>
-        </div>
+        <div id="quizInfoBox" class="review-item" style="display:none; margin-top:20px;"></div>
+        <button class="nav-arrow" style="color:var(--warning); display:none;" id="quizNextBtn" onclick="nextQuizQuestion()">❯</button>
     </div>
 </div>
 
 <div id="quizResultScreen" class="overlay-screen">
-    <div class="panel-box" style="max-width: 800px; width: 100%; text-align: center;">
-        <h2 id="quizResultTitle" style="color: var(--success); margin-top: 0; font-size: 36px; font-weight: 900;">🎉 KẾT QUẢ</h2>
-        <h3 id="quizScoreText" style="font-size: 26px; color: var(--text-main); font-weight: 900;">Điểm: --/20</h3>
-        <p id="quizXPReward" style="font-weight: 900; color: var(--primary); font-size: 22px;">Thưởng: +0 XP</p>
-        
-        <div class="review-list" id="quizReviewList" style="max-height: 45vh; overflow-y: auto; padding-right: 15px;"></div>
-        
-        <div style="text-align: center; margin-top: 30px;">
-            <button id="quizResultReturnBtn" class="nav-arrow next">&#10095;</button>
-        </div>
+    <div class="panel-box" style="text-align:center; width:100%; max-width:600px;">
+        <h2 style="color:var(--success); font-weight:900;">🎉 KẾT QUẢ</h2>
+        <h3 id="quizScoreText" style="font-weight:900;"></h3>
+        <p id="quizXPReward" style="color:var(--primary); font-weight:900;"></p>
+        <div id="quizReviewList" style="max-height:400px; overflow-y:auto;"></div>
+        <button class="nav-arrow" onclick="returnToMain()">❮</button>
     </div>
 </div>
 
 <script>
-    // ==========================================
-    // 🌐 BƯỚC 1: DÁN 2 LINK GOOGLE SHEETS VÀO ĐÂY
-    // ==========================================
     const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSPyDrjlrEZpuElt_nnQlh9Rg6eJ19daHP74k_g_XhyvmP0Dvv1H5Cm465ubWpzojocL_xsmSPrCVxf/pub?gid=1951662307&single=true&output=csv";
     const GOOGLE_SHEET_USERS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSPyDrjlrEZpuElt_nnQlh9Rg6eJ19daHP74k_g_XhyvmP0Dvv1H5Cm465ubWpzojocL_xsmSPrCVxf/pub?gid=1042146582&single=true&output=csv";
-const LEVEL_ORDER = { "Trọng tâm": 1, "Cơ bản": 2, "Mở rộng": 3, "Nâng cao": 4 };
+    const LEVEL_ORDER = { "Trọng tâm": 1, "Cơ bản": 2, "Mở rộng": 3, "Nâng cao": 4 };
+    const SRS_DAYS = [0, 1, 3, 7, 14, 30, 60];
 
-    let studentID = ""; let allData = []; let currentSet = []; let originalGroupSet = []; let currentIndex = 0;
-    let isSrsMode = false; let isReverseMode = false; let hasDoneWarmup = false;
-    let currentLearningMode = 'flashcard'; 
-    let studentStats = { streak: 0, lastStudyDate: "", xp: 0, badges: [], dailyTime: 0, totalTime: 0, lastStudyDateForTime: "", totalDaysStudied: 1, history: {}, timeHistory: {} };
+    let studentID = ""; let allData = []; let currentSet = []; let currentIndex = 0;
+    let isSrsMode = false; let isReverseMode = false; let currentLearningMode = "";
+    let studentStats = { streak: 0, lastStudyDate: "", xp: 0, badges: [], dailyTime: 0, totalTime: 0, lastStudyDateForTime: "", totalDaysStudied: 1, timeHistory: {} };
     let studyTimer = null; let wordsStudiedSession = 0; let recentWordsForGame = [];
     let quizQuestions = []; let currentQuizIndex = 0; let quizScore = 0; 
-    
-    let gameFlowType = 'normal'; let midSessionFailedFlag = false;
-    let gameTargetScore = 5; let gameSelEn = null; let gameSelVi = null; let gameMatchesFound = 0; 
-    let matchingStartTime = 0; let matchingPairsData = [];
+    let matchingPairsData = []; let matchingStartTime = 0; let gameMatchesFound = 0; let gameSelEn = null; let gameSelVi = null;
 
-    const SRS_DAYS = [0, 1, 3, 7, 14, 30, 60]; 
-
-    // --- HÀM BẢO VỆ CHỐNG LỖI HIỂN THỊ (DOM PROTECTOR) ---
     function setDisplay(id, display) { let el = document.getElementById(id); if (el) el.style.display = display; }
     function setHTML(id, html) { let el = document.getElementById(id); if (el) el.innerHTML = html; }
-    
-    function showToast(msg) {
-        let t = document.getElementById('toastNotification');
-        if(t) { t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); }
-    }
-
-    function calculateLevel(xp) { 
-        if(xp < 1000) return { lv: 1, title: "Tân Binh", next: 1000 }; 
-        if(xp < 3000) return { lv: 2, title: "Học Giả", next: 3000 }; 
-        if(xp < 6000) return { lv: 3, title: "Thợ Săn", next: 6000 }; 
-        if(xp < 10000) return { lv: 4, title: "Chuyên Gia", next: 10000 }; 
-        return { lv: 5, title: "TOEIC Master", next: 15000 }; 
-    }
-
-    function checkBadges() {
-        try {
-            if (!studentStats.badges) studentStats.badges = [];
-            let hour = new Date().getHours(); 
-            let masteredCount = allData ? allData.filter(w => w.srsLevel >= 5).length : 0;
-            if (studentStats.streak >= 3 && !studentStats.badges.includes("streak3")) { studentStats.badges.push("streak3"); showToast("🏆 Mở khóa: Lửa Bùng Cháy (Học 3 ngày)!"); }
-            if (masteredCount >= 50 && !studentStats.badges.includes("vocab50")) { studentStats.badges.push("vocab50"); showToast("🏆 Mở khóa: Bộ Não Trí Tuệ (Thuộc 50 từ)!"); }
-            if (studentStats.xp >= 1000 && !studentStats.badges.includes("xp1000")) { studentStats.badges.push("xp1000"); showToast("🏆 Mở khóa: Ngôi Sao Sáng (Đạt 1000 XP)!"); }
-            if ((hour >= 22 || hour <= 3) && !studentStats.badges.includes("night")) { studentStats.badges.push("night"); showToast("🏆 Mở khóa: Cú Đêm (Học sau 22h)!"); }
-        } catch(e) {}
-    }
-
-    // --- BỘ QUÉT DỮ LIỆU THÔNG MINH BẤT TỬ (CSV PARSER) ---
-    function parseCSVData(text) {
-        if (!text) return [];
-        let delim = ',';
-        if (text.indexOf('\t') !== -1) delim = '\t';
-        else if (text.split('\n')[0].split(';').length > text.split('\n')[0].split(',').length) delim = ';';
-        
-        let objPattern = new RegExp(("(\\" + delim + "|\\r?\\n|\\r|^)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\"\\" + delim + "\\r\\n]*))"), "gi");
-        let arrData = [[]]; let arrMatches = null;
-        while (arrMatches = objPattern.exec(text)) {
-            let strMatchedDelimiter = arrMatches[1];
-            if (strMatchedDelimiter.length && strMatchedDelimiter !== delim) arrData.push([]);
-            let strMatchedValue;
-            if (arrMatches[2]) strMatchedValue = arrMatches[2].replace(new RegExp("\"\"", "g"), "\"");
-            else strMatchedValue = arrMatches[3];
-            arrData[arrData.length - 1].push(strMatchedValue);
-        }
-        if(arrData[arrData.length-1].length === 1 && arrData[arrData.length-1][0] === "") arrData.pop();
-        return arrData;
-    }
-
+    function showToast(msg) { let t = document.getElementById('toastNotification'); if(t) { t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); } }
     function getDateKey(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0'); }
-    
-    function startTimer() { 
+
+    async function login() {
+        const code = document.getElementById('studentCode').value.trim().toUpperCase();
+        if(!code) return showToast("Vui lòng nhập mã!");
+        try {
+            const res = await fetch(GOOGLE_SHEET_USERS_URL); const csv = await res.text();
+            if (csv.includes(code)) {
+                studentID = code; setDisplay('loginScreen', 'none'); setDisplay('mainAppWrapper', 'block');
+                document.getElementById('displayUserName').innerText = `HV: ${studentID}`;
+                if(localStorage.getItem('charnishere_theme') === 'dark') document.body.classList.add('dark-mode');
+                loadDataFromLocal(); loadStats(); startTimer(); fetchDataFromGoogleSheets(false);
+            } else showToast("Sai mã học viên!");
+        } catch(e) { showToast("Lỗi kết nối!"); }
+    }
+
+    function startTimer() {
         if(studyTimer) clearInterval(studyTimer);
-        studyTimer = setInterval(() => { 
-            if(!studentStats) return;
-            let today = new Date().toDateString(); let dKey = getDateKey(new Date()); 
-            
-            if (studentStats.lastStudyDateForTime !== today) { 
-                studentStats.dailyTime = 0; studentStats.lastStudyDateForTime = today; studentStats.totalDaysStudied = (studentStats.totalDaysStudied || 0) + 1; 
-            } 
-            
-            studentStats.dailyTime = (studentStats.dailyTime || 0) + 1; studentStats.totalTime = (studentStats.totalTime || 0) + 1; 
-            if(!studentStats.timeHistory) studentStats.timeHistory = {}; studentStats.timeHistory[dKey] = studentStats.dailyTime; 
-            
-            updateTimeUI(); 
-            if (studentStats.dailyTime % 5 === 0) saveStats(); 
-        }, 1000); 
+        studyTimer = setInterval(() => {
+            let today = new Date().toDateString(); let dKey = getDateKey(new Date());
+            if (studentStats.lastStudyDateForTime !== today) { studentStats.dailyTime = 0; studentStats.lastStudyDateForTime = today; studentStats.totalDaysStudied++; }
+            studentStats.dailyTime++; studentStats.totalTime++;
+            studentStats.timeHistory[dKey] = studentStats.dailyTime;
+            document.getElementById('statDailyTime').innerText = formatTime(studentStats.dailyTime);
+            if (studentStats.dailyTime % 10 === 0) saveStats();
+        }, 1000);
     }
 
-    function formatTime(seconds) { if (!seconds) return "0s"; let h = Math.floor(seconds / 3600); let m = Math.floor((seconds % 3600) / 60); let s = Math.floor(seconds % 60); if (h > 0) return `${h}h ${m}p`; if (m > 0) return `${m}p ${s}s`; return `${s}s`; }
-    
-    function updateTimeUI() { 
-        let d = document.getElementById('statDailyTime'); if(d) d.innerText = formatTime(studentStats.dailyTime); 
-        let t = document.getElementById('statTotalTime'); if(t) t.innerText = formatTime(studentStats.totalTime); 
-        let a = document.getElementById('statAvgTime'); if(a) a.innerText = formatTime(Math.floor(studentStats.totalTime / Math.max(1, studentStats.totalDaysStudied))); 
-    }
+    function formatTime(s) { if(!s) return "0s"; let m = Math.floor(s/60); let rs = s%60; return m > 0 ? `${m}p ${rs}s` : `${rs}s`; }
 
-    function loadDataFromLocal() { try { let sd = localStorage.getItem(`toeic_data_${studentID}`); allData = sd ? JSON.parse(sd) : []; } catch(e) { allData = []; } }
-    function loadStats() {
-        let def = { streak: 0, lastStudyDate: "", dailyTime: 0, totalTime: 0, lastStudyDateForTime: "", totalDaysStudied: 1, xp: 0, badges: [], history: {}, timeHistory: {} };
-        try { let st = localStorage.getItem(`stats_${studentID}`); studentStats = st ? { ...def, ...JSON.parse(st) } : { ...def }; } catch(e) { studentStats = { ...def }; }
-        if (!studentStats.badges) studentStats.badges = [];
-        
-        let today = new Date().toDateString(); let yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-        if (studentStats.lastStudyDate !== today) { if (studentStats.lastStudyDate === yesterday.toDateString()) studentStats.streak++; else studentStats.streak = 1; studentStats.lastStudyDate = today; }
-        if (studentStats.lastStudyDateForTime !== today) { studentStats.dailyTime = 0; studentStats.lastStudyDateForTime = today; if(!studentStats.totalDaysStudied) studentStats.totalDaysStudied = 1; else studentStats.totalDaysStudied++; }
-        
-        saveStats(); updateTimeUI();
-    }
-    
+    function loadDataFromLocal() { let sd = localStorage.getItem(`toeic_data_${studentID}`); allData = sd ? JSON.parse(sd) : []; }
+    function loadStats() { let st = localStorage.getItem(`stats_${studentID}`); if(st) studentStats = JSON.parse(st); if(!studentStats.badges) studentStats.badges = []; }
     function saveStats() { localStorage.setItem(`stats_${studentID}`, JSON.stringify(studentStats)); }
     function saveStudentData() { localStorage.setItem(`toeic_data_${studentID}`, JSON.stringify(allData)); updateStatsDashboard(); }
 
     function updateStatsDashboard() {
-        let st = document.getElementById('statStreak'); if(st) st.innerText = studentStats.streak + "🔥";
-        let sm = document.getElementById('statMastered'); if(sm) sm.innerText = allData.filter(w => w.isStudied && w.srsLevel >= 5).length;
-        let sd = document.getElementById('statDue'); if(sd) sd.innerText = allData.filter(w => w.isStudied && w.nextReviewDate <= Date.now()).length;
+        document.getElementById('statStreak').innerText = studentStats.streak + "🔥";
+        document.getElementById('statMastered').innerText = allData.filter(w => w.isStudied && w.srsLevel >= 5).length;
+        document.getElementById('statDue').innerText = allData.filter(w => w.isStudied && w.nextReviewDate <= Date.now()).length;
         let lvlInfo = calculateLevel(studentStats.xp);
-        let lv = document.getElementById('displayUserLevel'); if(lv) lv.innerText = `(Lv.${lvlInfo.lv})`;
+        document.getElementById('displayUserLevel').innerText = `(Lv.${lvlInfo.lv})`;
     }
 
-    async function login() {
-        const code = document.getElementById('studentCode').value.trim().toUpperCase();
-        if(!code) return showToast("Vui lòng nhập mã học viên!");
-        let loginBtn = document.getElementById('loginBtnAction'); let oldText = loginBtn.innerText;
-        loginBtn.innerText = "Đang tải..."; loginBtn.disabled = true;
+    function calculateLevel(xp) {
+        if(xp < 1000) return { lv: 1, title: "Tân Binh", next: 1000 };
+        if(xp < 3000) return { lv: 2, title: "Học Giả", next: 3000 };
+        return { lv: 3, title: "Master", next: 10000 };
+    }
 
-        if (GOOGLE_SHEET_USERS_URL === "DÁN_LINK_DANH_SÁCH_HỌC_VIÊN_CỦA_BẠN_VÀO_ĐÂY") { showToast("⚠️ Chưa cấp Link Danh sách!"); loginBtn.innerText = oldText; loginBtn.disabled = false; return; }
+    function parseCSVData(text) {
+        let rows = text.split('\n').map(r => r.split(',').map(c => c.replace(/^"|"$/g, '')));
+        return rows.filter(r => r.length > 2);
+    }
+
+    async function fetchDataFromGoogleSheets(manual) {
+        setDisplay('loadingArea', 'block'); setDisplay('dashboardArea', 'none');
         try {
-            const res = await fetch(GOOGLE_SHEET_USERS_URL); const csvText = await res.text(); const rows = parseCSVData(csvText);
-            let allowedCodes = []; for(let i = 0; i < rows.length; i++) { if(rows[i] && rows[i][0]) allowedCodes.push(rows[i][0].trim().toUpperCase()); }
-            if (!allowedCodes.includes(code)) { showToast("❌ Mã không hợp lệ!"); loginBtn.innerText = oldText; loginBtn.disabled = false; return; }
-
-            studentID = code; 
-            setDisplay('loginScreen', 'none'); 
-            let un = document.getElementById('displayUserName'); if(un) un.innerText = `HV: ${studentID}`; 
-            setDisplay('mainAppWrapper', 'block');
-            document.body.style.background = "var(--bg-color)";
-            
-            if(localStorage.getItem('charnishere_theme') === 'dark') { document.body.classList.add('dark-mode'); let dm = document.getElementById('darkModeBtn'); if(dm) dm.innerText = '☀️'; }
-            
-            loadDataFromLocal(); loadStats(); startTimer(); fetchDataFromGoogleSheets(false);
-        } catch(e) { showToast("❌ Lỗi kết nối!"); loginBtn.innerText = oldText; loginBtn.disabled = false; }
+            const res = await fetch(GOOGLE_SHEET_URL); const csv = await res.text();
+            const rows = parseCSVData(csv);
+            let newData = [];
+            for(let i=1; i<rows.length; i++) {
+                let r = rows[i]; if(!r[2]) continue;
+                let key = `Ngày ${r[0]} - ${r[1]}_${r[2]}`;
+                let old = allData.find(o => `${o.groupKey}_${o.vocab}` === key);
+                newData.push({
+                    dayNum: r[0], level: r[1], groupKey: `Ngày ${r[0]} - ${r[1]}`,
+                    vocab: r[2], ipa: r[3], type: r[4], vn: r[5], exEn: r[6], exVi: r[7], phrasal: r[8], synAnt: r[9],
+                    isStudied: old ? old.isStudied : false,
+                    srsLevel: old ? old.srsLevel : 0,
+                    nextReviewDate: old ? old.nextReviewDate : Date.now(),
+                    id: old ? old.id : `W_${Date.now()}_${i}`
+                });
+            }
+            allData = newData; saveStudentData();
+            setDisplay('loadingArea', 'none'); setDisplay('dashboardArea', 'block');
+            if(manual) showToast("Đã cập nhật!");
+        } catch(e) { showToast("Lỗi tải Sheets!"); setDisplay('loadingArea', 'none'); setDisplay('dashboardArea', 'block'); }
     }
 
-    function speakWord(text, e) { if(e) { e.preventDefault(); e.stopPropagation(); } if(!text) return; window.speechSynthesis.cancel(); const msg = new SpeechSynthesisUtterance(text); msg.lang = 'en-US'; window.speechSynthesis.speak(msg); }
-    function toggleDarkMode() { document.body.classList.toggle('dark-mode'); let isDark = document.body.classList.contains('dark-mode'); let dm = document.getElementById('darkModeBtn'); if(dm) dm.innerText = isDark ? '☀️' : '🌙'; localStorage.setItem('charnishere_theme', isDark ? 'dark' : 'light'); }
-    function toggleReverseMode() { isReverseMode = !isReverseMode; let rm = document.getElementById('reverseModeBtn'); if(rm) rm.innerText = isReverseMode ? "🔄 Đảo: VI ➔ EN" : "🔄 Đảo: EN ➔ VI"; let fa = document.getElementById('flashcardApp'); if(fa && fa.style.display === 'block') updateUI_Flashcard(); }
-
-    function prepareModeSelection(choiceType) {
+    function prepareModeSelection(type) {
         setDisplay('choiceArea', 'none');
-        if (choiceType === 1) {
-            let hasStudiedAny = allData.some(w => w.isStudied); let reviewPool = [];
-            if (hasStudiedAny) { reviewPool = allData.filter(w => w.isStudied && w.nextReviewDate <= Date.now()); if(reviewPool.length === 0) { showToast("🎉 Không còn từ cần ôn hôm nay."); setDisplay('choiceArea', 'flex'); return; } reviewPool.sort((a, b) => a.nextReviewDate - b.nextReviewDate); } 
-            else { let tt = allData.filter(w => w.level.toLowerCase().includes('trọng tâm')); reviewPool = tt.length > 0 ? tt : allData; reviewPool = reviewPool.sort(() => 0.5 - Math.random()); }
-            isSrsMode = true; currentSet = reviewPool; originalGroupSet = [...currentSet];
-            let mh = document.getElementById('modeHeaderTitle'); if(mh) mh.innerText = `Ôn tập ${currentSet.length} từ`; setDisplay('modeSelectionArea', 'block');
-        } else if (choiceType === 2) {
+        if(type === 1) {
+            currentSet = allData.filter(w => w.isStudied && w.nextReviewDate <= Date.now());
+            if(currentSet.length === 0) { showToast("Hết từ cần ôn!"); setDisplay('choiceArea', 'grid'); return; }
+            isSrsMode = true; setDisplay('modeSelectionArea', 'block');
+        } else {
             isSrsMode = false; setDisplay('filterArea', 'block');
-            const um = new Map(); allData.forEach(item => { if (!um.has(item.groupKey)) um.set(item.groupKey, { groupKey: item.groupKey, dayNum: item.dayNum, levelWeight: LEVEL_ORDER[item.level] || 99, total: 0, studied: 0, mastered: 0 }); let g = um.get(item.groupKey); g.total++; if(item.isStudied) g.studied++; if(item.srsLevel >= 5) g.mastered++; });
-            let groups = Array.from(um.values()); groups.sort((a, b) => { if (a.dayNum !== b.dayNum) return a.dayNum - b.dayNum; return a.levelWeight - b.levelWeight; });
-            let gs = document.getElementById('groupSelect'); if(gs) gs.innerHTML = groups.map(g => `<option value="${g.groupKey}">${(g.total>0 && g.mastered===g.total) ? "✅ Đã thuộc" : (g.studied>0 ? "⏳ Đang học" : "⬜ Chưa học")} | ${g.groupKey}</option>`).join('');
+            let groups = [...new Set(allData.map(w => w.groupKey))];
+            setHTML('groupSelect', groups.map(g => `<option value="${g}">${g}</option>`).join(''));
         }
     }
 
-function confirmGroupSelection() {
-    let gs = document.getElementById('groupSelect');
-    let key = gs ? gs.value : "";
-    
-    // 1. Lấy dữ liệu bài học
-    currentSet = allData.filter(w => w.groupKey === key);
-    
-    // 2. Kiểm tra nếu có tích chọn "Trộn thẻ"
-    let shuffleBtn = document.getElementById('shuffleCheck');
-    let isShuffle = shuffleBtn ? shuffleBtn.checked : false;
-    
-    if (isShuffle) {
-        currentSet.sort(() => 0.5 - Math.random());
-        showToast("🔀 Đã trộn thẻ ngẫu nhiên!");
-    }
-    
-    originalGroupSet = [...currentSet];
-
-    // 3. CHUYỂN GIAO DIỆN (Đoạn quan trọng nhất)
-    if(currentSet.length > 0) {
-        // Ẩn vùng lọc bài học
-        setDisplay('filterArea', 'none');
-        
-        // Cập nhật tiêu đề cho màn hình chọn chế độ
-        let mh = document.getElementById('modeHeaderTitle');
-        if(mh) mh.innerText = isShuffle ? `${key} (Đã trộn)` : key;
-        
-        // HIỆN VÙNG CHỌN CHẾ ĐỘ (Flashcard, Quiz...)
-        setDisplay('modeSelectionArea', 'block'); 
-    } else {
-        showToast("⚠️ Bài học này chưa có từ vựng!");
-    }
-}
-function startAppMode(modeName) {
-    if(currentSet.length === 0) { showToast("Không có từ vựng nào!"); returnToMain(); return; }
-    
-    setDisplay('dashboardArea', 'none'); 
-    setDisplay('modeSelectionArea', 'none'); 
-    setDisplay('learningSpace', 'block');
-    
-    currentLearningMode = modeName; 
-    currentIndex = 0; 
-    wordsStudiedSession = 0; 
-    recentWordsForGame = [];
-
-    // Tắt hết giao diện con trước khi bật cái mới
-    setDisplay('flashcardApp', 'none'); 
-    setDisplay('typingApp', 'none');
-    setDisplay('finalQuizScreen', 'none');
-
-    if (modeName === 'flashcard') { 
-        setDisplay('flashcardApp', 'block'); 
-        setDisplay('reverseModeBtn', 'inline-block'); 
-        updateUI_Flashcard(); 
-    } 
-    else if (modeName === 'typing' || modeName === 'listening') { 
-        setDisplay('typingApp', 'block'); 
-        updateUI_Typing(); 
-    }
-    else if (modeName === 'quiz') { 
-        // Đã sửa: Dùng modeName thay vì randomMode
-        setDisplay('learningSpace', 'none'); 
-        quizQuestions = [...currentSet].sort(() => 0.5 - Math.random()); 
-        currentQuizIndex = 0;
-        gameFlowType = 'standalone';
-        renderQuizQuestion();
-    }
-    else if (modeName === 'matching') { 
-        setDisplay('learningSpace', 'none'); 
-        startStandaloneMatching(); 
-    }
-} 
-   function returnToMain() { 
-    gameFlowType = 'normal';
-    // Ẩn hết các màn hình con
-    setDisplay('quizResultScreen', 'none'); 
-    setDisplay('finalQuizScreen', 'none'); 
-    setDisplay('matchingGameScreen', 'none'); 
-    setDisplay('matchResultScreen', 'none'); 
-    setDisplay('allDoneScreen', 'none'); 
-    setDisplay('learningSpace', 'none'); 
-    setDisplay('modeSelectionArea', 'none'); 
-    setDisplay('filterArea', 'none');
-    
-    // Hiện Dashboard và 3 nút chính
-    setDisplay('dashboardArea', 'block'); 
-    setDisplay('choiceArea', 'flex'); 
-    updateStatsDashboard();
-}
-    function updateGlobalProgress() { 
-        let pb = document.getElementById('progressBar');
-        if(pb && currentSet.length > 0) pb.style.width = ((currentIndex + 1) / currentSet.length) * 100 + '%'; 
-        let pt = document.getElementById('progressText');
-        if(pt) pt.innerText = isSrsMode ? `Cần ôn: ${currentSet.length - currentIndex} từ` : `Tiến độ: ${currentIndex + 1} / ${currentSet.length} từ`; 
+    function confirmGroupSelection() {
+        let key = document.getElementById('groupSelect').value;
+        currentSet = allData.filter(w => w.groupKey === key);
+        if(document.getElementById('shuffleCheck').checked) currentSet.sort(() => 0.5 - Math.random());
+        setDisplay('filterArea', 'none'); setDisplay('modeSelectionArea', 'block');
     }
 
-    function checkNextStep(isFailed) {
-        if(isSrsMode) { if(!isFailed) currentSet.splice(currentIndex, 1); else currentSet.push(currentSet.splice(currentIndex, 1)[0]); if(currentSet.length === 0) finishLearningSession(); else routeNextUI(); } 
-        else { if(currentIndex < currentSet.length - 1) { currentIndex++; routeNextUI(); } else finishLearningSession(); }
-    }
-  function routeNextUI() {
-    // 1. Dọn dẹp: Tắt hết mọi màn hình con
-    setDisplay('flashcardApp', 'none'); 
-    setDisplay('typingApp', 'none');
-    setDisplay('finalQuizScreen', 'none');
-    setDisplay('learningSpace', 'block');
-    setDisplay('reverseModeBtn', 'none');
-
-    // 2. Điều hướng: Chế độ nào thì vào đúng màn hình đó, không ngẫu nhiên nữa
-    if (currentLearningMode === 'flashcard') {
-        setDisplay('flashcardApp', 'block');
-        setDisplay('reverseModeBtn', 'inline-block');
-        updateUI_Flashcard();
-    } 
-    else if (currentLearningMode === 'typing' || currentLearningMode === 'listening') {
-        setDisplay('typingApp', 'block');
-        updateUI_Typing();
-    }
-}
-    function finishLearningSession() { setDisplay('learningSpace', 'none'); setDisplay('matchingGameScreen', 'none'); setDisplay('allDoneScreen', 'block'); addXP(50); }
-
-    function startMidSessionGame(isFailed) {
-        gameFlowType = 'midsession'; midSessionFailedFlag = isFailed; setDisplay('learningSpace', 'none');
-        let uniqueIds = new Set(); let uniqueWords = [];
-        for(let i = recentWordsForGame.length - 1; i >= 0; i--) { if(!uniqueIds.has(recentWordsForGame[i].id)) { uniqueIds.add(recentWordsForGame[i].id); uniqueWords.push(recentWordsForGame[i]); } }
-
-        let randomChoice = Math.random() > 0.5 ? 'quiz' : 'matching';
-        if (randomChoice === 'quiz') {
-            quizQuestions = uniqueWords.sort(() => 0.5 - Math.random()); quizScore = 0; currentQuizIndex = 0; 
-            let qt = document.getElementById('quizScreenTitle'); if(qt) qt.innerText = "⏳ KIỂM TRA NHANH"; 
-            setDisplay('finalQuizScreen', 'flex'); renderQuizQuestion();
-        } else {
-            let gameWords = uniqueWords.sort(() => 0.5 - Math.random()).slice(0, 10);
-            matchingStartTime = Date.now(); matchingPairsData = gameWords;
-            setDisplay('matchingGameScreen', 'flex'); 
-            let mt = document.getElementById('matchTitle'); if(mt) mt.innerText = `🧩 ÔN TẬP NHANH (${gameWords.length} cặp)`; 
-            gameTargetScore = gameWords.length; gameMatchesFound = 0; gameSelEn = null; gameSelVi = null;
-            let arrEn = gameWords.map(w => ({ id: w.id, text: w.vocab })).sort(() => 0.5 - Math.random()); let arrVi = gameWords.map(w => ({ id: w.id, text: w.vn })).sort(() => 0.5 - Math.random());
-            const colEn = document.getElementById('colEn'); const colVi = document.getElementById('colVi'); if(colEn) colEn.innerHTML = ''; if(colVi) colVi.innerHTML = '';
-            if(colEn) arrEn.forEach(item => { let btn = document.createElement('button'); btn.type = "button"; btn.className = 'game-item'; btn.innerText = item.text; btn.onclick = function(e) { e.preventDefault(); selectGameItem(this, item.id, 'en'); }; colEn.appendChild(btn); });
-            if(colVi) arrVi.forEach(item => { let btn = document.createElement('button'); btn.type = "button"; btn.className = 'game-item'; btn.innerText = item.text; btn.onclick = function(e) { e.preventDefault(); selectGameItem(this, item.id, 'vi'); }; colVi.appendChild(btn); });
-        }
+    function startAppMode(mode) {
+        currentLearningMode = mode; currentIndex = 0;
+        setDisplay('dashboardArea', 'none'); setDisplay('learningSpace', 'block');
+        setDisplay('flashcardApp', 'none'); setDisplay('typingApp', 'none');
+        if(mode === 'flashcard') { setDisplay('flashcardApp', 'block'); updateUI_Flashcard(); }
+        else if(mode === 'typing' || mode === 'listening') { setDisplay('typingApp', 'block'); updateUI_Typing(); }
+        else if(mode === 'quiz') startStandaloneQuiz();
+        else if(mode === 'matching') startStandaloneMatching();
     }
 
-    function addXP(amount) { 
-        try {
-            studentStats.xp += amount; let dKey = getDateKey(new Date()); 
-            if(!studentStats.history) studentStats.history = {}; 
-            studentStats.history[dKey] = (studentStats.history[dKey]||0) + 1; 
-            saveStats(); checkBadges(); 
-        } catch(e) { console.error("Lỗi cộng XP", e); }
-    }
-
-    // --- BẢO VỆ FLASHCARD ---
     function updateUI_Flashcard() {
-        try {
-            if(currentSet.length === 0) return; const data = currentSet[currentIndex];
-            
-            let dv = document.getElementById('displayVocab');
-            let dtf = document.getElementById('displayTypeFront');
-            if(isReverseMode) { if(dv) dv.innerText = data.vn; if(dtf) dtf.innerText = ""; } 
-            else { if(dv) dv.innerText = data.vocab; if(dtf) dtf.innerText = data.type ? `(${data.type})` : ""; }
-            
-            let ds = document.getElementById('displaySrs'); if(ds) ds.innerText = data.srsLevel > 0 ? `Nhớ mức ${data.srsLevel}⭐` : "Mới học";
-            
-            let dvb = document.getElementById('displayVocabBack'); if(dvb) dvb.innerText = data.vocab;
-            let dtb = document.getElementById('displayTypeBack'); if(dtb) dtb.innerText = data.type ? `(${data.type})` : "";
-            let dib = document.getElementById('displayIpaBack'); if(dib) dib.innerText = data.ipa || ""; 
-            let dm = document.getElementById('displayMeaning'); if(dm) dm.innerText = data.vn || ""; 
-            let dee = document.getElementById('displayExEn'); if(dee) dee.innerText = data.exEn || ""; 
-            let dev = document.getElementById('displayExVi'); if(dev) dev.innerText = data.exVi || "";
-            
-            let dsa = document.getElementById('displaySynAnt'); if(dsa) dsa.innerText = data.synAnt || ""; 
-            setDisplay('displaySynAntContainer', data.synAnt ? 'block' : 'none');
-            
-            let dp = document.getElementById('displayPhrasal'); if(dp) dp.innerText = data.phrasal || ""; 
-            setDisplay('displayPhrasalContainer', data.phrasal ? 'block' : 'none');
-            
-            setDisplay('displayExtraBox', (data.synAnt || data.phrasal) ? 'block' : 'none');
-
-            let card = document.getElementById('card'); if(card) card.classList.remove('is-flipped'); 
-            setDisplay('flipControls', 'block'); setDisplay('ankiControls', 'none');
-            
-            let t0 = document.getElementById('time0'); if(t0) t0.innerText = "< 10p";
-            let t1 = document.getElementById('time1'); if(t1) t1.innerText = data.srsLevel === 0 ? "0 ngày" : SRS_DAYS[Math.max(1, data.srsLevel)] + " ngày";
-            let t2 = document.getElementById('time2'); if(t2) t2.innerText = SRS_DAYS[Math.min(6, data.srsLevel + 1)] + " ngày";
-            let t3 = document.getElementById('time3'); if(t3) t3.innerText = SRS_DAYS[Math.min(6, data.srsLevel + 2)] + " ngày";
-
-            updateGlobalProgress(); if(!isReverseMode) setTimeout(() => speakWord(data.vocab, null), 150);
-        } catch(e) { console.error("Lỗi Flashcard", e); showToast("Lỗi tải thẻ, vui lòng chọn lại!"); }
+        let d = currentSet[currentIndex];
+        setHTML('displayVocab', d.vocab); setHTML('displayTypeFront', `(${d.type})`);
+        setHTML('displaySrs', d.srsLevel > 0 ? `${d.srsLevel}⭐` : "Mới học");
+        setHTML('displayVocabBack', d.vocab); setHTML('displayIpaBack', d.ipa);
+        setHTML('displayMeaning', d.vn); setHTML('displayTypeBack', `(${d.type})`);
+        setHTML('displayExEn', d.exEn); setHTML('displayExVi', d.exVi);
+        setHTML('displayPhrasal', d.phrasal || "---"); setHTML('displaySynAnt', d.synAnt || "---");
+        document.getElementById('card').classList.remove('is-flipped');
+        setDisplay('flipControls', 'block'); setDisplay('ankiControls', 'none');
+        updateProgress(); speakWord(d.vocab);
     }
-    
-    function flipAndShowAnki() { let card = document.getElementById('card'); if(card) card.classList.add('is-flipped'); setDisplay('flipControls', 'none'); setDisplay('ankiControls', 'block'); if(isReverseMode) speakWord(currentSet[currentIndex].vocab, null); }
-    
+
+    function flipAndShowAnki() { document.getElementById('card').classList.add('is-flipped'); setDisplay('flipControls', 'none'); setDisplay('ankiControls', 'block'); }
+
     function rateCard(rating) {
-        addXP(5); const data = currentSet[currentIndex]; data.isStudied = true; let newLvl = data.srsLevel;
-        if(rating === 0) newLvl = 0; else if(rating === 1) newLvl = Math.max(1, newLvl); else if(rating === 2) newLvl = Math.min(6, newLvl + 1); else if(rating === 3) newLvl = Math.min(6, newLvl + 2);
-        data.srsLevel = newLvl; data.nextReviewDate = Date.now() + (SRS_DAYS[newLvl] * 24 * 60 * 60 * 1000); saveStudentData();
-        
-        recentWordsForGame.push(data); wordsStudiedSession++;
-        if(wordsStudiedSession > 0 && wordsStudiedSession % 20 === 0) { startMidSessionGame(rating === 0); } else { checkNextStep(rating === 0); }
+        let d = currentSet[currentIndex]; d.isStudied = true;
+        if(rating === 0) d.srsLevel = 0; else d.srsLevel = Math.min(6, d.srsLevel + rating);
+        d.nextReviewDate = Date.now() + (SRS_DAYS[d.srsLevel] * 86400000);
+        studentStats.xp += 5; saveStudentData(); checkBadges();
+        if(currentIndex < currentSet.length - 1) { currentIndex++; updateUI_Flashcard(); } else finishSession();
     }
 
-    // --- BẢO VỆ TYPING ---
-    function updateUI_Typing() {
-        try {
-            if(currentSet.length === 0) return; const data = currentSet[currentIndex];
-            let inputBox = document.getElementById('typingInput'); if(inputBox) { inputBox.value = ''; inputBox.className = 'typing-input-box'; inputBox.disabled = false; }
-            setDisplay('typingCheckBtn', 'inline-block'); setDisplay('typingNextBtn', 'none'); setDisplay('typingInfoBox', 'none');
-            
-            let tat = document.getElementById('typingAppTitle');
-            let tpt = document.getElementById('typingPromptText');
-            let tht = document.getElementById('typingHintText');
-            
-            if (currentLearningMode === 'listening') { 
-                if(tat) tat.innerText = "🎧 Luyện Nghe Từ Vựng"; setDisplay('typingAudioBtn', 'inline-flex'); 
-                if(tpt) tpt.innerText = "???"; if(tht) tht.innerText = `Gợi ý: Từ này có ${data.vocab.length} chữ cái.`; 
-                setTimeout(() => speakWord(data.vocab, null), 200); 
-            } else { 
-                if(tat) tat.innerText = "⌨️ Luyện Gõ Từ Vựng"; setDisplay('typingAudioBtn', 'none'); 
-                if(tpt) tpt.innerText = data.vn || ""; if(tht) tht.innerText = data.type ? `(${data.type})` : "Viết chính xác từ tiếng Anh."; 
-            }
-            updateGlobalProgress(); setTimeout(() => { if(inputBox) inputBox.focus(); }, 100);
-        } catch(e) { console.error(e); }
-    }
-    function checkTypingAnswer() {
-        let cb = document.getElementById('typingCheckBtn'); if(cb && cb.style.display === 'none') return;
-        const data = currentSet[currentIndex]; let inputBox = document.getElementById('typingInput'); 
-        let inputVal = inputBox ? inputBox.value.trim().toLowerCase() : ""; let targetVal = data.vocab.trim().toLowerCase();
-        if(inputBox) inputBox.disabled = true; setDisplay('typingCheckBtn', 'none'); speakWord(data.vocab, null);
-        
-        let tiv = document.getElementById('typingInfoVocab'); if(tiv) tiv.innerText = data.vocab || ""; 
-        let tit = document.getElementById('typingInfoType'); if(tit) tit.innerText = data.type ? `(${data.type})` : ""; 
-        let tii = document.getElementById('typingInfoIpa'); if(tii) tii.innerText = data.ipa || ""; 
-        let tim = document.getElementById('typingInfoMeaning'); if(tim) tim.innerText = data.vn || ""; 
-        let tiee = document.getElementById('typingInfoExEn'); if(tiee) tiee.innerText = data.exEn || ""; 
-        let tiev = document.getElementById('typingInfoExVi'); if(tiev) tiev.innerText = data.exVi || ""; 
-        
-        let tisa = document.getElementById('typingInfoSynAnt'); if(tisa) tisa.innerText = data.synAnt || ""; 
-        setDisplay('typingSynAntContainer', data.synAnt ? 'block' : 'none');
-        let tip = document.getElementById('typingInfoPhrasal'); if(tip) tip.innerText = data.phrasal || ""; 
-        setDisplay('typingPhrasalContainer', data.phrasal ? 'block' : 'none');
-        setDisplay('typingExtraBox', (data.synAnt || data.phrasal) ? 'block' : 'none');
-
-        setDisplay('typingInfoBox', 'block'); setDisplay('typingNextBtn', 'inline-flex');
-        
-        if (inputVal === targetVal) { if(inputBox) inputBox.classList.add('correct'); addXP(currentLearningMode==='listening' ? 15 : 10); data.isStudied = true; data.srsLevel = Math.min(6, data.srsLevel + 1); } 
-        else { if(inputBox) { inputBox.classList.add('wrong'); inputBox.value = data.vocab; } data.isStudied = true; data.srsLevel = 0; currentSet.push(data); }
-        data.nextReviewDate = Date.now() + (SRS_DAYS[data.srsLevel] * 24 * 60 * 60 * 1000); saveStudentData(); 
-        let btn = document.getElementById('typingNextBtn'); if(btn) btn.focus();
-    }
-    function nextTypingWord() { 
-        recentWordsForGame.push(currentSet[currentIndex]); wordsStudiedSession++;
-        if(wordsStudiedSession > 0 && wordsStudiedSession % 20 === 0) { startMidSessionGame(false); } else { checkNextStep(false); }
+    function updateProgress() {
+        let p = ((currentIndex + 1) / currentSet.length) * 100;
+        document.getElementById('progressBar').style.width = p + "%";
+        document.getElementById('progressText').innerText = `${currentIndex + 1} / ${currentSet.length}`;
     }
 
-    // --- MATCHING GAME ---
+    function finishSession() { setDisplay('learningSpace', 'none'); setDisplay('dashboardArea', 'block'); setDisplay('modeSelectionArea', 'none'); setDisplay('choiceArea', 'grid'); showToast("Hoàn thành bài học!"); }
+    function returnToMain() { location.reload(); }
+    function toggleDarkMode() { document.body.classList.toggle('dark-mode'); localStorage.setItem('charnishere_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); }
+    function speakWord(t) { window.speechSynthesis.cancel(); let m = new SpeechSynthesisUtterance(t); m.lang = 'en-US'; window.speechSynthesis.speak(m); }
+
+    function openProfile() {
+        setDisplay('profileModal', 'flex'); let lvl = calculateLevel(studentStats.xp);
+        document.getElementById('profXP').innerText = studentStats.xp;
+        document.getElementById('profLevelTitle').innerText = lvl.title;
+        document.getElementById('profXpBar').style.width = (studentStats.xp/lvl.next)*100 + "%";
+        const badgeList = ['streak3', 'vocab50', 'xp1000', 'night'];
+        badgeList.forEach(b => { if(studentStats.badges.includes(b)) document.getElementById(`badge_${b}`).classList.add('unlocked'); });
+    }
+    function closeProfile() { setDisplay('profileModal', 'none'); }
+
+    function checkBadges() {
+        if(studentStats.xp >= 1000 && !studentStats.badges.includes('xp1000')) { studentStats.badges.push('xp1000'); showToast("Huy hiệu mới: Ngôi Sao!"); }
+        saveStats();
+    }
+
+    /* MATCHING FIX */
     function startStandaloneMatching() {
-        gameFlowType = 'standalone';
-        let gameWords = [...currentSet].sort(() => 0.5 - Math.random()).slice(0, 10); if(gameWords.length === 0) return returnToMain();
-        matchingStartTime = Date.now(); matchingPairsData = gameWords;
-        setDisplay('matchingGameScreen', 'flex'); 
-        let mt = document.getElementById('matchTitle'); if(mt) mt.innerText = `🧩 Nối Từ (${gameWords.length} cặp)`; 
-        gameTargetScore = gameWords.length; gameMatchesFound = 0; gameSelEn = null; gameSelVi = null;
-        let arrEn = gameWords.map(w => ({ id: w.id, text: w.vocab })).sort(() => 0.5 - Math.random()); let arrVi = gameWords.map(w => ({ id: w.id, text: w.vn })).sort(() => 0.5 - Math.random());
-        const colEn = document.getElementById('colEn'); const colVi = document.getElementById('colVi'); if(colEn) colEn.innerHTML = ''; if(colVi) colVi.innerHTML = '';
-        
-        if(colEn) arrEn.forEach(item => { let btn = document.createElement('button'); btn.type = "button"; btn.className = 'game-item'; btn.innerText = item.text; btn.onclick = function(e) { e.preventDefault(); selectGameItem(this, item.id, 'en'); }; colEn.appendChild(btn); });
-        if(colVi) arrVi.forEach(item => { let btn = document.createElement('button'); btn.type = "button"; btn.className = 'game-item'; btn.innerText = item.text; btn.onclick = function(e) { e.preventDefault(); selectGameItem(this, item.id, 'vi'); }; colVi.appendChild(btn); });
+        matchingPairsData = [...currentSet].sort(()=>0.5-Math.random()).slice(0,10);
+        matchingStartTime = Date.now(); gameMatchesFound = 0;
+        setDisplay('matchingGameScreen', 'flex');
+        const colEn = document.getElementById('colEn'); const colVi = document.getElementById('colVi');
+        colEn.innerHTML = ''; colVi.innerHTML = '';
+        matchingPairsData.forEach(w => {
+            let bEn = document.createElement('button'); bEn.className = 'choice-btn'; bEn.innerText = w.vocab;
+            bEn.onclick = () => { if(gameSelEn) gameSelEn.style.borderColor = 'var(--primary)'; gameSelEn = bEn; bEn.style.borderColor = 'var(--info)'; checkMatch(w.id); };
+            colEn.appendChild(bEn);
+            let bVi = document.createElement('button'); bVi.className = 'choice-btn'; bVi.innerText = w.vn;
+            bVi.onclick = () => { if(gameSelVi) gameSelVi.style.borderColor = 'var(--primary)'; gameSelVi = bVi; bVi.style.borderColor = 'var(--info)'; checkMatch(w.id); };
+            colVi.appendChild(bVi);
+        });
     }
 
-    function selectGameItem(element, id, type) {
-        if(element.classList.contains('selected')) { element.classList.remove('selected'); if(type === 'en') gameSelEn = null; else gameSelVi = null; return; }
-        if(type === 'en') { if(gameSelEn) gameSelEn.classList.remove('selected'); gameSelEn = element; gameSelEn.dataset.id = id; } else { if(gameSelVi) gameSelVi.classList.remove('selected'); gameSelVi = element; gameSelVi.dataset.id = id; }
-        element.classList.add('selected');
-        
+    function checkMatch(id) {
         if(gameSelEn && gameSelVi) {
-            if(gameSelEn.dataset.id === gameSelVi.dataset.id) {
-                gameSelEn.classList.add('matched'); gameSelVi.classList.add('matched'); gameMatchesFound++; addXP(10);
-                let w = allData.find(x => x.id === id);
-                if(w) { speakWord(w.vocab, null); }
-                gameSelEn = null; gameSelVi = null; 
-                if(gameMatchesFound >= gameTargetScore) { setTimeout(() => { showMatchingResultScreen(); }, 800); }
-            } else {
-                gameSelEn.classList.add('wrong'); gameSelVi.classList.add('wrong'); let tempEn = gameSelEn; let tempVi = gameSelVi; gameSelEn = null; gameSelVi = null; setTimeout(() => { tempEn.classList.remove('selected', 'wrong'); tempVi.classList.remove('selected', 'wrong'); }, 400);
-            }
+            let enId = matchingPairsData.find(x => x.vocab === gameSelEn.innerText).id;
+            let viId = matchingPairsData.find(x => x.vn === gameSelVi.innerText).id;
+            if(enId === viId) {
+                gameSelEn.style.visibility = 'hidden'; gameSelVi.style.visibility = 'hidden';
+                gameMatchesFound++; gameSelEn = null; gameSelVi = null;
+                if(gameMatchesFound === matchingPairsData.length) showMatchingResultScreen();
+            } else { gameSelEn = null; gameSelVi = null; showToast("Sai rồi!"); }
         }
     }
 
-function showMatchingResultScreen() {
-    setDisplay('matchingGameScreen', 'none'); 
-    setDisplay('matchResultScreen', 'flex');
-    
-    let timeTaken = Math.floor((Date.now() - matchingStartTime) / 1000);
-    let mrt = document.getElementById('matchResultTime'); 
-    if(mrt) mrt.innerText = `Hoàn thành trong: ${timeTaken} giây`;
-    
-    setHTML('matchResultList', matchingPairsData.map(w => `
-        <div class="review-item correct" style="background-color: #FFF8E7; border: 1px solid #FFB6C1;">
-            <p style="font-size: 18px; margin:0 0 5px 0; color: #121212 !important; font-weight:900;">
-                <b>${w.vocab}</b> 
-                <span style="color: #555555 !important; font-size:15px; font-weight:700;">${w.ipa || ""}</span> 
-                <span style="color: #D81B60; font-size:15px;">${w.type ? '(' + w.type + ')' : ''}</span>
-            </p>
-            <p style="margin:0; color: #222222 !important; font-weight:800; font-size: 16px;">${w.vn || ""}</p>
-        </div>
-    `).join(''));
-
-    let returnBtn = document.getElementById('matchResultBtn');
-    if(returnBtn) {
-        if (gameFlowType === 'midsession') {
-            returnBtn.onclick = () => { 
-                setDisplay('matchResultScreen', 'none'); 
-                setDisplay('learningSpace', 'block'); 
-                recentWordsForGame = []; 
-                checkNextStep(midSessionFailedFlag); 
-            };
-        } else {
-            returnBtn.onclick = () => { 
-                setDisplay('matchResultScreen', 'none'); 
-                finishLearningSession(); 
-            };
-        }
+    function showMatchingResultScreen() {
+        setDisplay('matchingGameScreen', 'none'); setDisplay('matchResultScreen', 'flex');
+        document.getElementById('matchResultTime').innerText = `Xong trong ${Math.floor((Date.now()-matchingStartTime)/1000)}s`;
+        setHTML('matchResultList', matchingPairsData.map(w => `<div class="review-item"><b>${w.vocab}</b>: ${w.vn}</div>`).join(''));
+        document.getElementById('matchResultBtn').onclick = finishSession;
     }
-}
-    function forceExitMatching() { setDisplay('matchingGameScreen', 'none'); if(gameFlowType === 'midsession') { setDisplay('learningSpace', 'block'); recentWordsForGame = []; checkNextStep(midSessionFailedFlag); } else if (gameFlowType === 'standalone') { returnToMain(); } }
 
-    // --- QUIZ TRẮC NGHIỆM ---
     function startStandaloneQuiz() {
-        gameFlowType = 'standalone';
-        quizQuestions = [...currentSet].sort(() => 0.5 - Math.random()); if(quizQuestions.length === 0) return returnToMain();
-        quizScore = 0; currentQuizIndex = 0; 
-        let qs = document.getElementById('quizScreenTitle'); if(qs) qs.innerText = `📝 TRẮC NGHIỆM`; 
-        setDisplay('finalQuizScreen', 'flex'); renderQuizQuestion();
-    }
-    
-    function startWarmupGame() {
-        gameFlowType = 'warmup';
-        let now = Date.now(); let hasStudiedAny = allData.some(w => w.isStudied); let warmupPool = [];
-        if (hasStudiedAny) warmupPool = allData.filter(w => w.isStudied && w.nextReviewDate <= now); else { let tt = allData.filter(w => w.level.toLowerCase().includes('trọng tâm')); warmupPool = tt.length > 0 ? tt : allData; }
-        quizQuestions = warmupPool.sort(() => 0.5 - Math.random()).slice(0, 20);
-        if (quizQuestions.length > 0 && !hasDoneWarmup) { hasDoneWarmup = true; setDisplay('dashboardArea', 'none'); quizScore = 0; currentQuizIndex = 0; let qs = document.getElementById('quizScreenTitle'); if(qs) qs.innerText = "🔥 KHỞI ĐỘNG"; setDisplay('finalQuizScreen', 'flex'); renderQuizQuestion(); } 
-        else { setDisplay('dashboardArea', 'block'); updateStatsDashboard(); setDisplay('choiceArea', 'flex'); setDisplay('filterArea', 'none'); setDisplay('modeSelectionArea', 'none'); }
+        quizQuestions = [...currentSet].sort(()=>0.5-Math.random()).slice(0,20);
+        quizScore = 0; currentQuizIndex = 0; setDisplay('finalQuizScreen', 'flex'); renderQuizQuestion();
     }
 
     function renderQuizQuestion() {
-        try {
-            const data = quizQuestions[currentQuizIndex]; 
-            let qpt = document.getElementById('quizProgressText'); if(qpt) qpt.innerText = `Câu ${currentQuizIndex + 1} / ${quizQuestions.length}`;
-            setDisplay('quizInfoBox', 'none'); setDisplay('quizNextBtn', 'none');
-            
-            let qTypes = ['meaning', 'fill']; let selectedType = qTypes[Math.floor(Math.random() * qTypes.length)]; if (!data.exEn) selectedType = 'meaning';
-            let questionHTML = ""; let hintHTML = "";
-            if (selectedType === 'fill') { questionHTML = data.exEn.replace(new RegExp(data.vocab.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "gi"), " <span class='blank'>_____</span> "); hintHTML = data.exVi || ""; } 
-            else { questionHTML = `Chọn từ vựng có nghĩa là: <br><span class='blank' style='font-size: 28px;'>${data.vn || ""}</span>`; hintHTML = ""; }
-            setHTML('finalQuizSentence', questionHTML); setHTML('finalQuizVi', hintHTML);
-            
-            let uniqueOtherWords = [...new Set(allData.map(w => w.vocab))].filter(v => v !== data.vocab).sort(() => 0.5 - Math.random());
-            let options = [data.vocab].concat(uniqueOtherWords.slice(0, 3)).sort(() => 0.5 - Math.random());
-            const optionsArea = document.getElementById('finalQuizOptions'); if(optionsArea) optionsArea.innerHTML = ''; let answered = false;
-            
-            options.forEach(opt => {
-                const btn = document.createElement('button'); btn.type = "button"; btn.className = 'quiz-btn'; btn.innerText = opt;
-                btn.onclick = (e) => {
-                    e.preventDefault(); e.stopPropagation(); if(answered) return; answered = true; data.userAnswer = opt; data.isCorrect = (opt === data.vocab);
-                    
-                    if(optionsArea) Array.from(optionsArea.children).forEach(b => { b.disabled = true; b.style.opacity = 0.5; }); btn.style.opacity = 1;
-                    
-                    if(data.isCorrect) { btn.classList.add('correct-ans'); quizScore++; data.srsLevel = Math.min(6, data.srsLevel+1); } 
-                    else { btn.classList.add('wrong-ans'); data.srsLevel = 0; }
-                    data.isStudied = true; data.nextReviewDate = Date.now() + (SRS_DAYS[data.srsLevel]*24*60*60*1000); saveStudentData(); 
-                    
-                    let qiv = document.getElementById('quizInfoVocab'); if(qiv) qiv.innerText = data.vocab || ""; 
-                    let qit = document.getElementById('quizInfoType'); if(qit) qit.innerText = data.type ? `(${data.type})` : "";
-                    let sqb = document.getElementById('quizSpeakBtn'); if(sqb) sqb.onclick = (e) => speakWord(data.vocab, e); 
-                    let qii = document.getElementById('quizInfoIpa'); if(qii) qii.innerText = data.ipa || ""; 
-                    let qim = document.getElementById('quizInfoMeaning'); if(qim) qim.innerText = data.vn || ""; 
-                    let qiee = document.getElementById('quizInfoExEn'); if(qiee) qiee.innerText = data.exEn || ""; 
-                    let qiev = document.getElementById('quizInfoExVi'); if(qiev) qiev.innerText = data.exVi || ""; 
-                    
-                    let qisa = document.getElementById('quizInfoSynAnt'); if(qisa) qisa.innerText = data.synAnt || ""; 
-                    setDisplay('quizSynAntContainer', data.synAnt ? 'block' : 'none');
-                    let qip = document.getElementById('quizInfoPhrasal'); if(qip) qip.innerText = data.phrasal || ""; 
-                    setDisplay('quizPhrasalContainer', data.phrasal ? 'block' : 'none');
-                    setDisplay('quizExtraBox', (data.synAnt || data.phrasal) ? 'block' : 'none');
-
-                    setDisplay('quizInfoBox', 'block'); setDisplay('quizNextBtn', 'inline-flex'); speakWord(data.vocab, null);
-                }; 
-                if(optionsArea) optionsArea.appendChild(btn);
-            });
-        } catch(e) { console.error(e); }
+        let d = quizQuestions[currentQuizIndex];
+        document.getElementById('quizProgressText').innerText = `Câu ${currentQuizIndex+1}/${quizQuestions.length}`;
+        document.getElementById('finalQuizSentence').innerText = `Từ nào nghĩa là: ${d.vn}?`;
+        let opts = [d.vocab, ...allData.filter(x=>x.id!==d.id).sort(()=>0.5-Math.random()).slice(0,3).map(x=>x.vocab)].sort(()=>0.5-Math.random());
+        setHTML('finalQuizOptions', opts.map(o => `<button class="choice-btn" onclick="checkQuiz('${o}')">${o}</button>`).join(''));
     }
 
-    function nextQuizQuestion() {
-    currentQuizIndex++;
-    if(currentQuizIndex < quizQuestions.length) {
-        renderQuizQuestion();
-    } else {
-        // KHI HẾT CÂU HỎI: Luôn hiện màn hình kết quả
-        try {
-            setDisplay('finalQuizScreen', 'none'); 
-            setDisplay('quizResultScreen', 'flex');
-            
-            let xp = quizScore * 10; 
-            addXP(xp); 
-            
-            let qst = document.getElementById('quizScoreText'); 
-            if(qst) qst.innerText = `Điểm: ${quizScore}/${quizQuestions.length} câu`; 
-            
-            let qxr = document.getElementById('quizXPReward'); 
-            if(qxr) qxr.innerText = `Thưởng: +${xp} XP`;
-            
-            setHTML('quizReviewList', quizQuestions.map((q, i) => `
-                <div class="review-item ${q.isCorrect ? 'correct' : 'incorrect'}">
-                    <p style="font-size: 18px; margin: 0 0 5px 0; font-weight:800;">
-                        <b>Câu ${i + 1}:</b> Nghĩa: ${q.vn||""}
-                    </p>
-                    <div style="margin-top: 5px; font-size: 16px;">
-                        <span>Đáp án đúng: <b style="color: var(--success);">${q.vocab||""}</b></span><br>
-                        <span>Bạn chọn: <b style="color: ${q.isCorrect ? 'var(--success)' : 'var(--danger)'};">${q.userAnswer||""}</b> ${q.isCorrect ? '✔️' : '❌'}</span>
-                    </div>
-                </div>`).join(''));
-            
-            let returnBtn = document.getElementById('quizResultReturnBtn');
-            if(returnBtn) {
-                if (gameFlowType === 'midsession') {
-                    returnBtn.onclick = () => { 
-                        setDisplay('quizResultScreen', 'none'); 
-                        setDisplay('learningSpace', 'block'); 
-                        recentWordsForGame = []; 
-                        checkNextStep(midSessionFailedFlag); 
-                    };
-                } else if (gameFlowType === 'warmup') {
-                    returnBtn.onclick = () => { 
-                        setDisplay('quizResultScreen', 'none'); 
-                        setDisplay('dashboardArea', 'block'); 
-                        setDisplay('choiceArea', 'flex'); 
-                        updateStatsDashboard(); 
-                    };
-                } else { 
-                    returnBtn.onclick = () => returnToMain(); 
-                }
-            }
-        } catch(e) { 
-            console.error("Lỗi hiển thị kết quả Quiz:", e); 
-            returnToMain(); 
+    function checkQuiz(o) {
+        let d = quizQuestions[currentQuizIndex];
+        if(o === d.vocab) { quizScore++; showToast("Đúng!"); } else showToast("Sai rồi!");
+        if(currentQuizIndex < quizQuestions.length -1) { currentQuizIndex++; renderQuizQuestion(); }
+        else {
+            setDisplay('finalQuizScreen', 'none'); setDisplay('quizResultScreen', 'flex');
+            document.getElementById('quizScoreText').innerText = `${quizScore}/${quizQuestions.length}`;
+            finishSession();
         }
     }
-}
-    // --- BẢO VỆ TẢI DỮ LIỆU ---
-    async function fetchDataFromGoogleSheets(isManualSync) {
-        if (GOOGLE_SHEET_URL === "DÁN_LINK_TỪ_VỰNG_CỦA_BẠN_VÀO_ĐÂY") { setDisplay('loadingArea', 'none'); setDisplay('dashboardArea', 'block'); if (allData.length > 0) { if(isManualSync) showToast("Dán link Google Sheets Từ Vựng để đồng bộ!"); if(!isManualSync) startWarmupGame(); } return; }
-        setDisplay('dashboardArea', 'none'); setDisplay('loadingArea', 'block');
-        try { 
-            const response = await fetch(GOOGLE_SHEET_URL); 
-            if (!response.ok) throw new Error("Lỗi fetch");
-            const csvText = await response.text(); 
-            processCloudData(csvText, isManualSync); 
-        } catch (error) { 
-            console.error(error); setDisplay('loadingArea', 'none'); setDisplay('dashboardArea', 'block'); 
-            if(isManualSync) showToast("Lỗi mạng hoặc File bị khóa!"); 
-            if (allData.length > 0 && !isManualSync) startWarmupGame(); 
-        }
-    }
-    
-    function processCloudData(csvText, isManualSync) {
-        try {
-            const rows = parseCSVData(csvText); if (rows.length < 2) { showToast("File trống hoặc sai định dạng!"); returnToMain(); return; }
-            let newDataMap = new Map();
-            for(let i = 1; i < rows.length; i++) {
-                const cols = rows[i]; if (!cols || cols.length < 3 || !cols[2]) continue; let vocab = cols[2]; let groupKey = `Ngày ${cols[0] || '1'} - ${cols[1] || 'Cơ bản'}`;
-                newDataMap.set(groupKey + "_" + vocab, { id: `W_${Date.now()}_${i}`, dayNum: parseInt(cols[0]) || 0, level: cols[1] || 'Cơ bản', groupKey: groupKey, vocab: vocab, ipa: cols[3]||'', type: cols[4]||'', vn: cols[5]||'', exEn: cols[6]||'', exVi: cols[7]||'', phrasal: cols[8]||'', synAnt: cols[9]||'', isStudied: false, srsLevel: 0, nextReviewDate: Date.now() });
-            }
-            if (allData && allData.length > 0) { allData.forEach(o => { if (newDataMap.has(o.groupKey + "_" + o.vocab)) { let n = newDataMap.get(o.groupKey + "_" + o.vocab); n.isStudied = o.isStudied; n.srsLevel = o.srsLevel; n.nextReviewDate = o.nextReviewDate; n.id = o.id; } }); }
-            allData = Array.from(newDataMap.values()); saveStudentData(); setDisplay('loadingArea', 'none'); setDisplay('dashboardArea', 'block');
-            if (isManualSync) { showToast(`✅ Đã nạp thành công ${allData.length} từ!`); returnToMain(); } else startWarmupGame(); 
-        } catch(e) { console.error(e); showToast("Lỗi giải mã file!"); returnToMain(); }
-    }
-
-    function openDeviceSyncModal() { setDisplay('deviceSyncModal', 'flex'); }
-    function closeDeviceSyncModal() { setDisplay('deviceSyncModal', 'none'); let ec = document.getElementById('exportCodeArea'); let ic = document.getElementById('importCodeArea'); if(ec) ec.value = ""; if(ic) ic.value = ""; }
-    function generateSyncCode() { let compactProgress = allData.filter(w => w.isStudied).map(w => [w.groupKey + "|||" + w.vocab, w.srsLevel, w.nextReviewDate]); let ec = document.getElementById('exportCodeArea'); if(ec) ec.value = btoa(unescape(encodeURIComponent(JSON.stringify({ s: studentStats, p: compactProgress })))); }
-    function copySyncCode() { let ct = document.getElementById("exportCodeArea"); if(!ct || !ct.value) return showToast("Bấm Lấy Mã trước!"); ct.select(); document.execCommand("copy"); showToast("✅ Đã chép!"); }
-    function importSyncCode() { let ic = document.getElementById('importCodeArea'); let code = ic ? ic.value.trim() : ""; if(!code) return showToast("Dán mã vào ô!"); try { let payload = JSON.parse(decodeURIComponent(escape(atob(code)))); if(payload.s) { studentStats = payload.s; saveStats(); } if(payload.p && Array.isArray(payload.p)) { let iMap = new Map(); payload.p.forEach(item => { iMap.set(item[0], { lvl: item[1], nxt: item[2] }); }); allData.forEach(w => { let key = w.groupKey + "|||" + w.vocab; if(iMap.has(key)) { let imp = iMap.get(key); w.isStudied = true; w.srsLevel = imp.lvl; w.nextReviewDate = imp.nxt; } }); saveStudentData(); } showToast("🎉 Thành công!"); setTimeout(()=>location.reload(), 1000); } catch(e) { showToast("❌ Mã lỗi."); } }
-    
-    function openProfile() {
-        setDisplay('profileModal', 'flex'); let lvlInfo = calculateLevel(studentStats.xp);
-        let plt = document.getElementById('profLevelTitle'); if(plt) plt.innerText = `${lvlInfo.title} (Lv.${lvlInfo.lv})`; 
-        let px = document.getElementById('profXP'); if(px) px.innerText = studentStats.xp;
-        let bar = document.getElementById('profXpBar'); if(bar) bar.style.width = `${(lvlInfo.lv === 5 ? 100 : Math.floor((studentStats.xp / lvlInfo.next) * 100))}%`; 
-        let pxn = document.getElementById('profXpNext'); if(pxn) pxn.innerText = lvlInfo.lv === 5 ? "Cấp độ Tối đa!" : `Cần ${lvlInfo.next} XP để lên cấp`;
-        
-        let chartArea = document.getElementById('historyChartArea'); if(chartArea) chartArea.innerHTML = ""; let today = new Date(); let maxTime = 1;
-        for(let i = 6; i >= 0; i--) { let d = new Date(); d.setDate(today.getDate() - i); let t = (studentStats.timeHistory && studentStats.timeHistory[getDateKey(d)]) ? studentStats.timeHistory[getDateKey(d)] : 0; if(t > maxTime) maxTime = t; }
-        maxTime = Math.max(1, maxTime);
-        
-        for(let i = 6; i >= 0; i--) {
-            let d = new Date(); d.setDate(today.getDate() - i); let t = (studentStats.timeHistory && studentStats.timeHistory[getDateKey(d)]) ? studentStats.timeHistory[getDateKey(d)] : 0; 
-            let hp = (t / maxTime) * 100; if (hp < 5 && t > 0) hp = 5; 
-            let emptyClass = (t === 0) ? ' empty' : '';
-            if(chartArea) chartArea.innerHTML += `<div class="history-bar-wrapper" onclick="showChartDetail('${d.toLocaleDateString('vi-VN')}', '${formatTime(t)}')"><div class="history-bar${emptyClass}" style="height: ${hp}%"></div><div class="history-day">${d.toLocaleDateString('vi-VN', {weekday: 'short'})}</div></div>`;
-        }
-        
-        ['streak3', 'vocab50', 'xp1000', 'night'].forEach(b => { 
-            let el = document.getElementById(`badge_${b}`); 
-            if(studentStats.badges && studentStats.badges.includes(b) && el) el.classList.add('unlocked'); 
-        });
-    }
-    function showChartDetail(dateStr, timeStr) { let cd = document.getElementById('chartDetailText'); if(cd) cd.innerText = `Ngày ${dateStr}: Đã học ${timeStr}`; }
-    function closeProfile() { setDisplay('profileModal', 'none'); }
-    
 </script>
 
 </body>
