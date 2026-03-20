@@ -300,7 +300,15 @@
                     </button>
                 </div>
             </div>
-
+            <div id="setSelectionArea" style="display:none; text-align: center; margin-top: 20px;">
+                <h3 style="color: var(--primary); font-weight: 900; font-size: 20px;">Chọn bộ từ vựng</h3>
+                
+                <div id="vocabSetGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-height: 50vh; overflow-y: auto; padding: 5px; margin-bottom: 15px;"></div>
+                
+                <div style="display: flex; justify-content: center; margin-top: 15px;">
+                    <button class="nav-arrow" onclick="backFromSetSelection()">&#10094;</button>
+                </div>
+            </div>
             <div id="filterArea" style="display:none; text-align: center; margin-top: 20px;">
                 <h3 style="color: var(--primary); font-weight: 900; font-size: 20px;">Chọn bài học</h3>
                 
@@ -978,26 +986,43 @@
             else if (grammarReviewPool.length > 0) { startReviewGrammar(); }
 
         } else if (choiceType === 2) {
-            isSrsMode = false; setDisplay('filterArea', 'block');
-            const um = new Map(); allData.forEach(item => { if (!um.has(item.groupKey)) um.set(item.groupKey, { groupKey: item.groupKey, dayNum: item.dayNum, levelWeight: LEVEL_ORDER[item.level] || 99, total: 0, studied: 0, mastered: 0 }); let g = um.get(item.groupKey); g.total++; if(item.isStudied) g.studied++; if(item.srsLevel >= 5) g.mastered++; });
-            let groups = Array.from(um.values()); groups.sort((a, b) => { if (a.dayNum !== b.dayNum) return a.dayNum - b.dayNum; return a.levelWeight - b.levelWeight; });
-            let vGrid = document.getElementById('vocabGroupGrid');
+            isSrsMode = false; 
+            setDisplay('choiceArea', 'none');
+            setDisplay('setSelectionArea', 'block'); // Mở màn hình chọn Bộ
+
+            // Gom nhóm toàn bộ từ vựng theo Level (Bộ từ vựng)
+            const um = new Map(); 
+            allData.forEach(item => { 
+                if (!um.has(item.level)) um.set(item.level, { levelName: item.level, levelWeight: LEVEL_ORDER[item.level] || 99, total: 0, studied: 0, mastered: 0 }); 
+                let g = um.get(item.level); 
+                g.total++; 
+                if(item.isStudied) g.studied++; 
+                if(item.srsLevel >= 5) g.mastered++; 
+            });
+            let groups = Array.from(um.values()); 
+            groups.sort((a, b) => a.levelWeight - b.levelWeight); 
+            
+            let vGrid = document.getElementById('vocabSetGrid');
             if (vGrid) {
                 vGrid.innerHTML = '';
                 groups.forEach(g => {
-                    let statusIcon = (g.total>0 && g.mastered===g.total) ? "✅ Đã thuộc" : (g.studied>0 ? "⏳ Đang học" : "⬜ Chưa học");
+                    let statusIcon = (g.total>0 && g.mastered===g.total) ? "✅ Hoàn thành" : (g.studied>0 ? "⏳ Đang học" : "⬜ Chưa học");
                     let btn = document.createElement('button');
-                    btn.style.cssText = "background: var(--card-bg); color: var(--text-main); border: 2px solid var(--primary); border-radius: 15px; padding: 12px 5px; font-family: 'Nunito', sans-serif; cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.2s;";
-                    btn.onmouseover = () => { btn.style.backgroundColor = "var(--primary)"; btn.style.color = "white"; };
+                    btn.style.cssText = "background: var(--card-bg); color: var(--text-main); border: 2px solid var(--warning); border-radius: 15px; padding: 15px 5px; font-family: 'Nunito', sans-serif; cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.2s; box-shadow: 0 4px 10px rgba(255,213,79,0.2);";
+                    btn.onmouseover = () => { btn.style.backgroundColor = "var(--warning)"; btn.style.color = "#222"; };
                     btn.onmouseout = () => { btn.style.backgroundColor = "var(--card-bg)"; btn.style.color = "var(--text-main)"; };
-                    btn.innerHTML = `<span style="font-size: 13px; margin-bottom: 5px; font-weight: 800;">${statusIcon}</span><span style="font-weight: 900; font-size: 15px; line-height: 1.3;">${g.groupKey}</span>`;
-                    btn.onclick = () => confirmGroupSelection(g.groupKey);
+                    btn.innerHTML = `
+                        <span style="font-size: 13px; margin-bottom: 5px; font-weight: 800;">${statusIcon}</span>
+                        <span style="font-weight: 900; font-size: 16px; line-height: 1.3;">${g.levelName}</span>
+                        <span style="font-size: 11px; margin-top: 5px; font-weight: 700; opacity: 0.8;">📚 ${g.total} từ</span>
+                    `;
+                    // Bấm vào Bộ nào thì mở danh sách Bài học của Bộ đó
+                    btn.onclick = () => openVocabSet(g.levelName);
                     vGrid.appendChild(btn);
                 });
             }
         }
     }
-
     function selectVocabReview() {
         isSrsMode = true; currentSet = window.tempDueVocab; originalGroupSet = [...currentSet];
         setText('modeHeaderTitle', `Ôn tập ${currentSet.length} từ`);
@@ -1014,20 +1039,81 @@
         startGrammarTimer(); renderGrammarQuestion();
     }
 
+    // Hàm mở danh sách bài học bên trong 1 Bộ từ vựng
+    function openVocabSet(selectedLevel) {
+        setDisplay('setSelectionArea', 'none');
+        setDisplay('filterArea', 'block');
+
+        // Lọc ra các từ thuộc Bộ vừa chọn, sau đó gom theo Bài học (Ngày)
+        let levelData = allData.filter(item => item.level === selectedLevel);
+        const um = new Map(); 
+        levelData.forEach(item => { 
+            if (!um.has(item.groupKey)) um.set(item.groupKey, { groupKey: item.groupKey, dayNum: item.dayNum, total: 0, studied: 0, mastered: 0 }); 
+            let g = um.get(item.groupKey); 
+            g.total++; if(item.isStudied) g.studied++; if(item.srsLevel >= 5) g.mastered++; 
+        });
+        
+        let groups = Array.from(um.values()); 
+        groups.sort((a, b) => a.dayNum - b.dayNum); 
+        
+        let vGrid = document.getElementById('vocabGroupGrid');
+        if (vGrid) {
+            vGrid.innerHTML = '';
+            groups.forEach(g => {
+                let statusIcon = (g.total>0 && g.mastered===g.total) ? "✅ Đã thuộc" : (g.studied>0 ? "⏳ Đang học" : "⬜ Chưa học");
+                let btn = document.createElement('button');
+                btn.style.cssText = "background: var(--card-bg); color: var(--text-main); border: 2px solid var(--primary); border-radius: 15px; padding: 12px 5px; font-family: 'Nunito', sans-serif; cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.2s;";
+                btn.onmouseover = () => { btn.style.backgroundColor = "var(--primary)"; btn.style.color = "white"; };
+                btn.onmouseout = () => { btn.style.backgroundColor = "var(--card-bg)"; btn.style.color = "var(--text-main)"; };
+                btn.innerHTML = `<span style="font-size: 13px; margin-bottom: 5px; font-weight: 800;">${statusIcon}</span><span style="font-weight: 900; font-size: 15px; line-height: 1.3;">${g.groupKey}</span>`;
+                btn.onclick = () => confirmGroupSelection(g.groupKey);
+                vGrid.appendChild(btn);
+            });
+        }
+    }
+
+    // Nút quay lại từ màn hình Chọn Bộ
+    function backFromSetSelection() {
+        setDisplay('setSelectionArea', 'none');
+        setDisplay('choiceArea', 'flex');
+    }
+    // Nhận trực tiếp tên bài học (key) từ nút bấm (ĐÃ DỌN SẠCH LỖI VÀ ĐUÔI THỪA)
     function confirmGroupSelection(key) {
         currentSet = allData.filter(w => w.groupKey === key);
-        let shuffleBtn = document.getElementById('shuffleCheck'); let isShuffle = shuffleBtn ? shuffleBtn.checked : false;
+        
+        let shuffleBtn = document.getElementById('shuffleCheck');
+        let isShuffle = shuffleBtn ? shuffleBtn.checked : false;
+        
         if (isShuffle) { currentSet.sort(() => 0.5 - Math.random()); showToast("🔀 Đã trộn thẻ ngẫu nhiên!"); }
         originalGroupSet = [...currentSet];
+
         if(currentSet.length > 0) {
-            setDisplay('filterArea', 'none'); setText('modeHeaderTitle', isShuffle ? `${key} (Đã trộn)` : key); setDisplay('modeSelectionArea', 'block'); 
+            setDisplay('filterArea', 'none');
+            setText('modeHeaderTitle', isShuffle ? `${key} (Đã trộn)` : key);
+            setDisplay('modeSelectionArea', 'block'); 
         } else { showToast("⚠️ Bài học này chưa có từ vựng!"); }
     }
 
-    function backFromFilter() { setDisplay('filterArea', 'none'); setDisplay('choiceArea', 'flex'); }
-    function backFromModeSelection() { setDisplay('modeSelectionArea', 'none'); if (isSrsMode) { setDisplay('choiceArea', 'flex'); } else { setDisplay('filterArea', 'block'); } }
+    function backFromFilter() {
+        setDisplay('filterArea', 'none');
+        setDisplay('setSelectionArea', 'block'); // Quay về màn hình Chọn Bộ
+    }
+
+    function backFromModeSelection() { 
+        setDisplay('modeSelectionArea', 'none'); 
+        if (isSrsMode) { setDisplay('choiceArea', 'flex'); } 
+        else { setDisplay('filterArea', 'block'); } 
+    }
     function backFromLearning() { setDisplay('learningSpace', 'none'); setDisplay('matchingGameScreen', 'none'); setDisplay('finalQuizScreen', 'none'); setDisplay('matchResultScreen', 'none'); setDisplay('quizResultScreen', 'none'); setDisplay('allDoneScreen', 'none'); setDisplay('dashboardArea', 'block'); setDisplay('modeSelectionArea', 'block'); if(window.speechSynthesis) window.speechSynthesis.cancel(); }
-    function returnToMain() { gameFlowType = 'normal'; setDisplay('quizResultScreen', 'none'); setDisplay('finalQuizScreen', 'none'); setDisplay('matchingGameScreen', 'none'); setDisplay('matchResultScreen', 'none'); setDisplay('allDoneScreen', 'none'); setDisplay('learningSpace', 'none'); setDisplay('modeSelectionArea', 'none'); setDisplay('filterArea', 'none'); setDisplay('dashboardArea', 'block'); setDisplay('choiceArea', 'flex'); updateStatsDashboard(); }
+    function returnToMain() { 
+        gameFlowType = 'normal'; 
+        // ... các dòng setDisplay('...', 'none') khác ...
+        setDisplay('setSelectionArea', 'none'); // <-- THÊM DÒNG NÀY VÀO TRONG HÀM returnToMain
+        setDisplay('filterArea', 'none'); 
+        setDisplay('dashboardArea', 'block'); 
+        setDisplay('choiceArea', 'flex'); 
+        updateStatsDashboard(); 
+    }
 
     function forceExitMatching() { setDisplay('matchingGameScreen', 'none'); if(gameFlowType === 'midsession') { setDisplay('learningSpace', 'block'); recentWordsForGame = []; checkNextStep(midSessionFailedFlag); } else if (gameFlowType === 'standalone') { backFromLearning(); } }
     function forceExitQuiz() { setDisplay('finalQuizScreen', 'none'); if(gameFlowType === 'midsession') { setDisplay('learningSpace', 'block'); recentWordsForGame = []; checkNextStep(midSessionFailedFlag); } else if (gameFlowType === 'standalone') { backFromLearning(); } else if (gameFlowType === 'warmup') { setDisplay('dashboardArea', 'block'); setDisplay('choiceArea', 'flex'); updateStatsDashboard(); } }
