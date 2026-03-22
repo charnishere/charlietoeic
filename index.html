@@ -1307,29 +1307,35 @@
     // MENU ĐIỀU HƯỚNG (TỪ VỰNG)
     // ==========================================
     function prepareModeSelection(choiceType) {
-        setDisplay('dashboardArea', 'none');
-        if (choiceType === 1) {
-            let hasStudiedAny = allData.some(w => w.isStudied); 
-            let reviewPool = [];
-            if (hasStudiedAny) { 
-                reviewPool = allData.filter(w => w.isStudied && w.nextReviewDate <= Date.now()); 
-                reviewPool.sort((a, b) => a.nextReviewDate - b.nextReviewDate); 
-            } else { 
-                let tt = allData.filter(w => w.level.toLowerCase().includes('trọng tâm')); 
-                reviewPool = tt.length > 0 ? tt : allData; 
-                reviewPool = reviewPool.sort(() => 0.5 - Math.random()); 
-            }
+    setDisplay('dashboardArea', 'none');
+    if (choiceType === 1) {
+        let hasStudiedAny = allData.some(w => w.isStudied); 
+        let reviewPool = [];
+        if (hasStudiedAny) { 
+            reviewPool = allData.filter(w => w.isStudied && w.nextReviewDate <= Date.now()); 
+            reviewPool.sort((a, b) => a.nextReviewDate - b.nextReviewDate); 
+        } else { 
+            let tt = allData.filter(w => w.level.toLowerCase().includes('trọng tâm')); 
+            reviewPool = tt.length > 0 ? tt : allData; 
+            reviewPool = reviewPool.sort(() => 0.5 - Math.random()); 
+        }
 
-            if (!studentStats.wrongGrammar) studentStats.wrongGrammar = [];
-            let grammarReviewPool = grammarData.filter(q => studentStats.wrongGrammar.includes(q.question));
+        if (!studentStats.wrongGrammar) studentStats.wrongGrammar = [];
+        let grammarReviewPool = grammarData.filter(q => studentStats.wrongGrammar.includes(q.question));
 
-            window.tempDueVocab = reviewPool; window.tempDueGrammar = grammarReviewPool;
+        window.tempDueVocab = reviewPool; window.tempDueGrammar = grammarReviewPool;
 
-            if (hasStudiedAny && reviewPool.length === 0 && grammarReviewPool.length === 0) {
-                showToast("🎉 Không còn gì cần ôn hôm nay.");
-                setDisplay('choiceArea', 'flex'); 
-                return;
-            }
+        // --- BẮT ĐẦU VÙNG ĐÃ SỬA LỖI TRANG TRẮNG ---
+        if (hasStudiedAny && reviewPool.length === 0 && grammarReviewPool.length === 0) {
+            showToast("🎉 Không còn gì cần ôn hôm nay.");
+            returnToMain(); // Đưa về trang chủ một cách sạch sẽ và an toàn
+            return;
+        }
+        // --- KẾT THÚC VÙNG ĐÃ SỬA ---
+
+        // (Phần code hiển thị Grid phía dưới giữ nguyên)
+        let vGrid = document.getElementById('vocabModeGrid'); let mGrid = document.getElementById('mixedModeGrid');
+        // ...
 
             let vGrid = document.getElementById('vocabModeGrid'); let mGrid = document.getElementById('mixedModeGrid');
 
