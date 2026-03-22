@@ -367,12 +367,12 @@
     min-height: 550px !important; 
     max-width: 650px !important; 
     
-    /* --- BẮT ĐẦU PHẦN SỬA LỀ --- */
-    margin-top: 15px !important;       /* Ép khoảng cách với thanh Charnishere là 15px */
-    margin-bottom: 50px !important;    /* Chừa khoảng trống phía dưới cùng */
+    /* --- BỘ KHÓA VỊ TRÍ CHỐNG TRÔI --- */
+    margin-top: 15px !important;       /* Cố định cách thanh Header 15px */
+    margin-bottom: auto !important;    /* Ép lò xo đẩy toàn bộ khung lên sát trần */
     margin-left: auto !important;      /* Tự động căn giữa màn hình */
     margin-right: auto !important;     /* Tự động căn giữa màn hình */
-    /* --- KẾT THÚC PHẦN SỬA LỀ --- */
+    /* --------------------------------- */
     
     display: flex; 
     flex-direction: column; 
@@ -468,6 +468,30 @@
         }
         /* Đẩy nội dung web sang phải để nhường chỗ cho Sidebar trên Máy tính */
         @media (min-width: 801px) { body { padding-left: 90px; } }
+        /* --- TẠO VIỀN CHO CÁC Ô TƯƠNG TÁC (CHẾ ĐỘ SÁNG) --- */
+
+#optionArea > div, 
+.matching-grid > div, 
+#vocabModeGrid > div, 
+#mixedModeGrid > div,
+.option-btn, 
+.match-item {
+    border: 1px solid #FFD1D7 !important; /* Màu hồng nhạt cho chế độ sáng */
+    border-radius: 12px !important;
+    transition: border-color 0.3s ease !important;
+    padding: 10px !important;
+    box-sizing: border-box !important;
+}
+
+/* --- GHI ĐÈ MÀU VIỀN CHO CHẾ ĐỘ TỐI --- */
+body.dark-mode #optionArea > div,
+body.dark-mode .matching-grid > div,
+body.dark-mode #vocabModeGrid > div,
+body.dark-mode #mixedModeGrid > div,
+body.dark-mode .option-btn,
+body.dark-mode .match-item {
+    border-color: #AA7B82 !important; /* Màu hồng đậm hơn cho chế độ tối */
+}
     </style>
 </head>
 <body>
