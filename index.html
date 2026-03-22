@@ -358,46 +358,32 @@
             border-color: rgba(255, 255, 255, 0.1) !important; 
         }
 /* ========================================= */
-        /* FIX LỖI GIẬT MÀN HÌNH & GIAO DIỆN HỌC TẬP */
+        /* GIAO DIỆN HỌC TẬP & MENU (BẢN CHUẨN CUỐI) */
         /* ========================================= */
         
-        /* 1. Bóp chiều ngang, ghim nội dung lên TRESS (flex-start) thay vì tụt xuống đáy */
-        #learningSpace { 
-            min-height: calc(100vh - 100px); /* Chiếm trọn màn hình trừ khoảng trống Header */
-            max-width: 650px !important; /* Bóp khung nhỏ lại gọn gàng hơn */
+        /* 1. Bóp khung phòng học, căn giữa mượt mà */
+        #learningSpace, #grammarQuizScreen { 
+            max-width: 650px !important; 
             margin: 10px auto 40px auto !important; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: flex-start !important; /* Lệnh quan trọng: Ép thẻ dính sát lên trên! */
+            display: flex; flex-direction: column; 
+            padding-bottom: 30px;
+            height: auto !important; min-height: unset !important;
         }
 
-        /* 2. Đẩy nội dung Flashcard & Typing lên sát thanh Tiến độ */
-        #flashcardApp, #typingApp { 
-            width: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: flex-start !important; /* Ép lên trên */
-            margin-top: 15px; 
-        }
-
-        /* 3. Chốt cứng chiều cao thẻ Flashcard để không nhún nhảy khi lật thẻ */
+        /* 2. Ép thẻ Flashcard không bị kéo giãn, chốt cứng chiều cao */
         .card-scene { 
-            height: 480px !important; /* Chốt cứng chiều cao, không dùng vh hay min-max nữa */
-            min-height: unset !important; 
-            max-height: unset !important; 
-            margin: 0 auto 20px auto !important;
+            width: 100%;
+            height: 400px !important; /* Chốt cứng chiều cao để không bị giật nhún */
+            margin: 20px auto 30px auto !important; /* Khoảng trống vừa vặn với nút đáp án */
+            perspective: 1000px;
+            min-height: unset !important; max-height: unset !important;
         }
+        .card__face {
+            height: 100% !important; /* Thẻ con cao bằng thẻ cha */
+        }
+        .flashcard-main, .flashcard-back { overflow-y: auto !important; padding-right: 5px; }
 
-        /* Thêm thanh cuộn vào trong lòng thẻ nếu chữ quá dài */
-        .flashcard-main, .flashcard-back { 
-            overflow-y: auto !important; 
-            padding-right: 5px; 
-        }
-        /* ========================================= */
-        /* GIAO DIỆN HỌC TẬP THÔNG MINH (AUTO-FIT TẤT CẢ MÀN HÌNH) */
-        /* ========================================= */
-        
-        /* 1. Dropdown Menu Đã Lưu (Bắn lên trên để không bị che chữ) */
+        /* 3. Dropdown Menu Đã Lưu (Bắn lên trên để không bị che chữ) */
         .dropdown-trigger { position: relative; overflow: visible !important; }
         .dropdown-content {
             display: none; position: absolute; 
@@ -412,49 +398,10 @@
         }
         .dropdown-content a:hover { background-color: var(--extra-bg); color: var(--warning); padding-left: 20px; }
         .dropdown-content.show { display: block !important; animation: popCorrect 0.3s ease-out; }
-
-        /* 2. Khu vực Học Từ vựng (Flashcard, Typing) - Ép vừa khít 100% màn hình, không bị thòng lòng */
-        #learningSpace { 
-            height: calc(100vh - 80px) !important; /* Trừ lề để thẻ luôn nằm trọn trong màn hình */
-            max-height: 750px !important; /* Không cho phình quá to trên PC */
-            min-height: 500px !important; 
-            max-width: 650px !important; /* Bóp chiều ngang cho thanh thoát */
-            margin: 10px auto 20px auto !important; 
-            display: flex !important; flex-direction: column !important; 
-            padding-bottom: 20px !important;
-            box-sizing: border-box;
-        }
-
-        #flashcardApp, #typingApp { 
-            width: 100%; flex: 1; 
-            display: flex; flex-direction: column; 
-            justify-content: space-between; /* Lệnh quan trọng: Đẩy thanh tiến độ lên đỉnh, nút đáp án xuống đáy! */
-            overflow: hidden;
-        }
-
-        /* 3. Thẻ Flashcard - Tự động co giãn như lò xo (Flex: 1) */
-        .card-scene { 
-            width: 100%;
-            flex: 1; /* Thẻ sẽ tự động phình to hoặc thu nhỏ để lấp đầy khoảng trống dư thừa */
-            min-height: 250px !important; 
-            max-height: 380px !important; /* Chốt độ cao tối đa để thẻ không bị lù lù trên mặt */
-            margin: 15px auto 25px auto !important; /* Tạo khoảng trống thoải mái với nút bấm */
-            perspective: 1000px;
-        }
         
-        .card__face {
-            height: 100% !important; /* Thẻ mặt trước và sau luôn cao bằng nhau tuyệt đối */
-        }
-        
-        /* 4. Nội dung bên trong thẻ (Tự động xuất hiện thanh cuộn bên trong nếu chữ quá dài) */
-        .flashcard-main, .flashcard-back { overflow-y: auto !important; padding-right: 5px; }
-
-        /* 5. Giữ cho khu vực thi Ngữ pháp được trượt tự do (Vì ngữ pháp cần đọc đề dài) */
-        #grammarQuizScreen {
-            height: auto !important;
-            min-height: unset !important;
-            padding-bottom: 30px !important;
-        }
+        /* 4. Fix Input Typing */
+        #typingApp, #flashcardApp { width: 100%; flex: 1; display: flex; flex-direction: column; height: auto !important;}
+       
         /* ========================================= */
         /* PHỤC HỒI THANH ĐIỀU HƯỚNG (SIDEBAR) */
         /* ========================================= */
@@ -1339,7 +1286,7 @@
     // MENU ĐIỀU HƯỚNG (TỪ VỰNG)
     // ==========================================
     function prepareModeSelection(choiceType) {
-        setDisplay('choiceArea', 'none');
+        setDisplay('dashboardArea', 'none');
         if (choiceType === 1) {
             let hasStudiedAny = allData.some(w => w.isStudied); 
             let reviewPool = [];
@@ -1519,7 +1466,7 @@
     // Nút quay lại từ màn hình Chọn Bộ
     function backFromSetSelection() {
         setDisplay('setSelectionArea', 'none');
-        setDisplay('choiceArea', 'flex');
+        returnToMain(); // Đưa thẳng về Trang chủ cho sạch sẽ
     }
     // Nhận trực tiếp tên bài học (key) từ nút bấm (ĐÃ DỌN SẠCH LỖI VÀ ĐUÔI THỪA)
     function confirmGroupSelection(key) {
@@ -1554,10 +1501,10 @@
     function backFromModeSelection() { 
         setDisplay('modeSelectionArea', 'none'); 
         if (isSrsMode) { 
-            setDisplay('choiceArea', 'flex'); 
+            returnToMain(); // Trở về Trang chủ
         } else if (isSavedVocabMode) { 
             isSavedVocabMode = false; 
-            returnToMain(); // 🚀 Bắn thẳng về Trang chủ
+            returnToMain(); 
         } else { 
             setDisplay('filterArea', 'block'); 
         } 
