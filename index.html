@@ -360,6 +360,23 @@
 /* ========================================= */
         /* GIAO DIỆN HỌC TẬP & MENU (BẢN CHUẨN CUỐI) */
         /* ========================================= */
+        
+        /* 2. Khu vực Học Từ vựng (Flashcard, Typing) - Treo lên cao, căn giữa khung hình */
+#learningSpace { 
+    height: auto !important; 
+    min-height: 550px !important; 
+    max-width: 650px !important; 
+    
+    /* --- KHÓA CỨNG VỊ TRÍ --- */
+    margin: 15px auto 50px auto !important; /* Lề trên ĐÚNG 15px, lề dưới 50px, trái phải giữa */
+    flex: 0 0 auto !important; /* Lệnh này cực kỳ quan trọng: Tắt hoàn toàn sự co giãn đẩy khung của Flexbox */
+    display: flex; 
+    flex-direction: column; 
+    justify-content: flex-start !important; 
+    padding-bottom: 20px !important;
+    box-sizing: border-box;
+}
+
         #flashcardApp, #typingApp { 
             width: 100%; flex: 1; 
             display: flex; flex-direction: column; 
