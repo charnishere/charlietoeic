@@ -1457,7 +1457,7 @@
         setDisplay('setSelectionArea', 'block'); // Quay về màn hình Chọn Bộ
     }
 
-    function backFromModeSelection() { 
+function backFromModeSelection() { 
         setDisplay('modeSelectionArea', 'none'); 
         
         // Nhận diện nếu đang ở màn hình chọn 2 thẻ (Từ vựng/Ngữ pháp) của Ôn tập
@@ -1467,13 +1467,14 @@
             return;
         }
 
-        if (isSrsMode) { 
-            returnToMain(); // Trở về Trang chủ
-        } else if (isSavedVocabMode) { 
-            isSavedVocabMode = false; 
+        // Nếu đang ở chế độ Ôn tập (Srs) HOẶC Từ vựng của tôi -> Bấm Back phải về thẳng Trang chủ
+        if (isSrsMode || isSavedVocabMode) { 
+            isSavedVocabMode = false; // Tắt cờ
+            isSrsMode = false; // Tắt cờ
             returnToMain(); 
         } else { 
-            setDisplay('filterArea', 'block'); // Quay lại màn hình chọn bài học (Học bài mới)
+            // Nếu đi từ "Học bài mới" vào -> Bấm Back thì lùi lại trang chọn bài học
+            setDisplay('filterArea', 'block'); 
         } 
     }
     function backFromLearning() { 
@@ -2571,7 +2572,7 @@ function nextGrammarQuestion() {
         window.isSavedGrammarDirectMode = true; // 🚩 Cờ đánh dấu xuất phát từ Trang chủ
         startGrammarPractice('SAVED_QUESTIONS'); // Mượn hàm học chủ đề có sẵn
     }
-    // Mở nhanh Từ vựng của tôi từ Trang chủ
+// Mở nhanh Từ vựng của tôi từ Trang chủ
     function openFavoriteVocab() {
         if (!studentStats.savedVocab || studentStats.savedVocab.length === 0) {
             showToast("⚠️ Bạn chưa lưu từ vựng nào (Bấm 💛 để lưu)");
@@ -2583,16 +2584,20 @@ function nextGrammarQuestion() {
         isSavedVocabMode = true; 
         window.isSavedVocabDirectMode = true; // 🚩 Cờ đánh dấu xuất phát từ Trang chủ
 
+        // Lọc từ vựng đã lưu
         originalGroupSet = allData.filter(w => studentStats.savedVocab.includes(w.vocab));
         currentSet = [...originalGroupSet];
         
+        // Ẩn Dashboard, đổi tiêu đề
         setDisplay('dashboardArea', 'none');
         setText('modeHeaderTitle', `Từ vựng của tôi (${currentSet.length})`);
+        
+        // Hiện các chế độ học (Flashcard, Quiz...) để người dùng có thể học từ đã lưu
+        setDisplay('mixedModeGrid', 'none'); 
+        setDisplay('vocabModeGrid', 'grid');
         setDisplay('modeSelectionArea', 'block'); 
         
-        // --- CHÚ Ý QUAN TRỌNG: Ẩn nút mũi tên '<' khi học từ vựng đã lưu để học xong về thẳng Trang chủ
-        document.querySelector('#vocabListArea .back-btn').style.display = 'none';
-        
+        // Bật khung danh sách và vẽ từ vựng
         setDisplay('vocabListContainer', 'block');
         document.getElementById('shuffleListCheck').checked = false;
         renderVocabList();
