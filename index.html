@@ -503,6 +503,47 @@ body.dark-mode .game-item,
 body.dark-mode .quiz-btn {
     border: 2px solid #555555 !important; 
 }
+    /* ======================================================= */
+/* KHÓA CỨNG GIAO DIỆN CHỐNG TRÔI KHI THU PHÓNG MÀN HÌNH */
+/* ======================================================= */
+
+/* 1. Tắt Flexbox ở khung ngoài cùng để vô hiệu hóa sự tự giãn */
+.container {
+    display: block !important; 
+    padding-top: 15px; 
+}
+
+/* 2. Định dạng lại khung Header (dòng trên cùng) giống hình mẫu */
+.container > .panel-box:first-child {
+    border: 2px solid var(--primary) !important; /* Viền hồng */
+    border-radius: 20px !important;
+    box-shadow: none !important; /* Tắt bóng mờ 3D */
+    margin-bottom: 0 !important; /* Ép lề dưới bằng 0 để kiểm soát khoảng cách */
+}
+
+/* 3. Khóa chết vị trí & định dạng khung học từ vựng */
+#learningSpace {
+    margin-top: 15px !important; /* CÁCH CHÍNH XÁC 15PX SO VỚI DÒNG TRÊN */
+    margin-bottom: 50px !important; 
+    margin-left: auto !important;
+    margin-right: auto !important;
+    
+    border: 2px solid var(--primary) !important; /* Viền hồng */
+    border-radius: 20px !important;
+    box-shadow: none !important; /* Tắt bóng mờ 3D */
+    
+    flex: none !important; /* Triệt tiêu hoàn toàn tính co giãn */
+    
+    /* Giữ nguyên các thông số kết cấu cũ */
+    height: auto !important; 
+    min-height: 550px !important; 
+    max-width: 650px !important; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: flex-start !important; 
+    padding-bottom: 20px !important;
+    box-sizing: border-box;
+}    
     </style>
 </head>
 <body>
