@@ -1491,6 +1491,10 @@
     }
     // Nhận trực tiếp tên bài học (key) từ nút bấm (ĐÃ DỌN SẠCH LỖI VÀ ĐUÔI THỪA)
     function confirmGroupSelection(key) {
+        setDisplay('dashboardArea', 'none');
+        setDisplay('setSelectionArea', 'none');
+        setDisplay('filterArea', 'none');
+        // -------------------------------------------------
         isSrsMode = false;        // <--- Reset cờ
         isSavedVocabMode = false; // <--- Reset cờ
         currentSet = allData.filter(w => w.groupKey === key);
