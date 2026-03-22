@@ -933,9 +933,10 @@
                 <input type="number" id="grammarCountInput" value="20" min="1" max="100" style="width: 60px; padding: 5px; border-radius: 8px; border: 2px solid var(--primary); text-align: center; font-weight: bold; outline: none;">
             </div>
             <div style="font-weight: 800; display: flex; align-items: center; gap: 5px;">
-                TG/câu (giây): 
+                TG/câu (s): 
                 <input type="number" id="grammarTimePerQ" value="0" min="0" placeholder="0 = Tắt" style="width: 60px; padding: 5px; border-radius: 8px; border: 2px solid var(--primary); text-align: center; font-weight: bold; outline: none;">
             </div>
+            <button class="action-btn" onclick="showGrammarProgress()" style="border-color: var(--success); color: var(--success); padding: 6px 15px; display: flex; align-items: center; gap: 5px;">📊 Tiến độ</button>
             <p style="width: 100%; margin: 0; font-size: 12px; color: var(--text-light); font-style: italic;">*Nhập 0 vào thời gian để học thoải mái không hẹn giờ</p>
         </div>
 
@@ -945,6 +946,18 @@
         <div style="text-align: center; margin-top: 25px;">
             <button class="nav-arrow" onclick="backToGrammarMenuFromSetup()">&#10094;</button>
         </div>
+    </div>
+</div>
+
+<div id="grammarProgressModal" class="overlay-screen" style="z-index: 999999;">
+    <div class="panel-box" style="max-width: 800px; width: 100%; text-align: left; padding: 25px; max-height: 85vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--border-color); padding-bottom: 10px; margin-bottom: 15px;">
+            <h3 style="margin: 0; color: var(--primary); font-weight: 900; font-size: 24px;">📊 TIẾN ĐỘ NGỮ PHÁP</h3>
+            <button onclick="document.getElementById('grammarProgressModal').style.display='none'" style="background: none; border: none; font-size: 20px; font-weight: 900; cursor: pointer; color: var(--text-light); outline: none;">✖</button>
+        </div>
+        <p style="font-size: 13px; color: var(--text-light); font-weight: 800; font-style: italic; margin-bottom: 20px; text-align: center;">💡 Nhấn vào từng chủ đề bên dưới để xem lịch sử đáp án bạn đã chọn.</p>
+        <div id="grammarProgressContent" style="display: flex; flex-direction: column; gap: 15px;">
+            </div>
     </div>
 </div>
 <div id="grammarQuizScreen" class="overlay-screen">
@@ -2115,12 +2128,22 @@ function backFromModeSelection() {
             grid.appendChild(savedBtn);
         }
         uniqueTopics.forEach((topic, index) => {
-            let btn = document.createElement('button');
-            btn.className = `mode-card grammar-topic-btn ets-color-${index % 10}`; btn.style.padding = '20px 10px';
-            btn.innerHTML = `<div class="mode-icon grammar-topic-icon">🎯</div><p class="mode-title grammar-topic-title" style="font-size: 15px;">${topic}</p>`;
-            btn.onclick = () => startGrammarPractice(topic);
-            grid.appendChild(btn);
-        });
+         // Đếm số câu tổng & đã làm
+         let topicQuestions = grammarData.filter(q => q.topic && q.topic.split(',').map(t=>t.trim()).includes(topic));
+         let totalQ = topicQuestions.length;
+         let doneQ = 0;
+         topicQuestions.forEach(q => {
+             if (studentStats.grammarTracker && studentStats.grammarTracker[q.question] && studentStats.grammarTracker[q.question].attempts > 0) doneQ++;
+         });
+
+         let btn = document.createElement('button');
+         btn.className = `mode-card grammar-topic-btn ets-color-${index % 10}`; btn.style.padding = '20px 10px';
+         btn.innerHTML = `<div class="mode-icon grammar-topic-icon">🎯</div>
+                          <p class="mode-title grammar-topic-title" style="font-size: 15px; margin-bottom: 5px;">${topic}</p>
+                          <p style="margin: 0; font-size: 12px; font-weight: 900; color: var(--text-main); background: rgba(255,255,255,0.6); padding: 3px 10px; border-radius: 12px; display: inline-block;">${doneQ}/${totalQ}</p>`;
+         btn.onclick = () => startGrammarPractice(topic);
+         grid.appendChild(btn);
+     });
 
         setDisplay('grammarMenuModal', 'none'); setDisplay('grammarPracticeSetupScreen', 'flex');
     }
@@ -2201,6 +2224,8 @@ function backFromModeSelection() {
                     let isCorrect = (optText === correctText);
                     
                     if (!studentStats.wrongGrammar) studentStats.wrongGrammar = [];
+                    // GỌI TRACKER GHI NHẬN:
+                 recordGrammarAnswer(d.question, optText, isCorrect);
                     if (isCorrect) { 
                         grammarScore++; 
                         let idx = studentStats.wrongGrammar.indexOf(d.question); 
@@ -2260,7 +2285,8 @@ function nextGrammarQuestion() {
             
             let isCorrect = (window.tempExamAnswer === correctText);
             if (!studentStats.wrongGrammar) studentStats.wrongGrammar = [];
-            
+            // GỌI TRACKER GHI NHẬN TẠI ĐÂY:
+         recordGrammarAnswer(d.question, window.tempExamAnswer, isCorrect);
             // Tính điểm và lưu sổ Nam Tào
             if (isCorrect) { 
                 grammarScore++; 
@@ -3077,6 +3103,102 @@ function nextGrammarQuestion() {
         document.getElementById('grammarTimerDisplay').style.display = 'none';
 
         renderGrammarQuestion();
+    }
+    // ===================================================
+    // HỆ THỐNG THEO DÕI TIẾN ĐỘ NGỮ PHÁP (TRACKER)
+    // ===================================================
+
+    // 1. Hàm ghi nhận mỗi khi làm 1 câu
+    function recordGrammarAnswer(questionText, userAnswer, isCorrect) {
+        if (!studentStats.grammarTracker) studentStats.grammarTracker = {};
+        if (!studentStats.grammarTracker[questionText]) {
+            studentStats.grammarTracker[questionText] = { attempts: 0, correct: 0, history: [] };
+        }
+        let tracker = studentStats.grammarTracker[questionText];
+        
+        tracker.attempts++;
+        if (isCorrect) tracker.correct++;
+        
+        // Lưu lịch sử đáp án (Chỉ giữ 5 lần gần nhất cho gọn nhẹ)
+        tracker.history.push(userAnswer || "Bỏ qua");
+        if (tracker.history.length > 5) tracker.history.shift(); 
+        
+        saveStats(); // Lưu vào bộ nhớ máy
+    }
+
+    // 2. Hàm vẽ Bảng Tiến Độ
+    function showGrammarProgress() {
+        if (!studentStats.grammarTracker) studentStats.grammarTracker = {};
+        
+        let allTopics = [];
+        grammarData.forEach(item => { if (item.topic) { let splitTopics = item.topic.split(',').map(t => t.trim()).filter(t => t !== ""); allTopics.push(...splitTopics); } });
+        let uniqueTopics = [...new Set(allTopics)];
+
+        const PREFERRED_ORDER = ["Từ loại", "Đại từ", "Động từ", "Câu điều kiện", "Giới từ", "Liên từ", "So sánh", "Từ vựng", "Cơ bản", "600+", "800+"];
+        uniqueTopics.sort((a, b) => {
+            let indexA = PREFERRED_ORDER.indexOf(a); let indexB = PREFERRED_ORDER.indexOf(b);
+            if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+            if (indexA === -1) return 1;
+            if (indexB === -1) return -1;
+            return indexA - indexB;
+        });
+
+        let html = '';
+        uniqueTopics.forEach(topic => {
+            let topicQuestions = grammarData.filter(q => q.topic && q.topic.split(',').map(t=>t.trim()).includes(topic));
+            let totalQ = topicQuestions.length;
+            let doneQ = 0;
+            let correctAttempts = 0;
+            let totalAttempts = 0;
+            let detailsHTML = '';
+
+            topicQuestions.forEach((q, idx) => {
+                let tr = studentStats.grammarTracker[q.question];
+                if (tr && tr.attempts > 0) {
+                    doneQ++;
+                    correctAttempts += tr.correct;
+                    totalAttempts += tr.attempts;
+                    
+                    let histStr = tr.history.map(h => `<span style="background: var(--card-bg); padding: 2px 6px; border-radius: 5px; border: 1px solid var(--border-color); font-size: 11px; font-weight: 900; color: var(--primary-dark);">${h}</span>`).join(' ➔ ');
+                    
+                    detailsHTML += `
+                        <div style="background: var(--card-bg); padding: 12px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid ${tr.correct > 0 ? 'var(--success)' : 'var(--danger)'}; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+                            <div style="font-size: 14px; font-weight: 800; color: var(--text-main); margin-bottom: 8px;">Câu ${idx+1}: ${q.question.replace(/_+/g, '___')}</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; flex-wrap: wrap; gap: 5px;">
+                                <span style="color: var(--text-light); font-weight: 800; background: var(--extra-bg); padding: 3px 8px; border-radius: 8px;">Đúng: ${tr.correct}/${tr.attempts} lần</span>
+                                <span style="display: flex; gap: 4px; align-items: center; font-weight: 800; color: var(--text-light);">Lịch sử: ${histStr}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            let accuracy = totalAttempts > 0 ? Math.round((correctAttempts / totalAttempts) * 100) : 0;
+            
+            html += `
+                <div style="background: var(--extra-bg); border-radius: 15px; padding: 15px; border: 2px solid var(--border-color); transition: 0.2s;" onmouseover="this.style.transform='scale(0.99)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleProgressDetail('prog_${CSS.escape(topic)}')">
+                        <h4 style="margin: 0; color: var(--primary); font-size: 18px; font-weight: 900;">${topic}</h4>
+                        <div style="text-align: right;">
+                            <div style="font-size: 13px; font-weight: 900; color: var(--text-main);">Đã làm: ${doneQ}/${totalQ}</div>
+                            <div style="font-size: 12px; font-weight: 900; color: ${accuracy >= 80 ? 'var(--success)' : (accuracy >= 50 ? 'var(--warning)' : 'var(--danger)')};">Độ chính xác: ${accuracy}%</div>
+                        </div>
+                    </div>
+                    <div id="prog_${CSS.escape(topic)}" style="display: none; margin-top: 15px; border-top: 2px dashed var(--border-color); padding-top: 15px;">
+                        ${detailsHTML || '<div style="font-size: 13px; color: var(--text-light); font-style: italic; font-weight: 700; text-align: center;">Bạn chưa làm câu nào trong chủ đề này.</div>'}
+                    </div>
+                </div>
+            `;
+        });
+
+        document.getElementById('grammarProgressContent').innerHTML = html;
+        setDisplay('grammarProgressModal', 'flex');
+    }
+    
+    function toggleProgressDetail(id) {
+        let el = document.getElementById(id);
+        if (el.style.display === 'none') el.style.display = 'block';
+        else el.style.display = 'none';
     }
 </script>
 
