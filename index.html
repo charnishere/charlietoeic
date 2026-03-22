@@ -588,7 +588,7 @@
                     <button id="tourTarget_grammar" class="choice-btn" style="border-color: #81D4FA;" onclick="openGrammarMenu()">
                         <span class="choice-icon">📝</span><p class="choice-title">Ngữ Pháp</p><p class="choice-desc">Lý thuyết & Bài tập</p>
                     </button>
-                    <div class="choice-btn dropdown-trigger" style="border-color: #FFD54F;" onclick="toggleSavedDropdown()">
+                    <div id="tourTarget_saved" class="choice-btn dropdown-trigger" style="border-color: #FFD54F;" onclick="toggleSavedDropdown()">
                         <span class="choice-icon">💛</span><p class="choice-title">Đã lưu</p><p class="choice-desc" id="savedVocabShortcutDesc">0 từ, 0 câu</p>
                         
                         <div class="dropdown-content" id="savedDropdown">
@@ -1101,11 +1101,15 @@
         },
         {
             target: 'tourTarget_learn', icon: '📚', title: 'Trạm Từ Vựng', position: 'top',
-            text: 'Mở khóa các chủ đề từ vựng BẮT BUỘC PHẢI BIẾT cùng các từ vựng của bộ đề ETS.'
+            text: 'Mở khóa các chủ đề từ vựng với 5 chế độ: Lật thẻ, Trắc nghiệm, Gõ phím, Luyện nghe và Game nối từ.'
         },
         {
             target: 'tourTarget_grammar', icon: '📝', title: 'Lò Luyện Ngữ Pháp', position: 'top',
             text: 'Làm bài tập trắc nghiệm chia theo từng dạng hoặc bật chế độ Luyện Thi ngẫu nhiên. Sai đến đâu giải thích đến đó!'
+        },
+        {
+            target: 'tourTarget_saved', icon: '💛', title: 'Kho Lưu Trữ', position: 'top',
+            text: 'Những từ vựng và câu ngữ pháp khó nhằn mà bạn đã thả tim sẽ được gom hết vào đây để tiện ôn tập lại.'
         },
         {
             target: 'tourTarget_profile', icon: '🏆', title: 'Hồ Sơ Thành Tích', position: 'top',
