@@ -101,10 +101,10 @@
 
         /* HEADER & TÙY CHỈNH HEADER CHÍNH */
         .container > .panel-box:first-child {
-            border: 2px solid var(--primary) !important; /* Viền hồng cho Header */
-            border-radius: 20px !important;
-            box-shadow: none !important;
-            margin-bottom: 0 !important;
+            border: none !important; /* Xóa viền hồng */
+            border-radius: 30px !important; /* Bo góc tròn đều */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06) !important; /* Bật lại hiệu ứng đổ bóng 3D */
+            margin-bottom: 15px !important; /* Thêm khoảng cách mỏng ở dưới cho thoáng */
         }
         .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid rgba(150, 150, 150, 0.2) !important; padding-bottom: 15px; }
         .header h2 { color: var(--primary); margin: 0; font-weight: 900; font-size: 26px; display: flex; align-items: center; gap: 8px; }
@@ -395,6 +395,47 @@
         }
         .dropdown-content a:hover { background-color: var(--extra-bg); color: var(--warning); padding-left: 20px; }
         .dropdown-content.show { display: block !important; animation: popCorrect 0.3s ease-out; }
+    /* ======================================================= */
+/* CHẾ ĐỘ AUTO-FIT: ÉP VỪA VẶN 100% MÀN HÌNH MÁY TÍNH      */
+/* ======================================================= */
+
+@media (min-width: 801px) {
+    /* 1. Khóa chiều cao tổng thể bằng 100% màn hình, tắt cuộn toàn trang */
+    html, body {
+        height: 100vh;
+        overflow: hidden; /* Cắt bỏ thanh cuộn dọc của toàn bộ web */
+    }
+
+    /* 2. Container chính tự giãn theo chiều dọc */
+    .container {
+        display: flex !important; /* Dùng lại Flexbox để tính toán tỷ lệ */
+        flex-direction: column;
+        height: 100vh; 
+        padding-bottom: 10px;
+    }
+
+    /* 3. Ô học từ vựng (learningSpace) sẽ tự động lấp đầy khoảng trống còn lại */
+    #learningSpace {
+        flex: 1 !important; /* Lệnh cực kỳ quan trọng: Chiếm toàn bộ không gian rảnh rỗi */
+        min-height: 0 !important; /* Phá vỡ mức cố định 550px cũ */
+        height: auto !important;
+        margin: 15px auto !important; /* Căn giữa, bỏ khoảng cách 50px thừa thãi ở đáy */
+        padding-bottom: 15px !important;
+    }
+
+    /* 4. Thẻ Flashcard lật mặt cũng tự động phình to/thu nhỏ theo ô từ vựng */
+    .card-scene {
+        flex: 1 !important; /* Tự động cao lấp đầy #learningSpace */
+        height: auto !important; /* Phá vỡ mức cố định 420px cũ */
+        min-height: 250px !important; /* Ngưỡng an toàn nhỏ nhất để chữ không bị nát */
+        margin: 0 auto 15px auto !important;
+    }
+    
+    /* 5. Cứu cánh nếu nội dung chữ bên trong mặt thẻ quá dài */
+    .card__face {
+        overflow-y: auto !important; /* Chỉ hiện thanh cuộn nhỏ bên trong thẻ nếu chữ quá nhiều */
+    }
+}
     </style>
 </head>
 <body>
