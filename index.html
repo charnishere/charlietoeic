@@ -357,6 +357,27 @@
         body.dark-mode div[style*="dashed"] { 
             border-color: rgba(255, 255, 255, 0.1) !important; 
         }
+        /* ========================================= */
+        /* FIX LỖI GIẬT MÀN HÌNH VÀ MENU ĐÃ LƯU */
+        /* ========================================= */
+        
+        /* Giữ cố định chiều cao khu vực học tập để không bị giật nhún */
+        #learningSpace { min-height: 550px; display: flex; flex-direction: column; }
+        #flashcardApp, #typingApp { width: 100%; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+        /* CSS cho Dropdown Menu Đã Lưu */
+        .dropdown-trigger { position: relative; overflow: visible !important; }
+        .dropdown-content {
+            display: none; position: absolute; top: 105%; left: 50%; transform: translateX(-50%);
+            background-color: var(--card-bg); min-width: 200px; box-shadow: 0px 10px 30px rgba(0,0,0,0.15);
+            z-index: 9999; border-radius: 15px; border: 2px solid var(--warning); padding: 5px;
+        }
+        .dropdown-content a {
+            color: var(--text-main); padding: 12px 15px; text-decoration: none; display: block;
+            font-size: 14px; font-weight: 800; border-radius: 10px; text-align: left; transition: 0.2s;
+        }
+        .dropdown-content a:hover { background-color: var(--extra-bg); color: var(--warning); padding-left: 20px; }
+        .dropdown-content.show { display: block !important; animation: popCorrect 0.3s ease-out; }
     </style>
 </head>
 <body>
@@ -501,9 +522,14 @@
                     <button class="choice-btn" style="border-color: #81D4FA;" onclick="openGrammarMenu()">
                         <span class="choice-icon">📝</span><p class="choice-title">Ngữ Pháp</p><p class="choice-desc">Lý thuyết & Bài tập</p>
                     </button>
-                    <button class="choice-btn" style="border-color: #FFD54F;" onclick="openFavoriteVocab()">
-                        <span class="choice-icon">💛</span><p class="choice-title">Từ vựng của tôi</p><p class="choice-desc" id="savedVocabShortcutDesc">0 từ đã lưu</p>
-                    </button>
+                    <div class="choice-btn dropdown-trigger" style="border-color: #FFD54F;" onclick="toggleSavedDropdown()">
+                        <span class="choice-icon">💛</span><p class="choice-title">Đã lưu</p><p class="choice-desc" id="savedVocabShortcutDesc">0 từ, 0 câu</p>
+                        
+                        <div class="dropdown-content" id="savedDropdown">
+                            <a href="#" onclick="openFavoriteVocab(); event.stopPropagation();">📚 Từ vựng của tôi</a>
+                            <a href="#" onclick="openSavedGrammarMenu(); event.stopPropagation();">📝 Câu hỏi trắc nghiệm</a>
+                        </div>
+                    </div>
                     <button class="choice-btn" style="border-color: #FFB6C1;" onclick="openProfile()">
                         <span class="choice-icon">🏆</span><p class="choice-title">Hồ Sơ</p><p class="choice-desc">Thành tích & Lịch sử</p>
                     </button>
@@ -1212,11 +1238,12 @@
         let lvlInfo = calculateLevel(studentStats.xp);
         setText('displayUserLevel', `(Lv.${lvlInfo.lv})`);
         
-        // Cập nhật bộ đếm cho nút tắt "Từ vựng của tôi"
+        // Cập nhật bộ đếm cho nút tắt "Đã lưu"
         let svDesc = document.getElementById('savedVocabShortcutDesc');
         if (svDesc) {
             let svCount = (studentStats.savedVocab && studentStats.savedVocab.length) ? studentStats.savedVocab.length : 0;
-            svDesc.innerText = `${svCount} từ đã lưu`;
+            let sgCount = (studentStats.savedGrammar && studentStats.savedGrammar.length) ? studentStats.savedGrammar.length : 0;
+            svDesc.innerText = `${svCount} từ, ${sgCount} câu`;
         }
     }
 
@@ -2487,6 +2514,34 @@ function nextGrammarQuestion() {
     // ==========================================
     // TÍNH NĂNG: LƯU TỪ VỰNG CỦA TÔI
     // ==========================================
+    // ----------------------------------------------------
+    // XỬ LÝ MENU DROPDOWN "ĐÃ LƯU"
+    // ----------------------------------------------------
+    function toggleSavedDropdown() {
+        document.getElementById("savedDropdown").classList.toggle("show");
+    }
+
+    // Tự động đóng menu nếu click ra vùng trống ngoài màn hình
+    window.addEventListener('click', function(event) {
+        if (!event.target.closest('.dropdown-trigger')) {
+            let dropdowns = document.getElementsByClassName("dropdown-content");
+            for (let i = 0; i < dropdowns.length; i++) {
+                if (dropdowns[i].classList.contains('show')) {
+                    dropdowns[i].classList.remove('show');
+                }
+            }
+        }
+    });
+
+    // Mở nhanh phòng Thực hành Ngữ pháp từ Menu Đã lưu
+    function openSavedGrammarMenu() {
+        if (!studentStats.savedGrammar || studentStats.savedGrammar.length === 0) {
+            showToast("⚠️ Bạn chưa lưu câu hỏi ngữ pháp nào!");
+            return;
+        }
+        document.getElementById("savedDropdown").classList.remove("show"); // Ẩn menu đi
+        startGrammarPractice('SAVED_QUESTIONS'); // Mượn hàm học chủ đề có sẵn
+    }
     // Mở nhanh Từ vựng của tôi từ Trang chủ
     function openFavoriteVocab() {
         if (!studentStats.savedVocab || studentStats.savedVocab.length === 0) {
