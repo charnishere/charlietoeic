@@ -1056,6 +1056,62 @@
 
 <script>
     // ==========================================
+    // ==========================================
+    // HỆ THỐNG HƯỚNG DẪN TÂN BINH (ONBOARDING)
+    // ==========================================
+    const tutorialSteps = [
+        { icon: "👋", title: "Chào mừng Tân Binh!", desc: "Hệ thống luyện thi TOEIC Charnishere sẽ giúp bạn cày từ vựng và ngữ pháp mượt như lướt Tiktok. Cùng xem qua cách hoạt động nhé!" },
+        { icon: "🚀", title: "Thuật toán Chống Quên", desc: "Đừng lo học trước quên sau! Khối <b>'Ôn tập ngay'</b> sẽ tự động nhắc bạn ôn lại những từ hoặc câu ngữ pháp ngay trước khi não bộ chuẩn bị quên chúng." },
+        { icon: "🎮", title: "Vũ trụ Từ Vựng", desc: "Mục <b>'Học Bài Mới'</b> sở hữu 5 trạm rèn luyện: Lật thẻ Flashcard, Trắc nghiệm, Luyện gõ, Nghe audio và Game nối từ tốc độ cao." },
+        { icon: "📝", title: "Lò Luyện Ngữ Pháp", desc: "Làm sai không sợ không ai chỉ! Mục <b>'Ngữ Pháp'</b> có giải thích chi tiết cặn kẽ từng câu và có chế độ Thi Thử y như thật." },
+        { icon: "🔥", title: "Thăng Hạng & Huy Hiệu", desc: "Hãy học mỗi ngày để thắp sáng ngọn lửa Chuỗi Ngày (Streak) và cày cấp độ mở khóa kho Huy Hiệu cực ngầu trong <b>'Hồ Sơ'</b> nhé. Bắt đầu thôi!" }
+    ];
+    let currentTutorialStep = 0;
+
+    function checkAndShowTutorial() {
+        let hasSeen = localStorage.getItem(`charnishere_has_seen_tutorial_${studentID}`);
+        if (!hasSeen) {
+            currentTutorialStep = 0;
+            document.getElementById('tutorialOverlay').style.display = 'flex';
+            renderTutorialStep();
+        }
+    }
+
+    function renderTutorialStep() {
+        const step = tutorialSteps[currentTutorialStep];
+        document.getElementById('tutorialIcon').innerText = step.icon;
+        document.getElementById('tutorialTitle').innerText = step.title;
+        document.getElementById('tutorialDesc').innerHTML = step.desc;
+        
+        let dotsHTML = '';
+        for(let i=0; i<tutorialSteps.length; i++) {
+            let color = i === currentTutorialStep ? 'var(--primary)' : 'var(--border-color)';
+            dotsHTML += `<div style="width: 8px; height: 8px; border-radius: 50%; background: ${color}; transition: 0.3s;"></div>`;
+        }
+        document.getElementById('tutorialDots').innerHTML = dotsHTML;
+        
+        let nextBtn = document.getElementById('tutorialNextBtn');
+        if (currentTutorialStep === tutorialSteps.length - 1) {
+            nextBtn.innerText = "Chiến luôn! ⚔️";
+        } else {
+            nextBtn.innerText = "Tiếp tục ➔";
+        }
+    }
+
+    function nextTutorialStep() {
+        if (currentTutorialStep < tutorialSteps.length - 1) {
+            currentTutorialStep++;
+            renderTutorialStep();
+        } else {
+            skipTutorial(); // Đã đến bước cuối thì đóng lại
+        }
+    }
+
+    function skipTutorial() {
+        document.getElementById('tutorialOverlay').style.display = 'none';
+        localStorage.setItem(`charnishere_has_seen_tutorial_${studentID}`, 'true'); // Đánh dấu đã xem
+        showToast("🎉 Chúc bạn học tập thật hiệu quả!");
+    }
     // 🌐 CẤU HÌNH DỮ LIỆU GOOGLE SHEETS
     // ==========================================
     const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSPyDrjlrEZpuElt_nnQlh9Rg6eJ19daHP74k_g_XhyvmP0Dvv1H5Cm465ubWpzojocL_xsmSPrCVxf/pub?gid=1951662307&single=true&output=csv";
@@ -1115,6 +1171,7 @@
             loadDataFromLocal(); loadStats(); startTimer(); 
             await fetchDataFromGoogleSheets(false); // Chờ tải bộ từ vựng xong
             await pullFromCloud(); // Kéo tiến độ về ghép vào
+            checkAndShowTutorial();
         } catch(e) { showToast("❌ Lỗi kết nối!"); loginBtn.innerText = oldText; loginBtn.disabled = false; }
     }
 // ==========================================
@@ -1158,6 +1215,7 @@
         loadDataFromLocal(); loadStats(); startTimer(); 
         await fetchDataFromGoogleSheets(false); 
         await pullFromCloud(); 
+        checkAndShowTutorial();
     }
     async function fetchDataFromGoogleSheets(isManualSync) {
         setDisplay('dashboardArea', 'none'); setDisplay('loadingArea', 'block');
@@ -2716,6 +2774,7 @@ function nextGrammarQuestion() {
             loadDataFromLocal(); loadStats(); startTimer(); 
             await fetchDataFromGoogleSheets(false); 
             await pullFromCloud(); 
+            checkAndShowTutorial();
         }
     }
 
@@ -3355,6 +3414,19 @@ function nextGrammarQuestion() {
         else el.style.display = 'none';
     }
 </script>
-
+<div id="tutorialOverlay" class="overlay-screen" style="z-index: 9999999; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center;">
+    <div class="panel-box" style="max-width: 400px; width: 90%; text-align: center; padding: 30px 20px; animation: popCorrect 0.4s ease-out;">
+        <div id="tutorialIcon" style="font-size: 60px; line-height: 1; margin-bottom: 10px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));">👋</div>
+        <h2 id="tutorialTitle" style="color: var(--primary); font-weight: 900; font-size: 22px; margin: 10px 0 15px 0;">Chào mừng!</h2>
+        <p id="tutorialDesc" style="color: var(--text-main); font-size: 15px; line-height: 1.5; font-weight: 700; margin-bottom: 25px;">Nội dung hướng dẫn</p>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <button class="action-btn" onclick="skipTutorial()" style="color: var(--text-light); background: transparent; box-shadow: none !important;">Bỏ qua</button>
+            <div id="tutorialDots" style="display: flex; gap: 6px;">
+                </div>
+            <button class="action-btn" id="tutorialNextBtn" onclick="nextTutorialStep()" style="background: var(--primary); color: white;">Tiếp tục ➔</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
