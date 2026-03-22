@@ -522,6 +522,8 @@
             <h1 class="login-title">CHARNISHERE</h1>
             <input type="text" id="studentCode" class="login-input" placeholder="MÃ HỌC VIÊN..." onkeypress="if(event.key === 'Enter') login()">
             <button class="login-btn" id="loginBtnAction" onclick="login()">Vào Học</button>
+            
+            <button class="login-btn" style="background: transparent; color: var(--text-light); border: 2px dashed var(--border-color); margin-top: 15px; font-size: 15px;" onclick="startFreeTrial()">🎁 Dùng thử miễn phí 7 ngày</button>
         </div>
     </div>
 
@@ -1115,7 +1117,48 @@
             await pullFromCloud(); // Kéo tiến độ về ghép vào
         } catch(e) { showToast("❌ Lỗi kết nối!"); loginBtn.innerText = oldText; loginBtn.disabled = false; }
     }
+// ==========================================
+    // TÍNH NĂNG: DÙNG THỬ 7 NGÀY
+    // ==========================================
+    async function startFreeTrial() {
+        let trialStart = localStorage.getItem('charnishere_trial_start');
+        let trialID = localStorage.getItem('charnishere_trial_id');
 
+        // Nếu chưa từng dùng thử, tạo ID mới và cắm mốc thời gian
+        if (!trialStart || !trialID) {
+            trialStart = Date.now();
+            trialID = "TRIAL_" + Math.floor(1000 + Math.random() * 9000); // Tạo mã dạng TRIAL_4582
+            localStorage.setItem('charnishere_trial_start', trialStart);
+            localStorage.setItem('charnishere_trial_id', trialID);
+        }
+
+        // Tính số ngày đã trôi qua
+        let daysPassed = (Date.now() - parseInt(trialStart)) / (1000 * 60 * 60 * 24);
+        
+        if (daysPassed > 7) {
+            showToast("⏳ Thời gian dùng thử 7 ngày của bạn đã hết! Vui lòng liên hệ Admin.");
+            return; // Khóa cửa, không cho vào
+        }
+
+        // --- NẾU CÒN HẠN, BẮT ĐẦU QUÁ TRÌNH ĐĂNG NHẬP ---
+        studentID = trialID; 
+        localStorage.setItem('charnishere_active_user', studentID);
+        
+        setDisplay('loginScreen', 'none'); 
+        setDisplay('mainAppWrapper', 'block');
+        document.body.style.background = "var(--bg-color)";
+        setDisplay('quickSidebar', 'flex');
+        
+        if(localStorage.getItem('charnishere_theme') === 'dark') { 
+            document.body.classList.add('dark-mode'); setText('darkModeBtn', '☀️'); 
+        }
+        
+        showToast(`🎁 Bạn còn ${Math.ceil(7 - daysPassed)} ngày dùng thử miễn phí!`);
+        
+        loadDataFromLocal(); loadStats(); startTimer(); 
+        await fetchDataFromGoogleSheets(false); 
+        await pullFromCloud(); 
+    }
     async function fetchDataFromGoogleSheets(isManualSync) {
         setDisplay('dashboardArea', 'none'); setDisplay('loadingArea', 'block');
         try { 
@@ -2647,6 +2690,18 @@ function nextGrammarQuestion() {
     async function checkAutoLogin() {
         let savedUser = localStorage.getItem('charnishere_active_user');
         if (savedUser) {
+            // --- KIỂM TRA HẠN DÙNG THỬ NẾU LÀ TÀI KHOẢN TRIAL ---
+            if (savedUser.startsWith("TRIAL_")) {
+                let trialStart = localStorage.getItem('charnishere_trial_start');
+                if (trialStart) {
+                    let daysPassed = (Date.now() - parseInt(trialStart)) / (1000 * 60 * 60 * 24);
+                    if (daysPassed > 7) {
+                        localStorage.removeItem('charnishere_active_user'); // Xóa vé vào cửa
+                        showToast("⏳ Tài khoản dùng thử đã hết hạn!");
+                        return; // Dừng lại ở màn hình Đăng nhập
+                    }
+                }
+            }
             // Đã có phiên đăng nhập -> Tự động đi thẳng vào trong
             studentID = savedUser;
             setDisplay('loginScreen', 'none'); 
