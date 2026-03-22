@@ -395,6 +395,26 @@
         }
         .dropdown-content a:hover { background-color: var(--extra-bg); color: var(--warning); padding-left: 20px; }
         .dropdown-content.show { display: block !important; animation: popCorrect 0.3s ease-out; }
+    /* ======================================================= */
+/* ĐIỀU CHỈNH ĐỔ BÓNG HỒNG ĐẬM/SÁNG CHO KHUNG THẺ TỪ VỰNG */
+/* ======================================================= */
+
+/* 1. Định nghĩa các biến màu đổ bóng mới */
+:root {
+    /* Chế độ Sáng: Bóng hồng đậm rõ rệt */
+    --flashcard-shadow-color: rgba(233, 110, 131, 0.35); 
+}
+
+body.dark-mode {
+    /* Chế độ Tối: Bóng hồng sáng rực rỡ/neon */
+    --flashcard-shadow-color: rgba(255, 182, 193, 0.65); 
+}
+
+/* 2. Áp dụng cho khung thẻ học từ vựng (#learningSpace) */
+#learningSpace {
+    /* Ghi đè bóng đổ cũ bằng biến mới, tăng alpha để rõ hơn */
+    box-shadow: 0 15px 40px var(--flashcard-shadow-color) !important;
+}
     </style>
 </head>
 <body>
@@ -1268,8 +1288,8 @@
                 if(mGrid) {
                     mGrid.style.display = 'grid';
                     mGrid.innerHTML = `
-                        <button class="mode-card mode-fc" style="padding: 20px;" onclick="selectVocabReview()"><div class="mode-icon">📚</div><p class="mode-title">Từ vựng (${reviewPool.length})</p></button>
-                        <button class="mode-card mode-qz" style="padding: 20px;" onclick="startReviewGrammar()"><div class="mode-icon">📝</div><p class="mode-title">Ngữ pháp (${grammarReviewPool.length})</p></button>
+                        <button class="mode-card ets-color-1" style="padding: 20px;" onclick="selectVocabReview()"><div class="mode-icon">📚</div><p class="mode-title" style="color: var(--text-main); text-shadow: none;">Từ vựng (${reviewPool.length})</p></button>
+                        <button class="mode-card ets-color-5" style="padding: 20px;" onclick="startReviewGrammar()"><div class="mode-icon">📝</div><p class="mode-title" style="color: var(--text-main); text-shadow: none;">Ngữ pháp (${grammarReviewPool.length})</p></button>
                     `;
                 }
                 setText('modeHeaderTitle', 'Bạn muốn ôn phần nào?');
