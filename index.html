@@ -406,11 +406,33 @@
         }
         .dropdown-content a:hover { background-color: var(--extra-bg); color: var(--warning); padding-left: 20px; }
         .dropdown-content.show { display: block !important; animation: popCorrect 0.3s ease-out; }
+        /* ========================================= */
+        /* FIX LỖI KHUNG TRẮNG BỊ KÉO DÀI THÒNG LÒNG */
+        /* ========================================= */
+        
+        #learningSpace, #grammarQuizScreen, #typingApp, #flashcardApp {
+            height: auto !important;
+            min-height: unset !important;
+        }
+        
+        #learningSpace .panel-box, #grammarQuizScreen .panel-box {
+            margin: 20px auto 40px auto !important;
+            height: auto !important; /* Ép hộp trắng tự ôm sát nội dung */
+            padding-bottom: 30px !important;
+        }
+
+        .card-scene {
+            height: 400px !important; /* Chiều cao thẻ Flashcard vừa vặn */
+            margin-bottom: 0 !important;
+        }
     </style>
 </head>
 <body>
   <div id="quickSidebar" class="quick-sidebar" style="display: none;">
-        <button class="quick-btn" onclick="forceNavigate('review')">
+      <button class="quick-btn" onclick="returnToMain()">
+            <span class="btn-icon">🏠</span><span class="btn-text">Trang chủ</span>
+        </button>  
+      <button class="quick-btn" onclick="forceNavigate('review')">
             <span class="btn-icon">🚀</span><span class="btn-text">Ôn tập</span>
         </button>
         <button class="quick-btn" onclick="forceNavigate('learn')">
@@ -2205,8 +2227,20 @@
                         let formattedExplain = d.explain ? d.explain.replace(/\r?\n/g, '<br>') : "";
                         expBox.innerHTML = `✔️ <b>CHÍNH XÁC!</b><br><br>${formattedExplain}`;
                     } else {
+                        // Nút chọn sai biến thành Đỏ
                         btn.style.backgroundColor = 'var(--danger)'; btn.style.borderColor = 'var(--danger)'; btn.style.color = 'white';
-                        Array.from(optArea.children).forEach(b => { if(b.innerText === correctText) { b.style.opacity = 1; b.style.borderColor = 'var(--success)'; b.style.borderWidth = '4px'; } });
+                        
+                        // Quét tìm nút Đúng để tô thành Xanh lá cây
+                        Array.from(optArea.children).forEach(b => { 
+                            if(b.innerText === correctText) { 
+                                b.style.opacity = 1; 
+                                b.style.backgroundColor = 'var(--success)'; // Thêm nền xanh
+                                b.style.borderColor = 'var(--success)'; 
+                                b.style.color = '#222'; // Chữ đen cho dễ đọc
+                                b.style.borderWidth = '4px'; 
+                            } 
+                        });
+                        
                         expBox.className = 'grammar-explanation wrong'; 
                         let formattedExplain = d.explain ? d.explain.replace(/\r?\n/g, '<br>') : "";
                         expBox.innerHTML = `❌ <b>SAI RỒI!</b> Đáp án đúng là: <b>${correctText}</b><br><br>${formattedExplain}`;
@@ -2314,17 +2348,35 @@ function nextGrammarQuestion() {
     }
 
     // Lệnh thoát nhanh bằng nút Back mũi tên
-    function forceExitGrammarQuiz() {
-        // --- NẮN ĐƯỜNG VỀ CHO MỤC "CÂU HỎI ĐÃ LƯU" ---
-        if (window.isSavedGrammarDirectMode) {
-            window.isSavedGrammarDirectMode = false; // Reset cờ
-            setDisplay('grammarQuizScreen', 'none');
-            returnToMain(); // 🚀 Bắn thẳng về Trang chủ
+    // Lệnh thoát nhanh bằng nút Back mũi tên
+    function forceExitGrammarQuiz() { 
+        setDisplay('grammarQuizScreen', 'none'); 
+
+        // Nếu đi vào từ Tìm kiếm hoặc mục Đã lưu -> Về trang chủ
+        if (window.isSearchModeActive || window.isSavedGrammarDirectMode) {
+            window.isSearchModeActive = false;
+            window.isSavedGrammarDirectMode = false;
+            returnToMain(); 
             return;
         }
+
+        // Nếu đang Ôn lại câu sai -> Về trang chủ
+        if (window.isGrammarReviewMode) { 
+            window.isGrammarReviewMode = false;
+            returnToMain();
+            return;
+        } 
         
-        // Logic thoát cũ (ví dụ về trang lọc chủ đề)
-        document.getElementById('displaySubjectTitle').click();
+        // Nếu đang Thực hành theo chủ đề -> Về trang chọn chủ đề
+        if (isGrammarPracticeMode) { 
+            setDisplay('grammarPracticeSetupScreen', 'flex'); 
+            updateStatsDashboard();
+            return;
+        } 
+        
+        // Nếu đang Luyện thi -> Về trang chọn hình thức thi
+        setDisplay('grammarComprehensiveSetupScreen', 'flex'); 
+        renderExamHistory();
     }
 
     // Hàm vẽ Lịch sử Luyện thi
