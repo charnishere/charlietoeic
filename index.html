@@ -273,7 +273,15 @@
 
         .history-chart { display: flex; justify-content: space-between; align-items: flex-end; gap: 4px; height: 150px; margin: 15px 0; border-bottom: 2px solid var(--border-color); padding-bottom: 5px; width: 100%; box-sizing: border-box; }
         .history-bar-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; cursor: pointer; flex: 1; position: relative; }
-        .history-bar { width: 80%; max-width: 30px; background: var(--primary); border-radius: 6px 6px 0 0; min-height: 4px; transition: height 0.5s ease-out; }
+        .history-bar { 
+            width: 80%; 
+            max-width: 30px; 
+            background: linear-gradient(to top, var(--primary), var(--warning)); 
+            border-radius: 6px 6px 0 0; 
+            min-height: 4px; 
+            transition: height 0.5s ease-out;
+            box-shadow: 0 -2px 10px rgba(255, 182, 193, 0.4); 
+        }
         .history-bar.empty { background: var(--border-color); opacity: 0.2; }
         .history-day { font-size: 10px; margin-top: 5px; color: var(--text-light); font-weight: 900; white-space: nowrap; }
         
@@ -399,7 +407,42 @@
         }
         .dropdown-content a:hover { background-color: var(--extra-bg); color: var(--warning); padding-left: 20px; }
         .dropdown-content.show { display: block !important; animation: popCorrect 0.3s ease-out; }
-    </style>
+    /* ======================================================= */
+        /* TĂNG ĐỘ NỔI BẬT KHỐI 3D CHO 4 NÚT MENU TRANG CHỦ        */
+        /* ======================================================= */
+
+        /* 1. Chế độ Sáng: Thêm viền hồng mờ và bóng hồng nhạt để tách khỏi nền */
+        .choice-btn {
+            background: var(--card-bg) !important;
+            border: 1px solid rgba(255, 182, 193, 0.4) !important; /* Viền hồng rất nhạt định hình viền khối */
+            box-shadow: 0 8px 25px rgba(255, 182, 193, 0.15) !important; /* Bóng đổ hồng nhẹ tạo độ nổi */
+        }
+        
+        .choice-btn:hover {
+            background: var(--primary) !important;
+            transform: translateY(-5px) !important;
+            box-shadow: 0 15px 30px rgba(255, 182, 193, 0.4) !important;
+        }
+
+        /* 2. Chế độ Tối: Đẩy nền sáng lên, thêm hiệu ứng hắt sáng 3D ở viền */
+        body.dark-mode .choice-btn {
+            background: #2A2A2A !important; /* Nền xám sáng hơn nền web (#121212) để bứt ra khỏi nền */
+            
+            /* Kỹ thuật hắt sáng 3D (Viền trên sáng, viền dưới tối) */
+            border-top: 1px solid rgba(255, 255, 255, 0.1) !important; 
+            border-left: 1px solid rgba(255, 255, 255, 0.05) !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.6) !important; 
+            border-bottom: 1px solid rgba(0, 0, 0, 0.8) !important;
+            
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8) !important; /* Bóng đen đậm tạo chiều sâu */
+        }
+
+        body.dark-mode .choice-btn:hover {
+            background: var(--primary) !important; 
+            border-color: var(--primary) !important;
+            box-shadow: 0 15px 35px rgba(255, 182, 193, 0.25) !important; /* Hắt bóng hồng khi di chuột */
+        }
+</style>
 </head>
 <body>
   <div id="quickSidebar" class="quick-sidebar" style="display: none;">
@@ -667,7 +710,7 @@
             <p style="font-weight: 900; margin: 0; font-size: 20px; color: var(--text-main);">Tổng Điểm: <span id="profXP" style="color: var(--primary);">0</span> XP</p>
             
             <div style="background: var(--extra-bg); height: 18px; border-radius: 10px; margin: 10px auto; width: 90%; overflow: hidden; border: 2px solid var(--border-color);">
-                <div style="background: var(--info); height: 100%; width: 0%; transition: 0.5s;" id="profXpBar"></div>
+                <div style="background: linear-gradient(90deg, var(--primary), var(--warning)); height: 100%; width: 0%; transition: 0.5s; box-shadow: 0 2px 10px rgba(255, 182, 193, 0.5);" id="profXpBar"></div>
             </div>
             <p style="font-size: 13px; color: var(--text-light); font-weight: 800;" id="profXpNext">Cần 1000 XP để lên cấp</p>
         </div>
