@@ -537,21 +537,26 @@
             
             <div class="header-controls">
                 <div id="statStreakHero" style="
-                    background: rgba(255, 182, 193, 0.25); /* Nền hồng trong suốt */
-                    backdrop-filter: blur(8px); /* Hiệu ứng kính mờ (frosted glass) */
+                    background: rgba(255, 182, 193, 0.25);
+                    backdrop-filter: blur(8px);
                     -webkit-backdrop-filter: blur(8px);
-                    border: none; /* Không viền */
-                    border-radius: 20px; /* Bo góc tròn trịa */
+                    border: none;
+                    border-radius: 20px;
                     padding: 8px 20px;
                     font-size: 22px;
                     font-weight: 900;
-                    color: #FF5E7E; /* Đổi màu số sang hồng đậm/cam để nổi bật trên nền mờ */
+                    color: #FF5E7E;
                     box-shadow: none;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     margin-right: 5px;
-                ">0🔥</div>
+                    /* --- CODE THÊM MỚI TỪ ĐÂY --- */
+                    cursor: pointer;
+                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                    white-space: nowrap;
+                    overflow: hidden;
+                " onclick="toggleStreakTime()">0🔥</div>
             </div>
         </div>
 
@@ -1073,6 +1078,7 @@
     let gameFlowType = 'normal'; let midSessionFailedFlag = false;
     let gameTargetScore = 5; let gameSelEn = null; let gameSelVi = null; let gameMatchesFound = 0; 
     let matchingStartTime = 0; let matchingPairsData = [];
+    let isStreakExpanded = false; // Cờ theo dõi xem thanh ngọn lửa đang đóng hay mở
 
     // BIẾN CHO NGỮ PHÁP
     let grammarData = []; let grammarQuestions = []; let currentGrammarIndex = 0; let grammarScore = 0; let currentGrammarTestMode = 'practice'; // Biến theo dõi: 'practice' hoặc 'exam'
@@ -1445,7 +1451,14 @@
     }
 
     function formatTime(seconds) { if (!seconds) return "0s"; let h = Math.floor(seconds / 3600); let m = Math.floor((seconds % 3600) / 60); let s = Math.floor(seconds % 60); if (h > 0) return `${h}h ${m}p`; if (m > 0) return `${m}p ${s}s`; return `${s}s`; }
-    function updateTimeUI() { setText('statDailyTime', formatTime(studentStats.dailyTime)); setText('statTotalTime', formatTime(studentStats.totalTime)); setText('statAvgTime', formatTime(Math.floor(studentStats.totalTime / Math.max(1, studentStats.totalDaysStudied)))); }
+    function updateTimeUI() { 
+        setText('statDailyTime', formatTime(studentStats.dailyTime)); 
+        setText('statTotalTime', formatTime(studentStats.totalTime)); 
+        setText('statAvgTime', formatTime(Math.floor(studentStats.totalTime / Math.max(1, studentStats.totalDaysStudied)))); 
+        
+        // Nếu thanh Header đang mở, ép nó cập nhật từng giây
+        if (isStreakExpanded) updateStatsDashboard();
+    }
 
     function loadDataFromLocal() { try { let sd = localStorage.getItem(`toeic_data_${studentID}`); allData = sd ? JSON.parse(sd) : []; } catch(e) { allData = []; } }
     function loadStats() {
@@ -1467,11 +1480,24 @@
     
     function saveStats() { localStorage.setItem(`stats_${studentID}`, JSON.stringify(studentStats)); }
     function saveStudentData() { localStorage.setItem(`toeic_data_${studentID}`, JSON.stringify(allData)); updateStatsDashboard(); }
-
+    function toggleStreakTime() {
+        isStreakExpanded = !isStreakExpanded;
+        updateStatsDashboard(); // Gọi lại hàm vẽ giao diện để nó tự động kéo dài ra
+    }
     function updateStatsDashboard() {
         // Cập nhật ngọn lửa Chuỗi ngày
         let streakEl = document.getElementById('statStreakHero'); 
-        if (streakEl) streakEl.innerText = studentStats.streak + "🔥";
+        if (streakEl) {
+            if (isStreakExpanded) {
+                // Đang mở: Hiện Thời gian hôm nay - Tổng thời gian | Chuỗi
+                let dailyStr = formatTime(studentStats.dailyTime);
+                let totalStr = formatTime(studentStats.totalTime);
+                streakEl.innerHTML = `<span style="font-size: 14px; margin-right: 12px; opacity: 0.85; font-weight: 800; letter-spacing: 0.5px;">${dailyStr} - ${totalStr}</span> ${studentStats.streak}🔥`;
+            } else {
+                // Đang đóng: Chỉ hiện Chuỗi
+                streakEl.innerHTML = `${studentStats.streak}🔥`;
+            }
+        }
         
         // Tính toán số từ cần ôn
         let vocabDue = allData.filter(w => w.isStudied && w.nextReviewDate <= Date.now()).length;
