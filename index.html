@@ -363,15 +363,15 @@
         
         /* 2. Khu vực Học Từ vựng (Flashcard, Typing) - Treo lên cao, căn giữa khung hình */
         #learningSpace { 
-            height: auto !important; /* Bỏ ép full màn hình để không bị tụt xuống đáy */
-            min-height: 550px !important; 
-            max-width: 650px !important; 
-            margin: 10px auto 40px auto !important; 
-            display: flex !important; flex-direction: column !important; 
-            justify-content: flex-start !important; /* Lệnh quan trọng: Ghim toàn bộ nội dung lên TRESS (trên cùng) */
-            padding-bottom: 20px !important;
-            box-sizing: border-box;
-        }
+    height: auto !important; 
+    min-height: 550px !important; 
+    max-width: 650px !important; 
+    margin: 10px auto 40px auto !important; 
+    display: flex; flex-direction: column; /* Đã xóa !important */
+    justify-content: flex-start !important; 
+    padding-bottom: 20px !important;
+    box-sizing: border-box;
+}
 
         #flashcardApp, #typingApp { 
             width: 100%; flex: 1; 
@@ -1640,12 +1640,12 @@
         // Tự động lưu tiến độ vì người dùng vừa thoát ngang
         pushToCloud();
     }
-    function forceExitMatching() { setDisplay('matchingGameScreen', 'none'); if(gameFlowType === 'midsession') { setDisplay('learningSpace', 'block'); recentWordsForGame = []; checkNextStep(midSessionFailedFlag); } else if (gameFlowType === 'standalone') { backFromLearning(); } }
-    function forceExitQuiz() { setDisplay('finalQuizScreen', 'none'); if(gameFlowType === 'midsession') { setDisplay('learningSpace', 'block'); recentWordsForGame = []; checkNextStep(midSessionFailedFlag); } else if (gameFlowType === 'standalone') { backFromLearning(); } else if (gameFlowType === 'warmup') { setDisplay('dashboardArea', 'block'); setDisplay('choiceArea', 'flex'); updateStatsDashboard(); } }
+    function forceExitMatching() { setDisplay('matchingGameScreen', 'none'); if(gameFlowType === 'midsession') { setDisplay('learningSpace', 'flex'); recentWordsForGame = []; checkNextStep(midSessionFailedFlag); } else if (gameFlowType === 'standalone') { backFromLearning(); } }
+    function forceExitQuiz() { setDisplay('finalQuizScreen', 'none'); if(gameFlowType === 'midsession') { setDisplay('learningSpace', 'flex'); recentWordsForGame = []; checkNextStep(midSessionFailedFlag); } else if (gameFlowType === 'standalone') { backFromLearning(); } else if (gameFlowType === 'warmup') { setDisplay('dashboardArea', 'block'); setDisplay('choiceArea', 'flex'); updateStatsDashboard(); } }
 
     function startAppMode(modeName) {
         if(currentSet.length === 0) { showToast("Không có từ vựng nào!"); returnToMain(); return; }
-        setDisplay('dashboardArea', 'none'); setDisplay('modeSelectionArea', 'none'); setDisplay('learningSpace', 'block');
+        setDisplay('dashboardArea', 'none'); setDisplay('modeSelectionArea', 'none'); setDisplay('learningSpace', 'flex');
         currentLearningMode = modeName; currentIndex = 0; wordsStudiedSession = 0; recentWordsForGame = [];
         setDisplay('flashcardApp', 'none'); setDisplay('typingApp', 'none'); setDisplay('finalQuizScreen', 'none');
 
@@ -1666,7 +1666,7 @@
     }
 
     function routeNextUI() {
-        setDisplay('flashcardApp', 'none'); setDisplay('typingApp', 'none'); setDisplay('finalQuizScreen', 'none'); setDisplay('learningSpace', 'block'); setDisplay('reverseModeBtn', 'none');
+        setDisplay('flashcardApp', 'none'); setDisplay('typingApp', 'none'); setDisplay('finalQuizScreen', 'none'); setDisplay('learningSpace', 'flex'); setDisplay('reverseModeBtn', 'none');
         if (currentLearningMode === 'flashcard') { setDisplay('flashcardApp', 'block'); setDisplay('reverseModeBtn', 'inline-block'); updateUI_Flashcard(); } 
         else if (currentLearningMode === 'typing' || currentLearningMode === 'listening') { setDisplay('typingApp', 'block'); updateUI_Typing(); }
     }
@@ -1833,7 +1833,7 @@
 
         let returnBtn = document.getElementById('matchResultBtn');
         if(returnBtn) {
-            if (gameFlowType === 'midsession') { returnBtn.onclick = () => { setDisplay('matchResultScreen', 'none'); setDisplay('learningSpace', 'block'); recentWordsForGame = []; checkNextStep(midSessionFailedFlag); }; } 
+            if (gameFlowType === 'midsession') { returnBtn.onclick = () => { setDisplay('matchResultScreen', 'none'); setDisplay('learningSpace', 'flex'); recentWordsForGame = []; checkNextStep(midSessionFailedFlag); }; } 
             else { returnBtn.onclick = () => { setDisplay('matchResultScreen', 'none'); finishLearningSession(); }; }
         }
     }
@@ -1922,7 +1922,7 @@
                 
                 let returnBtn = document.getElementById('quizResultReturnBtn');
                 if(returnBtn) {
-                    if (gameFlowType === 'midsession') { returnBtn.onclick = () => { setDisplay('quizResultScreen', 'none'); setDisplay('learningSpace', 'block'); recentWordsForGame = []; checkNextStep(midSessionFailedFlag); }; } 
+                    if (gameFlowType === 'midsession') { returnBtn.onclick = () => { setDisplay('quizResultScreen', 'none'); setDisplay('learningSpace', 'flex'); recentWordsForGame = []; checkNextStep(midSessionFailedFlag); }; } 
                     else if (gameFlowType === 'warmup') { returnBtn.onclick = () => { setDisplay('quizResultScreen', 'none'); setDisplay('dashboardArea', 'block'); setDisplay('choiceArea', 'flex'); updateStatsDashboard(); }; } 
                     else { returnBtn.onclick = () => backFromLearning(); }
                 }
@@ -2987,7 +2987,7 @@ function nextGrammarQuestion() {
         // Tắt màn hình ngoài, bật phòng Flashcard
         setDisplay('globalSearchResults', 'none');
         setDisplay('dashboardArea', 'none');
-        setDisplay('learningSpace', 'block');
+        setDisplay('learningSpace', 'flex');
         setDisplay('flashcardApp', 'block');
         setDisplay('typingApp', 'none');
         setDisplay('finalQuizScreen', 'none');
