@@ -1535,31 +1535,35 @@
         } 
     }
     function backFromLearning() { 
-        if (window.isSearchModeActive) {
-            window.isSearchModeActive = false;
-            // Ẩn triệt để các màn hình đang bị kẹt
-            setDisplay('learningSpace', 'none'); 
-            setDisplay('allDoneScreen', 'none');
-            setDisplay('flashcardApp', 'none');
-            
-            returnToMain(); // Về trang chủ
-            executeGlobalSearch(); // 🔍 Hiện lại ngay bảng tìm kiếm
-            return;
-        }
-        
+    if (window.isSearchModeActive) {
+        window.isSearchModeActive = false;
+        // Ẩn triệt để các màn hình đang bị kẹt
         setDisplay('learningSpace', 'none'); 
-        setDisplay('matchingGameScreen', 'none'); 
-        setDisplay('finalQuizScreen', 'none'); 
-        setDisplay('matchResultScreen', 'none'); 
-        setDisplay('quizResultScreen', 'none'); 
-        setDisplay('allDoneScreen', 'none'); 
-        setDisplay('dashboardArea', 'block'); 
-        setDisplay('modeSelectionArea', 'block'); 
-        if(window.speechSynthesis) window.speechSynthesis.cancel(); 
+        setDisplay('allDoneScreen', 'none');
+        setDisplay('flashcardApp', 'none');
         
-        // Gắn tự động lưu:
-        pushToCloud(); 
+        returnToMain(); // Về trang chủ
+        executeGlobalSearch(); // 🔍 Hiện lại ngay bảng tìm kiếm
+        return;
     }
+    
+    setDisplay('learningSpace', 'none'); 
+    setDisplay('matchingGameScreen', 'none'); 
+    setDisplay('finalQuizScreen', 'none'); 
+    setDisplay('matchResultScreen', 'none'); 
+    setDisplay('quizResultScreen', 'none'); 
+    setDisplay('allDoneScreen', 'none'); 
+    
+    // --- VỊ TRÍ ĐÃ SỬA LỖI ---
+    setDisplay('dashboardArea', 'none'); // Sửa 'block' thành 'none'
+    setDisplay('modeSelectionArea', 'block'); 
+    // -------------------------
+
+    if(window.speechSynthesis) window.speechSynthesis.cancel(); 
+    
+    // Gắn tự động lưu:
+    pushToCloud(); 
+}
     function returnToMain() { 
         gameFlowType = 'normal'; 
         isSavedVocabMode = false;
