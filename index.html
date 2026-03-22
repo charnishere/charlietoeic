@@ -384,13 +384,28 @@
         <div id="loadingArea"><div class="spinner"></div><p style="color: var(--text-main); font-weight: 900; font-size: 16px; text-align: center;">Đang tải dữ liệu...</p></div>
 
         <div id="dashboardArea" style="display: none;">
-            <div class="stats-dashboard">
-                <div class="stat-item"><div class="stat-value" id="statStreak">0🔥</div><div class="stat-label">Chuỗi ngày</div></div>
-                <div class="stat-item"><div class="stat-value" id="statDailyTime">0s</div><div class="stat-label">Hôm nay</div></div>
-                <div class="stat-item"><div class="stat-value" id="statTotalTime">0s</div><div class="stat-label">Tổng học</div></div>
-                <div class="stat-item"><div class="stat-value" id="statAvgTime">0s</div><div class="stat-label">TB / Ngày</div></div>
-                <div class="stat-item"><div class="stat-value" id="statMastered">0</div><div class="stat-label">Đã thuộc</div></div>
-                <div class="stat-item"><div class="stat-value" id="statDue">0</div><div class="stat-label">Cần ôn</div></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin: 15px 0;">
+                <div>
+                    <h3 style="margin: 0; color: var(--text-main); font-weight: 900; font-size: clamp(18px, 5vw, 22px);">Sẵn sàng học chưa?</h3>
+                    <p style="margin: 5px 0 0 0; color: var(--text-light); font-size: 14px; font-weight: 700;">Hôm nay chúng ta chinh phục TOEIC nhé!</p>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 24px; font-weight: 900; color: var(--warning);" id="statStreakHero">0🔥</div>
+                    <div style="font-size: 12px; font-weight: 800; color: var(--text-light);">Chuỗi ngày</div>
+                </div>
+            </div>
+
+            <div onclick="prepareModeSelection(1)" style="background: linear-gradient(135deg, #FF9EAA, #FFB6C1); padding: 25px; border-radius: 25px; color: white; cursor: pointer; box-shadow: 0 10px 25px rgba(255,182,193,0.4); transition: 0.3s; margin-bottom: 25px; position: relative; overflow: hidden; text-align: left;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='none'">
+                <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 13px; font-weight: 800; opacity: 0.9; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Nhiệm vụ ưu tiên</div>
+                        <div style="font-size: 28px; font-weight: 900; margin-bottom: 5px;">Ôn tập ngay</div>
+                        <div style="font-size: 15px; font-weight: 700; opacity: 0.9;" id="heroDueText">Đang tính toán...</div>
+                    </div>
+                    <div style="font-size: 55px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));">🚀</div>
+                </div>
+                <div style="position: absolute; right: -20px; top: -30px; width: 120px; height: 120px; background: rgba(255,255,255,0.15); border-radius: 50%; z-index: 1;"></div>
+                <div style="position: absolute; right: 60px; bottom: -40px; width: 80px; height: 80px; background: rgba(255,255,255,0.15); border-radius: 50%; z-index: 1;"></div>
             </div>
         <div id="globalSearchContainer" style="margin-bottom: 20px; margin-top: 10px;">
                 <div style="display: flex; gap: 10px;">
@@ -402,25 +417,21 @@
                 </div>
             </div>
             <div id="choiceArea" style="text-align: center;">
-                <div class="choice-container">
-                    <button class="choice-btn" onclick="prepareModeSelection(1)">
-                        <span class="choice-icon">🚀</span><p class="choice-title">Ôn tập nhanh</p><p class="choice-desc">Quét từ đến hạn</p>
-                    </button>
-                    
-                    <button class="choice-btn" onclick="prepareModeSelection(2)">
+                <div class="choice-container" style="grid-template-columns: repeat(2, 1fr);">
+                    <button class="choice-btn" style="border-color: #A8E6CF;" onclick="prepareModeSelection(2)">
                         <span class="choice-icon">📚</span><p class="choice-title">Học Bài Mới</p><p class="choice-desc">Mở khóa chủ đề</p>
                     </button>
-                    
-                    <button class="choice-btn" style="border-color: #FFB6C1;" onclick="openGrammarMenu()">
-                        <span class="choice-icon">📝</span>
-                        <p class="choice-title">Ngữ Pháp</p>
-                        <p class="choice-desc">Lý thuyết & Bài tập</p>
+                    <button class="choice-btn" style="border-color: #81D4FA;" onclick="openGrammarMenu()">
+                        <span class="choice-icon">📝</span><p class="choice-title">Ngữ Pháp</p><p class="choice-desc">Lý thuyết & Bài tập</p>
                     </button>
-
+                    <button class="choice-btn" style="border-color: #FFD54F;" onclick="openFavoriteVocab()">
+                        <span class="choice-icon">💛</span><p class="choice-title">Từ vựng của tôi</p><p class="choice-desc" id="savedVocabShortcutDesc">0 từ đã lưu</p>
+                    </button>
                     <button class="choice-btn" style="border-color: #FFB6C1;" onclick="openProfile()">
-                        <span class="choice-icon">🏆</span><p class="choice-title">Hồ Sơ</p><p class="choice-desc">Xem Lịch sử</p>
+                        <span class="choice-icon">🏆</span><p class="choice-title">Hồ Sơ</p><p class="choice-desc">Thành tích & Lịch sử</p>
                     </button>
                 </div>
+            </div>
             </div>
             <div id="setSelectionArea" style="display:none; text-align: center; margin-top: 20px;">
                 <h3 style="color: var(--primary); font-weight: 900; font-size: 20px;">Chọn bộ từ vựng</h3>
@@ -1105,16 +1116,31 @@
     function saveStudentData() { localStorage.setItem(`toeic_data_${studentID}`, JSON.stringify(allData)); updateStatsDashboard(); }
 
     function updateStatsDashboard() {
-        setText('statStreak', studentStats.streak + "🔥");
-        setText('statMastered', allData.filter(w => w.isStudied && w.srsLevel >= 5).length);
+        // Cập nhật ngọn lửa Chuỗi ngày
+        let streakEl = document.getElementById('statStreakHero'); 
+        if (streakEl) streakEl.innerText = studentStats.streak + "🔥";
         
-        // CỘNG GỘP: Từ vựng đến hạn + Ngữ pháp sai
+        // Tính toán số từ cần ôn
         let vocabDue = allData.filter(w => w.isStudied && w.nextReviewDate <= Date.now()).length;
         let grammarDue = (studentStats.wrongGrammar && studentStats.wrongGrammar.length > 0) ? studentStats.wrongGrammar.length : 0;
-        setText('statDue', vocabDue + grammarDue);
+        let totalDue = vocabDue + grammarDue;
+        
+        // Cập nhật chữ trên khối Hero CTA
+        let dueEl = document.getElementById('heroDueText');
+        if (dueEl) {
+            if (totalDue > 0) dueEl.innerText = `Có ${totalDue} câu hỏi/từ vựng cần ôn`;
+            else dueEl.innerText = "🎉 Tuyệt vời! Đã ôn xong hết.";
+        }
         
         let lvlInfo = calculateLevel(studentStats.xp);
         setText('displayUserLevel', `(Lv.${lvlInfo.lv})`);
+        
+        // Cập nhật bộ đếm cho nút tắt "Từ vựng của tôi"
+        let svDesc = document.getElementById('savedVocabShortcutDesc');
+        if (svDesc) {
+            let svCount = (studentStats.savedVocab && studentStats.savedVocab.length) ? studentStats.savedVocab.length : 0;
+            svDesc.innerText = `${svCount} từ đã lưu`;
+        }
     }
 
     function addXP(amount) { 
@@ -2373,6 +2399,24 @@ function nextGrammarQuestion() {
     // ==========================================
     // TÍNH NĂNG: LƯU TỪ VỰNG CỦA TÔI
     // ==========================================
+    // Mở nhanh Từ vựng của tôi từ Trang chủ
+    function openFavoriteVocab() {
+        if (!studentStats.savedVocab || studentStats.savedVocab.length === 0) {
+            showToast("⚠️ Bạn chưa lưu từ vựng nào (Bấm 💛 để lưu)");
+            return;
+        }
+        isSavedVocabMode = true; 
+        originalGroupSet = allData.filter(w => studentStats.savedVocab.includes(w.vocab));
+        currentSet = [...originalGroupSet];
+        
+        setDisplay('dashboardArea', 'none');
+        setText('modeHeaderTitle', `Từ vựng của tôi (${currentSet.length})`);
+        setDisplay('modeSelectionArea', 'block'); 
+        
+        setDisplay('vocabListContainer', 'block');
+        document.getElementById('shuffleListCheck').checked = false;
+        renderVocabList();
+    }
     function toggleSaveVocab(e) {
         if(e) { e.preventDefault(); e.stopPropagation(); } // Tránh lật thẻ khi bấm nút
         if(!currentSet || currentSet.length === 0) return;
