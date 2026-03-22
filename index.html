@@ -1455,13 +1455,21 @@
 
     function backFromModeSelection() { 
         setDisplay('modeSelectionArea', 'none'); 
+        
+        // Nhận diện nếu đang ở màn hình chọn 2 thẻ (Từ vựng/Ngữ pháp) của Ôn tập
+        let mGrid = document.getElementById('mixedModeGrid');
+        if (mGrid && mGrid.style.display === 'grid') {
+            returnToMain(); // Đưa thẳng về Trang chủ
+            return;
+        }
+
         if (isSrsMode) { 
             returnToMain(); // Trở về Trang chủ
         } else if (isSavedVocabMode) { 
             isSavedVocabMode = false; 
             returnToMain(); 
         } else { 
-            setDisplay('filterArea', 'block'); 
+            setDisplay('filterArea', 'block'); // Quay lại màn hình chọn bài học (Học bài mới)
         } 
     }
     function backFromLearning() { 
