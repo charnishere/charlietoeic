@@ -395,45 +395,50 @@
         }
         .dropdown-content a:hover { background-color: var(--extra-bg); color: var(--warning); padding-left: 20px; }
         .dropdown-content.show { display: block !important; animation: popCorrect 0.3s ease-out; }
-    /* ======================================================= */
+/* ======================================================= */
 /* CHẾ ĐỘ AUTO-FIT: ÉP VỪA VẶN 100% MÀN HÌNH MÁY TÍNH      */
 /* ======================================================= */
 
 @media (min-width: 801px) {
-    /* 1. Khóa chiều cao tổng thể bằng 100% màn hình, tắt cuộn toàn trang */
+    /* 1. Khóa chiều cao tổng thể bằng 100% màn hình */
     html, body {
         height: 100vh;
-        overflow: hidden; /* Cắt bỏ thanh cuộn dọc của toàn bộ web */
+        overflow: hidden; 
     }
 
     /* 2. Container chính tự giãn theo chiều dọc */
     .container {
-        display: flex !important; /* Dùng lại Flexbox để tính toán tỷ lệ */
+        display: flex !important; 
         flex-direction: column;
         height: 100vh; 
         padding-bottom: 10px;
     }
 
-    /* 3. Ô học từ vựng (learningSpace) sẽ tự động lấp đầy khoảng trống còn lại */
+    /* 3. Ô học từ vựng tự lấp đầy khoảng trống (Thêm bảo hiểm cuộn) */
     #learningSpace {
-        flex: 1 !important; /* Lệnh cực kỳ quan trọng: Chiếm toàn bộ không gian rảnh rỗi */
-        min-height: 0 !important; /* Phá vỡ mức cố định 550px cũ */
+        flex: 1 !important; 
+        min-height: 0 !important; 
         height: auto !important;
-        margin: 15px auto !important; /* Căn giữa, bỏ khoảng cách 50px thừa thãi ở đáy */
+        margin: 15px auto !important; 
         padding-bottom: 15px !important;
+        overflow-y: auto !important; /* CỨU CÁNH: Cho phép cuộn toàn bộ ô này nếu màn hình quá nhỏ */
     }
 
-    /* 4. Thẻ Flashcard lật mặt cũng tự động phình to/thu nhỏ theo ô từ vựng */
+    /* 4. Khắc phục lỗi Flashcard phình to đẩy nút xuống đáy */
+    #flashcardApp {
+        min-height: 0 !important; /* Ép App không được tràn khỏi LearningSpace */
+    }
+
     .card-scene {
-        flex: 1 !important; /* Tự động cao lấp đầy #learningSpace */
-        height: auto !important; /* Phá vỡ mức cố định 420px cũ */
-        min-height: 250px !important; /* Ngưỡng an toàn nhỏ nhất để chữ không bị nát */
+        flex: 1 !important; 
+        height: 100% !important; /* SỬA LỖI Ở ĐÂY: Trả về 100% thay vì 'auto' để ép thẻ có giới hạn */
+        min-height: 250px !important; 
         margin: 0 auto 15px auto !important;
     }
     
-    /* 5. Cứu cánh nếu nội dung chữ bên trong mặt thẻ quá dài */
+    /* 5. Kích hoạt thanh cuộn ĐỘC LẬP bên trong mặt thẻ */
     .card__face {
-        overflow-y: auto !important; /* Chỉ hiện thanh cuộn nhỏ bên trong thẻ nếu chữ quá nhiều */
+        overflow-y: auto !important; 
     }
 }
     </style>
