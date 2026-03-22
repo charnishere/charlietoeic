@@ -203,7 +203,23 @@
         .mode-card:active { transform: scale(0.95); }
         .mode-icon { font-size: 24px; background: rgba(255,255,255,0.4); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
         .mode-title { font-size: 15px; font-weight: 900; color: white; margin: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-        .mode-fc { background: #fde4cf; } .mode-qz { background: #ffcfd2; } .mode-ls { background: #f1c0e8; } .mode-tp { background: #cfbaf0; } .mode-mt { background: #a3c4f3; } 
+        /* ======================================================= */
+        /* ĐỒNG BỘ MÀU 5 NÚT HỌC TỪ VỰNG VỚI BẢNG MÀU ETS          */
+        /* ======================================================= */
+        
+        /* Chế độ Sáng (Tương ứng ets-color 1 đến 5) */
+        .mode-fc { background: #fde4cf !important; } 
+        .mode-qz { background: #ffcfd2 !important; } 
+        .mode-ls { background: #f1c0e8 !important; } 
+        .mode-tp { background: #cfbaf0 !important; } 
+        .mode-mt { background: #a3c4f3 !important; } 
+
+        /* Chế độ Tối (Tự động lật sang màu trầm của bộ ETS) */
+        body.dark-mode .mode-fc { background: #9b9b7a !important; }
+        body.dark-mode .mode-qz { background: #baa587 !important; }
+        body.dark-mode .mode-ls { background: #d9ae94 !important; }
+        body.dark-mode .mode-tp { background: #f1dca7 !important; }
+        body.dark-mode .mode-mt { background: #ffcb69 !important; } 
         
         select { padding: 15px; border-radius: 15px; border: 2px solid var(--primary); font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 900; width: 100%; max-width: 100%; margin: 15px auto; display: block; color: var(--text-main); background: var(--card-bg); outline: none; }
         
