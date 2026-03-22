@@ -442,6 +442,27 @@
             border-color: var(--primary) !important;
             box-shadow: 0 15px 35px rgba(255, 182, 193, 0.25) !important; /* Hắt bóng hồng khi di chuột */
         }
+    /* ======================================================= */
+        /* SỬA MÀU CHỮ CHỦ ĐỀ NGỮ PHÁP (TỪ TRẮNG SANG ĐEN Ở MODE SÁNG) */
+        /* ======================================================= */
+        
+        /* Ở chế độ Sáng: Chữ màu đen xám đậm, bỏ hiệu ứng đổ bóng mờ */
+        .grammar-topic-title {
+            color: #333333 !important;
+            text-shadow: none !important;
+        }
+
+        /* Ở chế độ Tối: Đổi lại thành chữ màu trắng để nổi bật trên nền đậm */
+        body.dark-mode .grammar-topic-title {
+            color: #FFFFFF !important;
+        }
+    /* (Tùy chọn) Làm dịu nền của icon tròn bên trong các thẻ */
+        .grammar-topic-icon {
+            background: rgba(0, 0, 0, 0.08) !important; /* Đổi nền vòng tròn thành đen trong suốt 8% */
+        }
+        body.dark-mode .grammar-topic-icon {
+            background: rgba(255, 255, 255, 0.2) !important; /* Trả lại màu trắng trong suốt khi ở mode Tối */
+        }
 </style>
 </head>
 <body>
@@ -3126,8 +3147,8 @@ function nextGrammarQuestion() {
         saveStats(); // Lưu vào bộ nhớ máy
     }
 
-    // 2. Hàm vẽ Bảng Tiến Độ
-    function showGrammarProgress() {
+// 2. Hàm vẽ Bảng Tiến Độ (Đã sửa lỗi click và thêm độ chính xác chi tiết)
+    window.showGrammarProgress = function() {
         if (!studentStats.grammarTracker) studentStats.grammarTracker = {};
         
         let allTopics = [];
@@ -3144,13 +3165,16 @@ function nextGrammarQuestion() {
         });
 
         let html = '';
-        uniqueTopics.forEach(topic => {
+        uniqueTopics.forEach((topic, topicIndex) => {
             let topicQuestions = grammarData.filter(q => q.topic && q.topic.split(',').map(t=>t.trim()).includes(topic));
             let totalQ = topicQuestions.length;
             let doneQ = 0;
             let correctAttempts = 0;
             let totalAttempts = 0;
             let detailsHTML = '';
+
+            // ID an toàn tuyệt đối không sợ lỗi dấu cách
+            let safeTargetId = `prog_topic_${topicIndex}`; 
 
             topicQuestions.forEach((q, idx) => {
                 let tr = studentStats.grammarTracker[q.question];
@@ -3159,33 +3183,53 @@ function nextGrammarQuestion() {
                     correctAttempts += tr.correct;
                     totalAttempts += tr.attempts;
                     
-                    let histStr = tr.history.map(h => `<span style="background: var(--card-bg); padding: 2px 6px; border-radius: 5px; border: 1px solid var(--border-color); font-size: 11px; font-weight: 900; color: var(--primary-dark);">${h}</span>`).join(' ➔ ');
+                    // Tính độ chính xác của RIÊNG CÂU NÀY
+                    let questionAccuracy = Math.round((tr.correct / tr.attempts) * 100);
+                    
+                    // Tìm đáp án đúng thực sự của câu này để tô màu lịch sử
+                    let correctText = "";
+                    if (q.correctChar === 'A') correctText = q.optA; else if (q.correctChar === 'B') correctText = q.optB; else if (q.correctChar === 'C') correctText = q.optC; else if (q.correctChar === 'D') correctText = q.optD;
+
+                    // Vẽ chuỗi lịch sử có tô màu Xanh (Đúng) / Đỏ (Sai)
+                    let histStr = tr.history.map(h => {
+                        let isMatch = (h === correctText);
+                        let colorBorder = isMatch ? 'var(--success)' : 'var(--danger)';
+                        let colorText = isMatch ? '#1b4332' : 'var(--danger)';
+                        let bg = isMatch ? 'rgba(168, 230, 207, 0.3)' : 'rgba(255, 138, 128, 0.1)';
+                        return `<span style="background: ${bg}; padding: 4px 8px; border-radius: 8px; border: 1px solid ${colorBorder}; font-size: 11px; font-weight: 900; color: ${colorText}; white-space: nowrap;">${h}</span>`;
+                    }).join('<span style="color: var(--border-color); font-weight: 900;">➔</span>');
                     
                     detailsHTML += `
-                        <div style="background: var(--card-bg); padding: 12px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid ${tr.correct > 0 ? 'var(--success)' : 'var(--danger)'}; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
-                            <div style="font-size: 14px; font-weight: 800; color: var(--text-main); margin-bottom: 8px;">Câu ${idx+1}: ${q.question.replace(/_+/g, '___')}</div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; flex-wrap: wrap; gap: 5px;">
-                                <span style="color: var(--text-light); font-weight: 800; background: var(--extra-bg); padding: 3px 8px; border-radius: 8px;">Đúng: ${tr.correct}/${tr.attempts} lần</span>
-                                <span style="display: flex; gap: 4px; align-items: center; font-weight: 800; color: var(--text-light);">Lịch sử: ${histStr}</span>
+                        <div style="background: var(--card-bg); padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid ${questionAccuracy >= 50 ? 'var(--success)' : 'var(--warning)'}; box-shadow: 0 4px 15px rgba(0,0,0,0.04);">
+                            <div style="font-size: 15px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; line-height: 1.4;">${q.question.replace(/_+/g, '___')}</div>
+                            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--border-color); padding-bottom: 8px;">
+                                    <span style="color: var(--text-light); font-weight: 800;">Đã làm: ${tr.attempts} | Đúng: ${tr.correct}</span>
+                                    <span style="font-weight: 900; color: ${questionAccuracy >= 50 ? 'var(--success)' : 'var(--danger)'}; font-size: 14px;">Chính xác: ${questionAccuracy}%</span>
+                                </div>
+                                <div style="font-weight: 800; color: var(--text-light);">
+                                    Lịch sử chọn (5 lần gần nhất):
+                                    <div style="margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">${histStr}</div>
+                                </div>
                             </div>
                         </div>
                     `;
                 }
             });
 
-            let accuracy = totalAttempts > 0 ? Math.round((correctAttempts / totalAttempts) * 100) : 0;
+            let overallAccuracy = totalAttempts > 0 ? Math.round((correctAttempts / totalAttempts) * 100) : 0;
             
             html += `
-                <div style="background: var(--extra-bg); border-radius: 15px; padding: 15px; border: 2px solid var(--border-color); transition: 0.2s;" onmouseover="this.style.transform='scale(0.99)'" onmouseout="this.style.transform='scale(1)'">
-                    <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleProgressDetail('prog_${CSS.escape(topic)}')">
+                <div style="background: var(--extra-bg); border-radius: 15px; padding: 15px; border: 2px solid var(--border-color); transition: 0.2s; margin-bottom: 12px;" onmouseover="this.style.transform='scale(0.99)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleProgressDetail('${safeTargetId}')">
                         <h4 style="margin: 0; color: var(--primary); font-size: 18px; font-weight: 900;">${topic}</h4>
                         <div style="text-align: right;">
-                            <div style="font-size: 13px; font-weight: 900; color: var(--text-main);">Đã làm: ${doneQ}/${totalQ}</div>
-                            <div style="font-size: 12px; font-weight: 900; color: ${accuracy >= 80 ? 'var(--success)' : (accuracy >= 50 ? 'var(--warning)' : 'var(--danger)')};">Độ chính xác: ${accuracy}%</div>
+                            <div style="font-size: 14px; font-weight: 900; color: var(--text-main);">Đã làm: ${doneQ}/${totalQ}</div>
+                            <div style="font-size: 12px; font-weight: 900; color: ${overallAccuracy >= 80 ? 'var(--success)' : (overallAccuracy >= 50 ? 'var(--warning)' : 'var(--danger)')};">Tổng chính xác: ${overallAccuracy}%</div>
                         </div>
                     </div>
-                    <div id="prog_${CSS.escape(topic)}" style="display: none; margin-top: 15px; border-top: 2px dashed var(--border-color); padding-top: 15px;">
-                        ${detailsHTML || '<div style="font-size: 13px; color: var(--text-light); font-style: italic; font-weight: 700; text-align: center;">Bạn chưa làm câu nào trong chủ đề này.</div>'}
+                    <div id="${safeTargetId}" style="display: none; margin-top: 15px; border-top: 2px dashed var(--border-color); padding-top: 15px;">
+                        ${detailsHTML || '<div style="font-size: 14px; color: var(--text-light); font-style: italic; font-weight: 700; text-align: center; padding: 15px 0;">Bạn chưa làm câu nào trong chủ đề này.</div>'}
                     </div>
                 </div>
             `;
@@ -3193,7 +3237,19 @@ function nextGrammarQuestion() {
 
         document.getElementById('grammarProgressContent').innerHTML = html;
         setDisplay('grammarProgressModal', 'flex');
-    }
+    };
+    
+    // Hàm bật/tắt bảng chi tiết
+    window.toggleProgressDetail = function(id) {
+        let el = document.getElementById(id);
+        if (el) {
+            if (el.style.display === 'none' || el.style.display === '') {
+                el.style.display = 'block';
+            } else {
+                el.style.display = 'none';
+            }
+        }
+    };
     
     function toggleProgressDetail(id) {
         let el = document.getElementById(id);
