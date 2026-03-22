@@ -128,11 +128,11 @@
             margin: 15px auto 50px auto !important; /* Lề trên 15px, dưới 50px, giữa 2 bên */
             flex: none !important; /* Triệt tiêu hoàn toàn tính giãn nén của Flexbox */
             
-            /* GIAO DIỆN TRỰC QUAN (Viền + Nền) */
-            border: 2px solid var(--primary) !important; 
-            border-radius: 20px !important;
-            background: var(--card-bg) !important; /* Tránh bị trong suốt đè chữ */
-            box-shadow: none !important;
+/* --- BỎ VIỀN HỒNG & HIỆN ĐỔ BÓNG 3D NHƯ CŨ --- */
+    border: none !important; /* Xóa viền hồng */
+    border-radius: 20px !important; /* Giữ bo góc */
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06) !important; /* Bật lại đổ bóng mờ 3D */
+    background: var(--card-bg) !important; /* Đảm bảo nền trắng */
         }
 
         #flashcardApp, #typingApp { 
