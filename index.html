@@ -361,8 +361,14 @@
         /* FIX LỖI GIẬT MÀN HÌNH VÀ MENU ĐÃ LƯU */
         /* ========================================= */
         
-        /* Giữ cố định chiều cao khu vực học tập để không bị giật nhún */
-        #learningSpace { min-height: 550px; display: flex; flex-direction: column; }
+        /* Giữ cố định chiều cao khu vực học tập, thu hẹp bề ngang cho gọn gàng */
+        #learningSpace { 
+            min-height: 550px; 
+            max-width: 850px !important; /* Bóp nhỏ khung lại, bạn có thể chỉnh số 750 tùy ý */
+            margin: 20px auto !important; /* Căn giữa khung vào giữa màn hình */
+            display: flex; 
+            flex-direction: column; 
+        }
         #flashcardApp, #typingApp { width: 100%; flex: 1; display: flex; flex-direction: column; justify-content: center; }
 
         /* CSS cho Dropdown Menu Đã Lưu */
@@ -1492,12 +1498,14 @@
 
     function backFromModeSelection() { 
         setDisplay('modeSelectionArea', 'none'); 
-        if (isSrsMode) { setDisplay('choiceArea', 'flex'); } 
-        else if (isSavedVocabMode) { 
+        if (isSrsMode) { 
+            setDisplay('choiceArea', 'flex'); 
+        } else if (isSavedVocabMode) { 
             isSavedVocabMode = false; 
-            setDisplay('setSelectionArea', 'block'); 
+            returnToMain(); // 🚀 Bắn thẳng về Trang chủ
+        } else { 
+            setDisplay('filterArea', 'block'); 
         } 
-        else { setDisplay('filterArea', 'block'); } 
     }
     function backFromLearning() { 
         if (window.isSearchModeActive) {
@@ -2277,6 +2285,14 @@ function nextGrammarQuestion() {
                         executeGlobalSearch(); // 🔍 Hiện lại ngay bảng tìm kiếm
                         return; // Kết thúc lệnh tại đây
                     }
+
+                    // --- NẮN ĐƯỜNG VỀ CHO MỤC "CÂU HỎI ĐÃ LƯU" ---
+                    if (window.isSavedGrammarDirectMode) {
+                        window.isSavedGrammarDirectMode = false;
+                        returnToMain(); // 🚀 Bắn thẳng về Trang chủ
+                        return; 
+                    }
+                    // --------------------------------------------------------
                     if (window.isGrammarReviewMode) { 
                         setDisplay('dashboardArea', 'block'); 
                         setDisplay('choiceArea', 'flex'); 
@@ -2300,7 +2316,12 @@ function nextGrammarQuestion() {
             executeGlobalSearch(); // 🔍 Hiện lại ngay bảng tìm kiếm
             return;
         }
-
+        if (window.isSavedGrammarDirectMode) {
+            window.isSavedGrammarDirectMode = false;
+            setDisplay('grammarQuizScreen', 'none');
+            returnToMain(); // 🚀 Bắn thẳng về Trang chủ
+            return;
+        }
         setDisplay('grammarQuizScreen', 'none'); 
         if (window.isGrammarReviewMode) { 
             setDisplay('dashboardArea', 'block'); 
@@ -2534,12 +2555,15 @@ function nextGrammarQuestion() {
     });
 
     // Mở nhanh phòng Thực hành Ngữ pháp từ Menu Đã lưu
+    // Mở nhanh phòng Thực hành Ngữ pháp từ Menu Đã lưu
     function openSavedGrammarMenu() {
         if (!studentStats.savedGrammar || studentStats.savedGrammar.length === 0) {
             showToast("⚠️ Bạn chưa lưu câu hỏi ngữ pháp nào!");
             return;
         }
         document.getElementById("savedDropdown").classList.remove("show"); // Ẩn menu đi
+        
+        window.isSavedGrammarDirectMode = true; // 🚩 Bật cờ đánh dấu xuất phát từ Trang chủ
         startGrammarPractice('SAVED_QUESTIONS'); // Mượn hàm học chủ đề có sẵn
     }
     // Mở nhanh Từ vựng của tôi từ Trang chủ
