@@ -1001,7 +1001,7 @@
                 TG/câu (s): 
                 <input type="number" id="grammarTimePerQ" value="0" min="0" placeholder="0 = Tắt" style="width: 60px; padding: 5px; border-radius: 8px; border: 2px solid var(--primary); text-align: center; font-weight: bold; outline: none;">
             </div>
-            <button class="action-btn" onclick="showGrammarProgress()" style="border-color: var(--success); color: var(--success); padding: 6px 15px; display: flex; align-items: center; gap: 5px;">📊 Tiến độ</button>
+            <button id="tourTarget_grammarProgress" class="action-btn" onclick="showGrammarProgress()" style="border-color: var(--success); color: var(--success); padding: 6px 15px; display: flex; align-items: center; gap: 5px;">📊 Tiến độ</button>
             <p style="width: 100%; margin: 0; font-size: 12px; color: var(--text-light); font-style: italic;">*Nhập 0 vào thời gian để học thoải mái không hẹn giờ</p>
         </div>
 
@@ -1096,115 +1096,94 @@
     // ==========================================
     // NÃO BỘ ĐIỀU KHIỂN BÓNG THOẠI HƯỚNG DẪN
     // ==========================================
-    const tourSteps = [
-        {
-            target: 'tourTarget_review', icon: '🚀', title: 'Nhiệm vụ Ưu tiên', position: 'bottom',
-            text: 'Mỗi ngày vào app, hãy kiểm tra khối này đầu tiên. Thuật toán sẽ nhắc nhở các từ vựng bạn sắp quên để học lại ngay lập tức!'
-        },
-        {
-            target: 'globalSearchContainer', icon: '🔍', title: 'Từ điển Bỏ túi', position: 'bottom',
-            text: 'Gõ tiếng Anh hoặc tiếng Việt vào đây để tra cứu nhanh ngữ nghĩa và lưu thẳng vào "Từ vựng của tôi".'
-        },
-        {
-            target: 'tourTarget_learn', icon: '📚', title: 'Trạm Từ Vựng', position: 'top',
-            text: 'Mở khóa các chủ đề từ vựng BẮT BUỘC PHẢI BIẾT và Bộ từ vựng từ đề ETS.'
-        },
-        {
-            target: 'tourTarget_grammar', icon: '📝', title: 'Lò Luyện Ngữ Pháp', position: 'top',
-            text: 'Làm bài tập trắc nghiệm chia theo từng dạng hoặc bật chế độ Luyện Thi ngẫu nhiên. Sai đến đâu giải thích đến đó!'
-        },
-        {
-            target: 'tourTarget_saved', icon: '💛', title: 'Kho Lưu Trữ', position: 'top',
-            text: 'Những từ vựng và câu ngữ pháp khó nhằn mà bạn đã thả tim sẽ được gom hết vào đây để tiện ôn tập lại.'
-        },
-        {
-            target: 'tourTarget_profile', icon: '🏆', title: 'Hồ Sơ Thành Tích', position: 'top',
-            text: 'Theo dõi chuỗi ngày học liên tục (Streak) và cày cấp độ để mở khóa 20+ Huy hiệu cực ngầu.'
-        },
-        {
-            target: 'darkModeBtn', icon: '🌙', title: 'Bảo Vệ Mắt', position: 'bottom',
-            text: 'Cú đêm cày TOEIC? Hãy bấm vào đây để bật Chế độ Tối (Dark Mode) êm dịu cho đôi mắt nhé.'
-        },
-        {
-            target: 'tourTarget_logout', icon: '👋', title: 'Đăng Xuất', position: 'top',
-            text: 'Khi học xong, hãy bấm vào đây để thoát. Mọi tiến trình của bạn sẽ tự động được lưu trữ an toàn!'
-        }
+    // ==========================================
+    // NÃO BỘ ĐIỀU KHIỂN BÓNG THOẠI (BẢN NÂNG CẤP ĐA NĂNG)
+    // ==========================================
+    let activeTourSteps = [];
+    let currentTourIndex = 0;
+    let currentTourKey = "";
+
+    // Kịch bản Tour ở Trang chủ (8 bước)
+    const mainTourSteps = [
+        { target: 'tourTarget_review', icon: '🚀', title: 'Nhiệm vụ Ưu tiên', position: 'bottom', text: 'Mỗi ngày vào app, hãy kiểm tra khối này đầu tiên. Thuật toán sẽ nhắc nhở các từ vựng bạn sắp quên để học lại ngay lập tức!' },
+        { target: 'globalSearchContainer', icon: '🔍', title: 'Từ điển Bỏ túi', position: 'bottom', text: 'Gõ tiếng Anh hoặc tiếng Việt vào đây để tra cứu nhanh ngữ nghĩa và lưu thẳng vào "Từ vựng của tôi".' },
+        { target: 'tourTarget_learn', icon: '📚', title: 'Trạm Từ Vựng', position: 'top', text: 'Mở khóa các chủ đề từ vựng với 5 chế độ: Lật thẻ, Trắc nghiệm, Gõ phím, Luyện nghe và Game nối từ.' },
+        { target: 'tourTarget_grammar', icon: '📝', title: 'Lò Luyện Ngữ Pháp', position: 'top', text: 'Làm bài tập trắc nghiệm chia theo từng dạng hoặc bật chế độ Luyện Thi ngẫu nhiên. Sai đến đâu giải thích đến đó!' },
+        { target: 'tourTarget_saved', icon: '💛', title: 'Kho Lưu Trữ', position: 'top', text: 'Những từ vựng và câu ngữ pháp khó nhằn mà bạn đã thả tim sẽ được gom hết vào đây để tiện ôn tập lại.' },
+        { target: 'tourTarget_profile', icon: '🏆', title: 'Hồ Sơ Thành Tích', position: 'top', text: 'Theo dõi chuỗi ngày học liên tục (Streak) và cày cấp độ để mở khóa 20+ Huy hiệu cực ngầu tại đây.' },
+        { target: 'darkModeBtn', icon: '🌙', title: 'Bảo Vệ Mắt', position: 'bottom', text: 'Cú đêm cày TOEIC? Hãy bấm vào đây để bật Chế độ Tối (Dark Mode) êm dịu cho đôi mắt nhé.' },
+        { target: 'tourTarget_logout', icon: '👋', title: 'Đăng Xuất', position: 'top', text: 'Khi học xong, hãy bấm vào đây để thoát. Mọi tiến trình của bạn sẽ tự động được lưu trữ an toàn lên Đám mây!' }
     ];
 
-    let currentTourIndex = 0;
-
+    // Khởi động Tour Trang chủ
     function startProductTour() {
-        let hasSeen = localStorage.getItem(`charnishere_tour_v1_${studentID}`);
-        if (hasSeen) return; // Đã xem rồi thì không làm phiền nữa
+        startCustomTour("charnishere_tour_v1", mainTourSteps);
+    }
 
-        document.getElementById('tourOverlay').style.display = 'block';
+    // Hàm Lõi: Khởi động bất kỳ Tour nào
+    function startCustomTour(tourKey, steps) {
+        let hasSeen = localStorage.getItem(`${tourKey}_${studentID}`);
+        if (hasSeen) return;
+
+        currentTourKey = tourKey;
+        activeTourSteps = steps;
         currentTourIndex = 0;
+        document.getElementById('tourOverlay').style.display = 'block';
         showTourStep();
     }
 
     function showTourStep() {
-        // Dọn dẹp highlight cũ
         document.querySelectorAll('.tour-highlight').forEach(el => el.classList.remove('tour-highlight'));
+        if (currentTourIndex >= activeTourSteps.length) { endTour(); return; }
 
-        if (currentTourIndex >= tourSteps.length) { endTour(); return; }
-
-        let step = tourSteps[currentTourIndex];
+        let step = activeTourSteps[currentTourIndex];
         let targetEl = document.getElementById(step.target);
         if (!targetEl) { currentTourIndex++; showTourStep(); return; }
 
-        // Cuộn màn hình đến phần tử đó một cách êm ái
         targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-        // Đợi cuộn xong (300ms) rồi mới bật highlight và bóng thoại
         setTimeout(() => {
             targetEl.classList.add('tour-highlight');
-
             document.getElementById('tourIcon').innerText = step.icon;
             document.getElementById('tourTitle').innerText = step.title;
             document.getElementById('tourText').innerHTML = step.text;
-            document.getElementById('tourStepIndicator').innerText = `${currentTourIndex + 1}/${tourSteps.length}`;
-            document.getElementById('tourNextBtn').innerText = currentTourIndex === tourSteps.length - 1 ? "Bắt đầu! ⚔️" : "Tiếp ➔";
+            
+            // Xử lý bộ đếm và Nút bấm (Nếu chỉ có 1 bước thì ẩn đếm số đi)
+            let stepIndicator = document.getElementById('tourStepIndicator');
+            stepIndicator.innerText = `${currentTourIndex + 1}/${activeTourSteps.length}`;
+            stepIndicator.style.display = activeTourSteps.length > 1 ? 'block' : 'none';
+            document.getElementById('tourNextBtn').innerText = currentTourIndex === activeTourSteps.length - 1 ? "Đã hiểu! ✔️" : "Tiếp ➔";
 
             let tooltip = document.getElementById('tourTooltip');
             tooltip.style.display = 'block';
 
-            // Tính toán vị trí đè lên màn hình siêu chuẩn
             let rect = targetEl.getBoundingClientRect();
             let tooltipHeight = tooltip.offsetHeight || 250;
             let tooltipWidth = tooltip.offsetWidth || 320;
             let arrow = document.getElementById('tourArrow');
 
-            // 1. Tọa độ Y (Trục dọc)
             let topPos = 0;
-            if (step.position === 'bottom') {
-                topPos = rect.bottom + 15;
-                arrow.className = 'tour-arrow top';
-            } else {
-                topPos = rect.top - tooltipHeight - 15;
-                arrow.className = 'tour-arrow bottom';
-            }
+            if (step.position === 'bottom') { topPos = rect.bottom + 15; arrow.className = 'tour-arrow top'; } 
+            else { topPos = rect.top - tooltipHeight - 15; arrow.className = 'tour-arrow bottom'; }
+            
             if (topPos < 10) { topPos = rect.bottom + 15; arrow.className = 'tour-arrow top'; }
             if (topPos + tooltipHeight > window.innerHeight) { topPos = rect.top - tooltipHeight - 15; arrow.className = 'tour-arrow bottom'; }
 
-            // 2. Tọa độ X (Trục ngang) - Trỏ thẳng vào giữa tâm nút
             let targetCenterX = rect.left + (rect.width / 2);
             let leftPos = targetCenterX; 
 
-            // Chống tràn bóng thoại ra khỏi viền 2 bên màn hình điện thoại
             let halfWidth = tooltipWidth / 2;
             if (leftPos - halfWidth < 10) { leftPos = halfWidth + 10; }
             if (leftPos + halfWidth > window.innerWidth - 10) { leftPos = window.innerWidth - halfWidth - 10; }
 
-            // Cập nhật vị trí Bóng thoại
             tooltip.style.left = leftPos + 'px';
             tooltip.style.top = topPos + 'px';
 
-            // Cập nhật vị trí Mũi tên (Dò đúng điểm giữa nút bấm)
             let actualTooltipLeft = leftPos - halfWidth;
             let arrowLeftOffset = targetCenterX - actualTooltipLeft;
             arrow.style.left = arrowLeftOffset + 'px';
 
-            setTimeout(() => tooltip.classList.add('show'), 50); // Mờ ảo hiện ra
+            setTimeout(() => tooltip.classList.add('show'), 50);
         }, 350);
     }
 
@@ -1219,9 +1198,7 @@
         document.getElementById('tourTooltip').classList.remove('show');
         document.querySelectorAll('.tour-highlight').forEach(el => el.classList.remove('tour-highlight'));
         
-        // Đánh dấu vào bộ nhớ trình duyệt là đứa này đã học việc xong
-        localStorage.setItem(`charnishere_tour_v1_${studentID}`, 'true'); 
-        showToast("🎉 Chúc bạn học tập thật vui!");
+        localStorage.setItem(`${currentTourKey}_${studentID}`, 'true'); 
     }
     // ==========================================
     // KHỞI TẠO & ĐĂNG NHẬP
@@ -1457,7 +1434,20 @@
         setText('statAvgTime', formatTime(Math.floor(studentStats.totalTime / Math.max(1, studentStats.totalDaysStudied)))); 
         
         // Nếu thanh Header đang mở, ép nó cập nhật từng giây
-        if (isStreakExpanded) updateStatsDashboard();
+        if (typeof isStreakExpanded !== 'undefined' && isStreakExpanded) updateStatsDashboard();
+
+        // --- BẪY KÍCH HOẠT BÓNG THOẠI KHI ĐẠT 1 TIẾNG (3600 GIÂY) ---
+        if (studentStats && studentStats.totalTime >= 3600) {
+            startCustomTour('tour_streak_1hour_v1', [
+                {
+                    target: 'statStreakHero', 
+                    icon: '⏱️', 
+                    title: 'Đồng Hồ Bí Mật', 
+                    position: 'bottom',
+                    text: 'Chúc mừng bạn đã chăm chỉ học được hơn 1 giờ! Bấm vào ngọn lửa này để xem chi tiết thời gian cày cuốc nhé.'
+                }
+            ]);
+        }
     }
 
     function loadDataFromLocal() { try { let sd = localStorage.getItem(`toeic_data_${studentID}`); allData = sd ? JSON.parse(sd) : []; } catch(e) { allData = []; } }
@@ -2410,6 +2400,15 @@ function backFromModeSelection() {
      });
 
         setDisplay('grammarMenuModal', 'none'); setDisplay('grammarPracticeSetupScreen', 'flex');
+        // --- KÍCH HOẠT BÓNG THOẠI CHO NÚT TIẾN ĐỘ ---
+        setTimeout(() => {
+            startCustomTour('tour_grammar_prog_v1', [
+                {
+                    target: 'tourTarget_grammarProgress', icon: '📊', title: 'Bảng Đo Lường', position: 'bottom',
+                    text: 'Nhấn vào đây để xem tỷ lệ % làm đúng/sai và lịch sử chọn đáp án chi tiết của từng chủ đề nhé!'
+                }
+            ]);
+        }, 300); // Chờ màn hình mở ra hoàn toàn mới chạy bóng thoại
     }
 
     function backToGrammarMenuFromSetup() { setDisplay('grammarPracticeSetupScreen', 'none'); setDisplay('grammarMenuModal', 'flex'); }
