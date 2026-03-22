@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FFB6C1">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Charnishere - Charlie TOEIC</title>
@@ -346,18 +349,52 @@
         .quick-btn:hover .btn-icon { filter: grayscale(0); opacity: 1; transform: scale(1.15); }
         
         @media (max-width: 800px) {
+            @media (max-width: 800px) {
             .quick-sidebar {
-                top: auto; bottom: 0; left: 0; width: 100%; height: 75px;
-                flex-direction: row; justify-content: space-around; gap: 0;
+                top: auto; bottom: 0; left: 0; width: 100%; 
+                height: auto; min-height: 85px; /* Thả tự do chiều cao để không bóp bẹp nút */
+                flex-direction: row; justify-content: flex-start; 
+                gap: 8px; 
+                padding: 10px 10px calc(10px + env(safe-area-inset-bottom)) 10px; /* Trừ hao vùng vuốt của iPhone */
                 border-right: none; border-top: 2px solid var(--border-color);
-                border-radius: 20px 20px 0 0; padding-bottom: env(safe-area-inset-bottom); 
-                box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+                border-radius: 20px 20px 0 0; 
+                box-shadow: 0 -10px 25px rgba(0,0,0,0.1);
+                
+                /* HIỆU ỨNG ẨN XUỐNG VÀ CUỘN NGANG */
+                transform: translateY(150%); /* Đẩy chìm hẳn 150% xuống dưới đáy */
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                overflow-x: auto; 
+                scroll-behavior: smooth;
+                -webkit-overflow-scrolling: touch;
             }
-            .quick-btn { width: 20%; height: 100%; border-radius: 0; }
+            /* Class dùng để kích hoạt đẩy menu lên */
+            .quick-sidebar.show-menu { transform: translateY(0); }
+            
+            /* Cố định lại kích thước của nút */
+            .quick-btn { width: 70px; min-width: 70px; height: 65px; border-radius: 15px; flex-shrink: 0; }
             .quick-btn:hover { background: transparent; transform: none; }
             .quick-btn:active .btn-icon { transform: scale(0.9); }
-            body { padding-bottom: 90px; padding-left: 10px; } 
-            .overlay-screen { padding-bottom: 90px; }
+            
+            body { padding-bottom: 20px; padding-left: 10px; } 
+            .overlay-screen { padding-bottom: 20px; }
+
+            /* NÚT TOGGLE MENU NỔI */
+            .mobile-menu-toggle {
+                display: flex; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+                background: var(--primary); color: white; border: none; padding: 10px 25px;
+                border-radius: 30px; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 15px;
+                box-shadow: 0 5px 20px rgba(255, 182, 193, 0.6); z-index: 999998; cursor: pointer;
+                align-items: center; gap: 8px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .mobile-menu-toggle.active {
+                bottom: 105px; /* Nhảy cao lên một chút để tránh đè vào Menu */
+                background: var(--card-bg); color: var(--text-main); border: 2px solid var(--border-color);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+        }
+        /* Giấu nút Toggle khi xem trên máy tính */
+        @media (min-width: 801px) {
+            .mobile-menu-toggle { display: none !important; }
         }
         /* Đẩy nội dung web & các popup sang phải để nhường chỗ cho Sidebar trên Máy tính */
         @media (min-width: 801px) { 
@@ -491,7 +528,10 @@
 </style>
 </head>
 <body>
-  <div id="quickSidebar" class="quick-sidebar" style="display: none;">
+    <button id="mobileMenuToggle" class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+        <span>▲</span> Menu
+    </button>
+    <div id="quickSidebar" class="quick-sidebar" style="display: none;">
       <button class="quick-btn" onclick="returnToMain()">
             <span class="btn-icon">🏠</span><span class="btn-text">Trang chủ</span>
         </button>  
@@ -1094,8 +1134,32 @@
     function showToast(msg) { let t = document.getElementById('toastNotification'); if(t) { t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); } }
     function getDateKey(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0'); }
     // ==========================================
-    // NÃO BỘ ĐIỀU KHIỂN BÓNG THOẠI HƯỚNG DẪN
+    // HỆ THỐNG ĐÓNG/MỞ MENU TRÊN ĐIỆN THOẠI
     // ==========================================
+    function toggleMobileMenu() {
+        let sidebar = document.getElementById('quickSidebar');
+        let toggleBtn = document.getElementById('mobileMenuToggle');
+        
+        sidebar.classList.toggle('show-menu');
+        toggleBtn.classList.toggle('active');
+
+        if (sidebar.classList.contains('show-menu')) {
+            toggleBtn.innerHTML = '<span>▼</span> Đóng';
+        } else {
+            toggleBtn.innerHTML = '<span>▲</span> Menu';
+        }
+    }
+
+    // Hàm phụ: Tự động giấu menu khi chuyển trang
+    function closeMobileMenu() {
+        let sidebar = document.getElementById('quickSidebar');
+        let toggleBtn = document.getElementById('mobileMenuToggle');
+        if (sidebar && sidebar.classList.contains('show-menu')) {
+            sidebar.classList.remove('show-menu');
+            toggleBtn.classList.remove('active');
+            toggleBtn.innerHTML = '<span>▲</span> Menu';
+        }
+    }
     // ==========================================
     // NÃO BỘ ĐIỀU KHIỂN BÓNG THOẠI (BẢN NÂNG CẤP ĐA NĂNG)
     // ==========================================
@@ -1140,6 +1204,21 @@
         let targetEl = document.getElementById(step.target);
         if (!targetEl) { currentTourIndex++; showTourStep(); return; }
 
+        // --- THUẬT TOÁN MỚI: PHÁ BẪY PHÂN TẦNG (STACKING CONTEXT) ---
+        let closestOverlay = targetEl.closest('.overlay-screen');
+        let tourOverlay = document.getElementById('tourOverlay');
+        let tooltip = document.getElementById('tourTooltip');
+        if (closestOverlay) {
+            // Đưa bóng thoại vào cùng phòng với nút bấm để nút nổi lên được
+            closestOverlay.appendChild(tourOverlay);
+            closestOverlay.appendChild(tooltip);
+        } else {
+            // Nếu ở trang chủ thì để ngoài sảnh
+            document.body.appendChild(tourOverlay);
+            document.body.appendChild(tooltip);
+        }
+        // -------------------------------------------------------------
+
         targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
         setTimeout(() => {
@@ -1148,13 +1227,11 @@
             document.getElementById('tourTitle').innerText = step.title;
             document.getElementById('tourText').innerHTML = step.text;
             
-            // Xử lý bộ đếm và Nút bấm (Nếu chỉ có 1 bước thì ẩn đếm số đi)
             let stepIndicator = document.getElementById('tourStepIndicator');
             stepIndicator.innerText = `${currentTourIndex + 1}/${activeTourSteps.length}`;
             stepIndicator.style.display = activeTourSteps.length > 1 ? 'block' : 'none';
             document.getElementById('tourNextBtn').innerText = currentTourIndex === activeTourSteps.length - 1 ? "Đã hiểu! ✔️" : "Tiếp ➔";
 
-            let tooltip = document.getElementById('tourTooltip');
             tooltip.style.display = 'block';
 
             let rect = targetEl.getBoundingClientRect();
@@ -1826,6 +1903,7 @@ function backFromModeSelection() {
     pushToCloud(); 
 }
     function returnToMain() { 
+        closeMobileMenu();
         gameFlowType = 'normal'; 
         isSavedVocabMode = false;
         window.isSavedGrammarDirectMode = false;
@@ -1859,6 +1937,7 @@ function backFromModeSelection() {
     // HÀM ĐIỀU HƯỚNG NHANH TỪ SIDEBAR
     // ==========================================
     function forceNavigate(target) {
+        closeMobileMenu();
         // 1. Tắt hết toàn bộ các cửa sổ/màn hình đang mở
         setDisplay('learningSpace', 'none'); 
         setDisplay('matchingGameScreen', 'none'); 
@@ -3538,6 +3617,12 @@ function nextGrammarQuestion() {
     #tourTarget_review.tour-highlight {
         color: #FF5E7E !important; 
     }
+        /* FIX LỖI MÀU CHO NÚT TIẾN ĐỘ: Ép nền trắng sáng, chữ xanh lá đậm */
+    #tourTarget_grammarProgress.tour-highlight {
+        background-color: #FFFFFF !important; 
+        color: #2E7D32 !important; 
+        box-shadow: 0 0 0 4px #FFFFFF, 0 0 20px rgba(46, 125, 50, 0.6) !important; /* Đổi vòng hào quang sang tông xanh lá */
+    }
 </style>
 <div id="tourOverlay"></div>
 <div id="tourTooltip">
@@ -3551,5 +3636,58 @@ function nextGrammarQuestion() {
         <button id="tourNextBtn" onclick="nextTourStep()" class="action-btn" style="background: var(--primary); color: white; margin: 0; padding: 8px 20px; font-size: 15px;">Tiếp ➔</button>
     </div>
 </div>
+    <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(registration => {
+          console.log('PWA Service Worker đã đăng ký thành công!', registration);
+        })
+        .catch(error => {
+          console.log('Lỗi đăng ký PWA:', error);
+        });
+    });
+  }
+</script>
+    <button id="installAppBtn" style="display: none; position: fixed; bottom: 80px; right: 20px; background: #FFB6C1; color: white; border: 2px solid white; border-radius: 25px; padding: 10px 20px; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 14px; box-shadow: 0 5px 15px rgba(255, 182, 193, 0.6); z-index: 999999; cursor: pointer; animation: popCorrect 0.5s ease-out;">
+    📲 Tải App ngay
+</button>
+
+<script>
+    let deferredPrompt;
+    const installBtn = document.getElementById('installAppBtn');
+
+    // Bắt sự kiện khi trình duyệt đã sẵn sàng cho cài đặt App
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Ngăn trình duyệt tự hiện popup mặc định
+        e.preventDefault();
+        // Lưu lại sự kiện để kích hoạt sau
+        deferredPrompt = e;
+        // Hiện nút Tải App của chúng ta lên
+        installBtn.style.display = 'block';
+    });
+
+    // Khi người dùng bấm vào nút Tải App
+    installBtn.addEventListener('click', async () => {
+        if (deferredPrompt !== null) {
+            // Hiện popup cài đặt mặc định của điện thoại
+            deferredPrompt.prompt();
+            // Đợi người dùng trả lời (Đồng ý hoặc Hủy)
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+            }
+            // Ẩn nút đi sau khi đã xử lý xong
+            deferredPrompt = null;
+            installBtn.style.display = 'none';
+        }
+    });
+
+    // Ẩn nút đi nếu App ĐÃ ĐƯỢC CÀI ĐẶT rồi
+    window.addEventListener('appinstalled', () => {
+        installBtn.style.display = 'none';
+        deferredPrompt = null;
+    });
+</script>
 </body>
 </html>
