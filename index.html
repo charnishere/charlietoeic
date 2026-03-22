@@ -492,6 +492,16 @@ body.dark-mode .option-btn,
 body.dark-mode .match-item {
     border-color: #AA7B82 !important; /* Màu hồng đậm hơn cho chế độ tối */
 }
+        /* --- KHÔI PHỤC VIỀN CHO GAME NỐI TỪ & TRẮC NGHIỆM --- */
+.game-item, .quiz-btn {
+    border: 2px solid var(--border-color) !important; 
+}
+
+/* Ép màu viền sáng hơn một chút khi bật Dark Mode để dễ nhìn */
+body.dark-mode .game-item, 
+body.dark-mode .quiz-btn {
+    border: 2px solid #555555 !important; 
+}
     </style>
 </head>
 <body>
