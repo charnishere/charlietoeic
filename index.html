@@ -510,7 +510,7 @@
         <a href="https://www.threads.com/@charnishere" target="_blank" class="quick-btn">
             <span class="btn-icon">💛</span><span class="btn-text">Charlie</span>
         </a>
-      <button class="quick-btn" onclick="logout()" title="Đăng xuất">
+      <button id="tourTarget_logout" class="quick-btn" onclick="logout()" title="Đăng xuất">
             <span class="btn-icon" style="filter: none; opacity: 1;">👤</span>
             <span class="btn-text" id="sidebarUserLevel" style="white-space: nowrap; font-size: 9px; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">HV: ---</span>
         </button>
@@ -1101,7 +1101,7 @@
         },
         {
             target: 'tourTarget_learn', icon: '📚', title: 'Trạm Từ Vựng', position: 'top',
-            text: 'Mở khóa các chủ đề từ vựng với 5 chế độ: Lật thẻ, Trắc nghiệm, Gõ phím, Luyện nghe và Game nối từ.'
+            text: 'Mở khóa các chủ đề từ vựng BẮT BUỘC PHẢI BIẾT và Bộ từ vựng từ đề ETS.'
         },
         {
             target: 'tourTarget_grammar', icon: '📝', title: 'Lò Luyện Ngữ Pháp', position: 'top',
@@ -1113,7 +1113,15 @@
         },
         {
             target: 'tourTarget_profile', icon: '🏆', title: 'Hồ Sơ Thành Tích', position: 'top',
-            text: 'Theo dõi chuỗi ngày học liên tục (Streak) và cày cấp độ để mở khóa 20+ Huy hiệu cực ngầu tại đây.'
+            text: 'Theo dõi chuỗi ngày học liên tục (Streak) và cày cấp độ để mở khóa 20+ Huy hiệu cực ngầu.'
+        },
+        {
+            target: 'darkModeBtn', icon: '🌙', title: 'Bảo Vệ Mắt', position: 'bottom',
+            text: 'Cú đêm cày TOEIC? Hãy bấm vào đây để bật Chế độ Tối (Dark Mode) êm dịu cho đôi mắt nhé.'
+        },
+        {
+            target: 'tourTarget_logout', icon: '👋', title: 'Đăng Xuất', position: 'top',
+            text: 'Khi học xong, hãy bấm vào đây để thoát. Mọi tiến trình của bạn sẽ tự động được lưu trữ an toàn!'
         }
     ];
 
@@ -1154,26 +1162,42 @@
             let tooltip = document.getElementById('tourTooltip');
             tooltip.style.display = 'block';
 
-            // Tính toán vị trí đè lên màn hình
+            // Tính toán vị trí đè lên màn hình siêu chuẩn
             let rect = targetEl.getBoundingClientRect();
             let tooltipHeight = tooltip.offsetHeight || 250;
+            let tooltipWidth = tooltip.offsetWidth || 320;
             let arrow = document.getElementById('tourArrow');
 
+            // 1. Tọa độ Y (Trục dọc)
             let topPos = 0;
-            // Nếu bảo hiện ở dưới (bottom)
             if (step.position === 'bottom') {
-                topPos = rect.bottom + 20;
+                topPos = rect.bottom + 15;
                 arrow.className = 'tour-arrow top';
-            } else { // Hiện ở trên
-                topPos = rect.top - tooltipHeight - 20;
+            } else {
+                topPos = rect.top - tooltipHeight - 15;
                 arrow.className = 'tour-arrow bottom';
             }
+            if (topPos < 10) { topPos = rect.bottom + 15; arrow.className = 'tour-arrow top'; }
+            if (topPos + tooltipHeight > window.innerHeight) { topPos = rect.top - tooltipHeight - 15; arrow.className = 'tour-arrow bottom'; }
 
-            // Chống tràn màn hình điện thoại
-            if (topPos < 10) { topPos = rect.bottom + 20; arrow.className = 'tour-arrow top'; }
-            if (topPos + tooltipHeight > window.innerHeight) { topPos = rect.top - tooltipHeight - 20; arrow.className = 'tour-arrow bottom'; }
+            // 2. Tọa độ X (Trục ngang) - Trỏ thẳng vào giữa tâm nút
+            let targetCenterX = rect.left + (rect.width / 2);
+            let leftPos = targetCenterX; 
 
+            // Chống tràn bóng thoại ra khỏi viền 2 bên màn hình điện thoại
+            let halfWidth = tooltipWidth / 2;
+            if (leftPos - halfWidth < 10) { leftPos = halfWidth + 10; }
+            if (leftPos + halfWidth > window.innerWidth - 10) { leftPos = window.innerWidth - halfWidth - 10; }
+
+            // Cập nhật vị trí Bóng thoại
+            tooltip.style.left = leftPos + 'px';
             tooltip.style.top = topPos + 'px';
+
+            // Cập nhật vị trí Mũi tên (Dò đúng điểm giữa nút bấm)
+            let actualTooltipLeft = leftPos - halfWidth;
+            let arrowLeftOffset = targetCenterX - actualTooltipLeft;
+            arrow.style.left = arrowLeftOffset + 'px';
+
             setTimeout(() => tooltip.classList.add('show'), 50); // Mờ ảo hiện ra
         }, 350);
     }
