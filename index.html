@@ -362,12 +362,12 @@
         /* ========================================= */
         
         /* 2. Khu vực Học Từ vựng (Flashcard, Typing) - Treo lên cao, căn giữa khung hình */
-        #learningSpace { 
+       #learningSpace { 
     height: auto !important; 
     min-height: 550px !important; 
     max-width: 650px !important; 
-    margin: 10px auto 40px auto !important; 
-    display: flex; flex-direction: column; /* Đã xóa !important */
+    margin: 15px auto auto auto !important; /* <--- CẬP NHẬT DÒNG NÀY */
+    display: flex; flex-direction: column; 
     justify-content: flex-start !important; 
     padding-bottom: 20px !important;
     box-sizing: border-box;
@@ -516,10 +516,6 @@
         <div id="loadingArea"><div class="spinner"></div><p style="color: var(--text-main); font-weight: 900; font-size: 16px; text-align: center;">Đang tải dữ liệu...</p></div>
 
         <div id="dashboardArea" style="display: none;">
-            <div style="margin: 15px 0 25px 0; text-align: left;">
-                <h3 style="margin: 0; color: var(--text-main); font-weight: 900; font-size: clamp(18px, 5vw, 22px);">Sẵn sàng học chưa?</h3>
-                <p style="margin: 5px 0 0 0; color: var(--text-light); font-size: 14px; font-weight: 700;">Hôm nay chúng ta chinh phục TOEIC nhé!</p>
-            </div>
 
             <div onclick="prepareModeSelection(1)" style="background: linear-gradient(135deg, #FF9EAA, #FFB6C1); padding: 25px; border-radius: 25px; color: white; cursor: pointer; box-shadow: 0 10px 25px rgba(255,182,193,0.4); transition: 0.3s; margin-bottom: 25px; position: relative; overflow: hidden; text-align: left;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='none'">
                 <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center;">
