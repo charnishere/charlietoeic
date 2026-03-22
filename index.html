@@ -367,12 +367,9 @@
     min-height: 550px !important; 
     max-width: 650px !important; 
     
-    /* --- BỘ KHÓA VỊ TRÍ MỚI (CHUẨN XÁC & KHÔNG BỊ TRÔI) --- */
-    margin-top: 15px !important;       /* Ghim cách thanh Header đúng 15px */
-    margin-bottom: auto !important;    /* Lò xo đẩy khung lên trên (Bắt buộc phải có) */
-    margin-left: auto !important;      /* Tự động căn giữa màn hình (trái) */
-    margin-right: auto !important;     /* Tự động căn giữa màn hình (phải) */
-    /* --------------------------------- */
+    /* --- BỘ KHÓA VỊ TRÍ TRIỆT ĐỂ --- */
+    margin: 15px auto 50px auto !important; 
+    /* Giải thích cú pháp: Cách lề trên 15px | Lề phải auto (căn giữa) | Lề dưới 50px | Lề trái auto (căn giữa) */
     
     display: flex; 
     flex-direction: column; 
@@ -380,6 +377,15 @@
     padding-bottom: 20px !important;
     box-sizing: border-box;
 }
+
+        #flashcardApp, #typingApp { 
+            width: 100%; flex: 1; 
+            display: flex; flex-direction: column; 
+            justify-content: flex-start !important; /* Ghim lên trên, bỏ khoảng trống ở giữa */
+            margin-top: 15px;
+            overflow: visible;
+        }
+
         /* 1.1 Trả lại không gian rộng rãi cho phòng Ngữ pháp để chia 2 cột Trái/Phải */
         #grammarQuizScreen .panel-box {
             max-width: 1000px !important; /* Đủ rộng để chứa câu hỏi bên trái, giải thích bên phải */
