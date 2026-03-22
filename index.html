@@ -393,12 +393,44 @@
             overflow-y: auto !important; 
             padding-right: 5px; 
         }
-        /* CSS cho Dropdown Menu Đã Lưu */
+        /* ========================================= */
+        /* FIX LỖI GIẬT MÀN HÌNH & MENU ĐÃ LƯU BỊ CHE */
+        /* ========================================= */
+        
+        /* 1. Chốt chiều cao, bóp chiều rộng, căn giữa tuyệt đối phòng học */
+        #learningSpace { 
+            min-height: calc(100vh - 120px); 
+            max-width: 650px !important; 
+            margin: 10px auto 20px auto !important; 
+            display: flex; flex-direction: column; 
+            justify-content: center !important; 
+        }
+
+        #flashcardApp, #typingApp { 
+            width: 100%; flex: 1; display: flex; flex-direction: column; justify-content: center; 
+        }
+
+        /* 2. Ép thẻ Flashcard không bị kéo giãn, chốt cứng chiều cao */
+        .card-scene { 
+            width: 100%;
+            height: 420px !important; /* Chốt cứng chiều cao để không bị giật nhún */
+            min-height: unset !important; max-height: unset !important; 
+            margin: 0 auto 30px auto !important; /* Tạo khoảng trống để nút Đáp án không dính chặt */
+            perspective: 1000px;
+        }
+        .card__face {
+            height: 100% !important; /* Ép thẻ con cao bằng đúng thẻ cha */
+        }
+        .flashcard-main, .flashcard-back { overflow-y: auto !important; padding-right: 5px; }
+
+        /* 3. CSS Dropdown Menu: Đẩy lên trên (bottom) để không bị cắt chữ */
         .dropdown-trigger { position: relative; overflow: visible !important; }
         .dropdown-content {
-            display: none; position: absolute; top: 105%; left: 50%; transform: translateX(-50%);
-            background-color: var(--card-bg); min-width: 200px; box-shadow: 0px 10px 30px rgba(0,0,0,0.15);
-            z-index: 9999; border-radius: 15px; border: 2px solid var(--warning); padding: 5px;
+            display: none; position: absolute; 
+            bottom: 110% !important; top: auto !important; /* Bắn ngược menu lên trên */
+            left: 50%; transform: translateX(-50%);
+            background-color: var(--card-bg); min-width: 220px; box-shadow: 0px 10px 40px rgba(0,0,0,0.15);
+            z-index: 99999; border-radius: 15px; border: 2px solid var(--warning); padding: 5px;
         }
         .dropdown-content a {
             color: var(--text-main); padding: 12px 15px; text-decoration: none; display: block;
@@ -406,24 +438,12 @@
         }
         .dropdown-content a:hover { background-color: var(--extra-bg); color: var(--warning); padding-left: 20px; }
         .dropdown-content.show { display: block !important; animation: popCorrect 0.3s ease-out; }
-        /* ========================================= */
-        /* FIX LỖI KHUNG TRẮNG BỊ KÉO DÀI THÒNG LÒNG */
-        /* ========================================= */
         
-        #learningSpace, #grammarQuizScreen, #typingApp, #flashcardApp {
-            height: auto !important;
-            min-height: unset !important;
-        }
-        
+        /* 4. Fix lỗi khung trắng bị kéo thòng lòng */
+        #grammarQuizScreen, #typingApp, #flashcardApp { height: auto !important; min-height: unset !important; }
         #learningSpace .panel-box, #grammarQuizScreen .panel-box {
             margin: 20px auto 40px auto !important;
-            height: auto !important; /* Ép hộp trắng tự ôm sát nội dung */
-            padding-bottom: 30px !important;
-        }
-
-        .card-scene {
-            height: 400px !important; /* Chiều cao thẻ Flashcard vừa vặn */
-            margin-bottom: 0 !important;
+            height: auto !important; padding-bottom: 30px !important;
         }
     </style>
 </head>
@@ -447,6 +467,10 @@
         <a href="https://www.threads.com/@charnishere" target="_blank" class="quick-btn">
             <span class="btn-icon">💛</span><span class="btn-text">Charlie</span>
         </a>
+      <button class="quick-btn" onclick="logout()" title="Đăng xuất">
+            <span class="btn-icon" style="filter: none; opacity: 1;">👤</span>
+            <span class="btn-text" id="sidebarUserLevel" style="white-space: nowrap; font-size: 9px; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">HV: ---</span>
+        </button>
     </div>
     <div id="toastNotification">Thông báo</div>
 
@@ -466,10 +490,7 @@
                 <h2>💛 Charnishere <button class="icon-btn" onclick="toggleDarkMode()" id="darkModeBtn">🌙</button></h2>
             </div>
             <div class="header-controls">
-                <div class="user-badge" onclick="logout()" title="Nhấn để đăng xuất"><span id="displayUserName">HV: ---</span> <span id="displayUserLevel" style="color:inherit;">(Lv.1)</span></div>
-                <button class="action-btn" onclick="fetchDataFromGoogleSheets(true)">☁️ Nạp Từ</button>
-                <button class="action-btn sync-custom-btn" onclick="pullFromCloud()">🔄 Đồng Bộ</button>
-
+                </div>
 <<style>
     /* ========================================= */
     /* THANH ĐIỀU HƯỚNG HIỆN ĐẠI (V2) */
@@ -1286,7 +1307,8 @@
         }
         
         let lvlInfo = calculateLevel(studentStats.xp);
-        setText('displayUserLevel', `(Lv.${lvlInfo.lv})`);
+        // Ghi tên và Level xuống thanh Sidebar
+        setText('sidebarUserLevel', `${studentID} (Lv.${lvlInfo.lv})`);
         
         // Cập nhật bộ đếm cho nút tắt "Đã lưu"
         let svDesc = document.getElementById('savedVocabShortcutDesc');
@@ -1580,14 +1602,31 @@
     function returnToMain() { 
         gameFlowType = 'normal'; 
         isSavedVocabMode = false;
-        setDisplay('loadingArea', 'none');
-        setDisplay('setSelectionArea', 'none');
-        setDisplay('filterArea', 'none'); 
+        window.isSavedGrammarDirectMode = false;
+        window.isSearchModeActive = false;
+        window.isGrammarReviewMode = false;
+        
+        // Dừng mọi âm thanh và đồng hồ đếm ngược nếu có
+        if(window.speechSynthesis) window.speechSynthesis.cancel();
+        clearInterval(grammarTimerInterval);
+        
+        // 🧹 TẮT SẠCH SẼ MỌI MÀN HÌNH ĐANG MỞ
+        const allScreens = [
+            'loadingArea', 'setSelectionArea', 'filterArea', 'learningSpace', 
+            'flashcardApp', 'typingApp', 'grammarQuizScreen', 'quizResultScreen', 
+            'allDoneScreen', 'modeSelectionArea', 'profileModal', 'grammarMenuModal', 
+            'grammarComprehensiveSetupScreen', 'grammarPracticeSetupScreen', 
+            'globalSearchResults', 'matchingGameScreen', 'matchResultScreen', 
+            'finalQuizScreen', 'grammarTheoryScreen', 'grammarReviewDetailModal'
+        ];
+        allScreens.forEach(id => setDisplay(id, 'none'));
+        
+        // 🏠 BẬT LẠI ĐÚNG MÀN HÌNH TRANG CHỦ
         setDisplay('dashboardArea', 'block'); 
         setDisplay('choiceArea', 'flex'); 
-        updateStatsDashboard(); 
         
-        // Gắn tự động lưu:
+        // Cập nhật lại thông tin
+        updateStatsDashboard(); 
         pushToCloud(); 
     }
 // ==========================================
