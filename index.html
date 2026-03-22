@@ -532,8 +532,8 @@
                         <span class="choice-icon">💛</span><p class="choice-title">Đã lưu</p><p class="choice-desc" id="savedVocabShortcutDesc">0 từ, 0 câu</p>
                         
                         <div class="dropdown-content" id="savedDropdown">
-                            <a href="#" onclick="openFavoriteVocab(); event.stopPropagation();">📚 Từ vựng của tôi</a>
-                            <a href="#" onclick="openSavedGrammarMenu(); event.stopPropagation();">📝 Câu hỏi trắc nghiệm</a>
+                            <a href="#" id="savedVocabMenuText" onclick="openFavoriteVocab(); event.stopPropagation();">📚 Từ vựng của tôi (0)</a>
+                            <a href="#" id="savedGrammarMenuText" onclick="openSavedGrammarMenu(); event.stopPropagation();">📝 Câu hỏi trắc nghiệm (0)</a>
                         </div>
                     </div>
                     <button class="choice-btn" style="border-color: #FFB6C1;" onclick="openProfile()">
@@ -1245,13 +1245,21 @@
         setText('sidebarUserLevel', `${studentID} (Lv.${lvlInfo.lv})`);
         
         // Cập nhật bộ đếm cho nút tắt "Đã lưu"
+        let svCount = (studentStats.savedVocab && studentStats.savedVocab.length) ? studentStats.savedVocab.length : 0;
+        let sgCount = (studentStats.savedGrammar && studentStats.savedGrammar.length) ? studentStats.savedGrammar.length : 0;
+        
         let svDesc = document.getElementById('savedVocabShortcutDesc');
         if (svDesc) {
-            let svCount = (studentStats.savedVocab && studentStats.savedVocab.length) ? studentStats.savedVocab.length : 0;
-            let sgCount = (studentStats.savedGrammar && studentStats.savedGrammar.length) ? studentStats.savedGrammar.length : 0;
             svDesc.innerText = `${svCount} từ, ${sgCount} câu`;
         }
-    }
+        
+        // Bơm số liệu đếm được vào thẳng menu thả xuống
+        let svMenu = document.getElementById('savedVocabMenuText');
+        if (svMenu) svMenu.innerText = `📚 Từ vựng của tôi (${svCount})`;
+        
+        let sgMenu = document.getElementById('savedGrammarMenuText');
+        if (sgMenu) sgMenu.innerText = `📝 Câu hỏi trắc nghiệm (${sgCount})`;
+        }
 
     function addXP(amount) { 
         try { studentStats.xp += amount; let dKey = getDateKey(new Date()); if(!studentStats.history) studentStats.history = {}; studentStats.history[dKey] = (studentStats.history[dKey]||0) + 1; saveStats(); checkBadges(); } catch(e) { console.error("Lỗi cộng XP", e); }
@@ -2446,7 +2454,9 @@ function nextGrammarQuestion() {
         if (item.isRight) { expBox.className = 'grammar-explanation'; expBox.innerHTML = `✔️ <b>BẠN ĐÃ LÀM ĐÚNG!</b><br><br>${formattedExplain}`; } 
         else { expBox.className = 'grammar-explanation wrong'; expBox.innerHTML = `❌ <b>SAI RỒI!</b> Đáp án đúng là: <b>${item.correct}</b><br><br>${formattedExplain}`; }
         
-        checkSaveButtonState(); setDisplay('grammarReviewDetailModal', 'flex');
+        checkSaveButtonState(); 
+        updateStatsDashboard();
+        setDisplay('grammarReviewDetailModal', 'flex');
     }
 
     function checkSaveButtonState() {
@@ -2662,6 +2672,7 @@ function nextGrammarQuestion() {
         }
         saveStats();
         updateSaveVocabUI();
+        updateStatsDashboard();
     }
 
     function updateSaveVocabUI() {
@@ -2742,6 +2753,7 @@ function nextGrammarQuestion() {
         }
         saveStats();
         renderVocabList(); // Vẽ lại danh sách lập tức để cập nhật hiệu ứng trái tim
+        updateStatsDashboard();
     }
 
 // Cập nhật trạng thái nút Lưu trong màn hình Trắc nghiệm
@@ -2778,6 +2790,7 @@ function nextGrammarQuestion() {
         }
         saveStats();
         updateQuizSaveBtnState(); // Đổi màu nút ngay lập tức
+        updateStatsDashboard();
     }
     // ----------------------------------------------------
     // ----------------------------------------------------
