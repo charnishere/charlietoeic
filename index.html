@@ -358,47 +358,39 @@
             border-color: rgba(255, 255, 255, 0.1) !important; 
         }
 /* ========================================= */
-        /* FIX LỖI GIẬT MÀN HÌNH & GIAO DIỆN HỌC TẬP */
+        /* FIX LỖI GIẬT MÀN HÌNH & MENU ĐÃ LƯU BỊ CHE */
         /* ========================================= */
         
-        /* 1. Bóp chiều ngang, ghim nội dung lên TRESS (flex-start) thay vì tụt xuống đáy */
+        /* 1. Chốt chiều cao, bóp chiều rộng, căn giữa tuyệt đối */
         #learningSpace { 
-            min-height: calc(100vh - 100px); /* Chiếm trọn màn hình trừ khoảng trống Header */
-            max-width: 650px !important; /* Bóp khung nhỏ lại gọn gàng hơn */
-            margin: 10px auto 40px auto !important; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: flex-start !important; /* Lệnh quan trọng: Ép thẻ dính sát lên trên! */
+            min-height: calc(100vh - 120px); 
+            max-width: 650px !important; 
+            margin: 10px auto 20px auto !important; 
+            display: flex; flex-direction: column; 
+            justify-content: center !important; 
         }
 
-        /* 2. Đẩy nội dung Flashcard & Typing lên sát thanh Tiến độ */
         #flashcardApp, #typingApp { 
-            width: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: flex-start !important; /* Ép lên trên */
-            margin-top: 15px; 
+            width: 100%; flex: 1; display: flex; flex-direction: column; justify-content: center; 
         }
 
-        /* 3. Chốt cứng chiều cao thẻ Flashcard để không nhún nhảy khi lật thẻ */
+        /* 2. Ép thẻ Flashcard không bị kéo giãn */
         .card-scene { 
-            height: 480px !important; /* Chốt cứng chiều cao, không dùng vh hay min-max nữa */
-            min-height: unset !important; 
-            max-height: unset !important; 
-            margin: 0 auto 20px auto !important;
+            height: 400px !important; 
+            min-height: unset !important; max-height: unset !important; 
+            margin: 0 auto 30px auto !important;
         }
 
-        /* Thêm thanh cuộn vào trong lòng thẻ nếu chữ quá dài */
-        .flashcard-main, .flashcard-back { 
-            overflow-y: auto !important; 
-            padding-right: 5px; 
-        }
-        /* CSS cho Dropdown Menu Đã Lưu */
+        .flashcard-main, .flashcard-back { overflow-y: auto !important; padding-right: 5px; }
+
+        /* 3. CSS Dropdown Menu: Đẩy lên trên (bottom: 110%) để không bị cắt chữ */
         .dropdown-trigger { position: relative; overflow: visible !important; }
         .dropdown-content {
-            display: none; position: absolute; top: 105%; left: 50%; transform: translateX(-50%);
-            background-color: var(--card-bg); min-width: 200px; box-shadow: 0px 10px 30px rgba(0,0,0,0.15);
-            z-index: 9999; border-radius: 15px; border: 2px solid var(--warning); padding: 5px;
+            display: none; position: absolute; 
+            bottom: 110%; top: auto; /* Bắn ngược menu lên trên */
+            left: 50%; transform: translateX(-50%);
+            background-color: var(--card-bg); min-width: 220px; box-shadow: 0px 10px 40px rgba(0,0,0,0.15);
+            z-index: 99999; border-radius: 15px; border: 2px solid var(--warning); padding: 5px;
         }
         .dropdown-content a {
             color: var(--text-main); padding: 12px 15px; text-decoration: none; display: block;
@@ -466,9 +458,8 @@
                 <h2>💛 Charnishere <button class="icon-btn" onclick="toggleDarkMode()" id="darkModeBtn">🌙</button></h2>
             </div>
             <div class="header-controls">
-                <div class="user-badge" onclick="logout()" title="Nhấn để đăng xuất"><span id="displayUserName">HV: ---</span> <span id="displayUserLevel" style="color:inherit;">(Lv.1)</span></div>
-                <button class="action-btn" onclick="fetchDataFromGoogleSheets(true)">☁️ Nạp Từ</button>
-                <button class="action-btn sync-custom-btn" onclick="pullFromCloud()">🔄 Đồng Bộ</button>
+                <div class="header-controls">
+                </div>
 
 <<style>
     /* ========================================= */
@@ -1580,14 +1571,30 @@
     function returnToMain() { 
         gameFlowType = 'normal'; 
         isSavedVocabMode = false;
+        window.isSavedGrammarDirectMode = false;
+        window.isSearchModeActive = false;
+        window.isGrammarReviewMode = false;
+        
+        // 🧹 Ẩn SẠCH SẼ mọi màn hình râu ria
         setDisplay('loadingArea', 'none');
         setDisplay('setSelectionArea', 'none');
         setDisplay('filterArea', 'none'); 
+        setDisplay('learningSpace', 'none'); 
+        setDisplay('grammarQuizScreen', 'none');
+        setDisplay('quizResultScreen', 'none');
+        setDisplay('allDoneScreen', 'none');
+        setDisplay('modeSelectionArea', 'none');
+        setDisplay('profileModal', 'none');
+        setDisplay('grammarMenuModal', 'none');
+        setDisplay('grammarComprehensiveSetupScreen', 'none');
+        setDisplay('grammarPracticeSetupScreen', 'none');
+        setDisplay('globalSearchResults', 'none');
+        
+        // 🏠 Bật ĐÚNG màn hình Trang chủ
         setDisplay('dashboardArea', 'block'); 
         setDisplay('choiceArea', 'flex'); 
         updateStatsDashboard(); 
         
-        // Gắn tự động lưu:
         pushToCloud(); 
     }
 // ==========================================
@@ -1917,14 +1924,21 @@
                     </div>`).join(''));
                 
                 let returnBtn = document.getElementById('quizResultReturnBtn');
-                if(returnBtn) {
-                    if (gameFlowType === 'midsession') { returnBtn.onclick = () => { setDisplay('quizResultScreen', 'none'); setDisplay('learningSpace', 'block'); recentWordsForGame = []; checkNextStep(midSessionFailedFlag); }; } 
-                    else if (gameFlowType === 'warmup') { returnBtn.onclick = () => { setDisplay('quizResultScreen', 'none'); setDisplay('dashboardArea', 'block'); setDisplay('choiceArea', 'flex'); updateStatsDashboard(); }; } 
-                    else { returnBtn.onclick = () => backFromLearning(); }
-                }
-            } catch(e) { console.error("Lỗi hiển thị kết quả Quiz:", e); returnToMain(); }
-        }
-    }
+            if (returnBtn) {
+                returnBtn.onclick = function() { 
+                    setDisplay('quizResultScreen', 'none');
+                    // Nếu đang từ mục Tìm kiếm hoặc mục Đã Lưu -> Về Trang chủ
+                    if (window.isSearchModeActive || window.isSavedGrammarDirectMode) {
+                        returnToMain(); 
+                        return; 
+                    }
+                    if (window.isGrammarReviewMode) { 
+                        returnToMain();
+                    } else { 
+                        openGrammarPracticeSetup(); 
+                    }
+                };
+            }
 
     // ==========================================
     // MODULE HỒ SƠ NGƯỜI DÙNG (PROFILE)
@@ -2234,9 +2248,9 @@
                         Array.from(optArea.children).forEach(b => { 
                             if(b.innerText === correctText) { 
                                 b.style.opacity = 1; 
-                                b.style.backgroundColor = 'var(--success)'; // Thêm nền xanh
+                                b.style.backgroundColor = 'var(--success)'; 
                                 b.style.borderColor = 'var(--success)'; 
-                                b.style.color = '#222'; // Chữ đen cho dễ đọc
+                                b.style.color = '#222'; 
                                 b.style.borderWidth = '4px'; 
                             } 
                         });
@@ -2346,23 +2360,18 @@ function nextGrammarQuestion() {
             }
         }
     }
-
-    // Lệnh thoát nhanh bằng nút Back mũi tên
     // Lệnh thoát nhanh bằng nút Back mũi tên
     function forceExitGrammarQuiz() { 
         setDisplay('grammarQuizScreen', 'none'); 
 
         // Nếu đi vào từ Tìm kiếm hoặc mục Đã lưu -> Về trang chủ
         if (window.isSearchModeActive || window.isSavedGrammarDirectMode) {
-            window.isSearchModeActive = false;
-            window.isSavedGrammarDirectMode = false;
             returnToMain(); 
             return;
         }
 
         // Nếu đang Ôn lại câu sai -> Về trang chủ
         if (window.isGrammarReviewMode) { 
-            window.isGrammarReviewMode = false;
             returnToMain();
             return;
         } 
@@ -2374,11 +2383,10 @@ function nextGrammarQuestion() {
             return;
         } 
         
-        // Nếu đang Luyện thi -> Về trang chọn hình thức thi
+        // Luyện thi -> Về trang Setup Tổng hợp
         setDisplay('grammarComprehensiveSetupScreen', 'flex'); 
         renderExamHistory();
     }
-
     // Hàm vẽ Lịch sử Luyện thi
     function renderExamHistory() {
         let box = document.getElementById('examHistoryList');
