@@ -82,7 +82,12 @@
         body.dark-mode .mode-mt { background: #f1dca7; } 
 
         body { font-family: 'Nunito', sans-serif; background: var(--bg-color); color: var(--text-main); transition: background 0.3s; padding: 10px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 850px; flex: 1; display: flex; flex-direction: column; justify-content: flex-start; }
+        .container { 
+    width: 100%; 
+    max-width: 850px; 
+    flex: 1; 
+    display: block !important; /* LỆNH QUAN TRỌNG: Tắt tính năng tự giãn khoảng cách của Flexbox */
+}
         .panel-box { width: 100%; margin: 10px auto; background: var(--card-bg); padding: 25px 30px; border-radius: 25px; border: 2px dashed var(--border-color); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04); position: relative; transition: background 0.3s; }
         
         #toastNotification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: #222; padding: 15px 30px; border-radius: 20px; font-weight: 900; font-size: 16px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); z-index: 999999; display: none; text-align: center; width: 90%; max-width: 400px; }
@@ -367,9 +372,9 @@
     min-height: 550px !important; 
     max-width: 650px !important; 
     
-    /* --- KHÓA CỨNG VỊ TRÍ --- */
-    margin: 15px auto 50px auto !important; /* Lề trên ĐÚNG 15px, lề dưới 50px, trái phải giữa */
-    flex: 0 0 auto !important; /* Lệnh này cực kỳ quan trọng: Tắt hoàn toàn sự co giãn đẩy khung của Flexbox */
+    /* --- BỘ KHÓA VỊ TRÍ CHUẨN KÈM VIỀN --- */
+    margin: 15px auto 50px auto !important; /* Cách thanh Header đúng 15px */
+    
     display: flex; 
     flex-direction: column; 
     justify-content: flex-start !important; 
