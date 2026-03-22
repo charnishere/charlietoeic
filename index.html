@@ -101,10 +101,10 @@
 
         /* HEADER & TÙY CHỈNH HEADER CHÍNH */
         .container > .panel-box:first-child {
-            border: 2px solid var(--primary) !important; /* Viền hồng cho Header */
-            border-radius: 20px !important;
-            box-shadow: none !important;
-            margin-bottom: 0 !important;
+            border: none !important; /* Xóa viền hồng */
+            border-radius: 30px !important; /* Bo góc tròn đều */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06) !important; /* Bật lại hiệu ứng đổ bóng 3D */
+            margin-bottom: 15px !important; /* Thêm khoảng cách mỏng ở dưới cho thoáng */
         }
         .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid rgba(150, 150, 150, 0.2) !important; padding-bottom: 15px; }
         .header h2 { color: var(--primary); margin: 0; font-weight: 900; font-size: 26px; display: flex; align-items: center; gap: 8px; }
@@ -117,7 +117,7 @@
             /* THÔNG SỐ KẾT CẤU */
             height: auto !important; 
             min-height: 550px !important; 
-            max-width: 850px !important; 
+            max-width: 100% !important; 
             display: flex; 
             flex-direction: column; 
             justify-content: flex-start !important; 
@@ -128,11 +128,11 @@
             margin: 15px auto 50px auto !important; /* Lề trên 15px, dưới 50px, giữa 2 bên */
             flex: none !important; /* Triệt tiêu hoàn toàn tính giãn nén của Flexbox */
             
-/* --- BỎ VIỀN HỒNG & HIỆN ĐỔ BÓNG 3D NHƯ CŨ --- */
-    border: none !important; /* Xóa viền hồng */
-    border-radius: 20px !important; /* Giữ bo góc */
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06) !important; /* Bật lại đổ bóng mờ 3D */
-    background: var(--card-bg) !important; /* Đảm bảo nền trắng */
+            /* BỎ VIỀN HỒNG & HIỆN ĐỔ BÓNG 3D NHƯ CŨ */
+            border: none !important; /* Xóa viền hồng */
+            border-radius: 20px !important; /* Giữ bo góc */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06) !important; /* Bật lại đổ bóng mờ 3D */
+            background: var(--card-bg) !important; /* Đảm bảo nền trắng */
         }
 
         #flashcardApp, #typingApp { 
@@ -152,6 +152,76 @@
         }
         .card__face { height: 100% !important; }
         .flashcard-main, .flashcard-back { overflow-y: auto !important; padding-right: 5px; }
+
+        /* =================================================== */
+        /* CHIẾN LƯỢC 4: UI HIỆN ĐẠI (ĐỔ BÓNG HỒNG)   */
+        /* =================================================== */
+
+        /* 1. Các đường kẻ phân cách chuyển thành nét liền siêu mảnh */
+        .info-header, #vocabListContainer {
+            border-bottom: 1px solid rgba(150, 150, 150, 0.2) !important;
+            border-top: none !important;
+        }
+        div[style*="dashed"] { 
+            border-color: rgba(150, 150, 150, 0.2) !important; 
+            border-style: solid !important; 
+            border-width: 1px !important; 
+        }
+
+        /* 2. Nút bấm Lưới Khám Phá: Nổi 3D và bay lên khi hover */
+        .choice-btn {
+            border: none !important;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05) !important;
+        }
+        .choice-btn:hover {
+            transform: translateY(-5px) !important;
+            box-shadow: 0 15px 30px rgba(255, 182, 193, 0.4) !important;
+        }
+
+        /* 3. MẶT THẺ FLASHCARD & ĐỔ BÓNG HỒNG NHẠT (CHẾ ĐỘ SÁNG) */
+        .card__face, #globalSearchResults {
+            border: none !important;
+            box-shadow: 0 15px 35px rgba(255, 182, 193, 0.4) !important; /* ĐỔ BÓNG HỒNG NHẠT DỊU NHẸ */
+        }
+
+        /* 4. Input nhập liệu: Lõm sâu 3D (Neumorphism) */
+        #globalSearchInput, .typing-input-box {
+            border: none !important;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.05) !important;
+            background: var(--extra-bg) !important;
+        }
+        #globalSearchInput:focus, .typing-input-box:focus {
+            box-shadow: 0 0 0 3px var(--primary) !important; /* Glow hồng tỏa sáng */
+        }
+
+        /* 5. Các nút hành động, Trắc nghiệm & Game nối từ */
+        .action-btn, .grammar-menu-btn, .quiz-btn, .game-item {
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
+        }
+        .action-btn:hover, .grammar-menu-btn:hover, .quiz-btn:hover:not(:disabled) {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important;
+        }
+
+        /* =================================================== */
+        /* TỐI ƯU DARK MODE - ĐỔ BÓNG HỒNG SÁNG     */
+        /* =================================================== */
+        body.dark-mode .panel-box, 
+        body.dark-mode .choice-btn, 
+        body.dark-mode #globalSearchResults {
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5) !important;
+            border: 1px solid rgba(255,255,255,0.05) !important; 
+        }
+        body.dark-mode div[style*="dashed"] { 
+            border-color: rgba(255, 255, 255, 0.1) !important; 
+        }
+
+        /* 6. ĐỔ BÓNG HỒNG SÁNG (CHẾ ĐỘ TỐI) -> Ghi đè lệnh mặc định */
+        body.dark-mode .card__face {
+            border: none !important;
+            box-shadow: 0 15px 35px rgba(255, 182, 193, 0.8) !important; /* ĐỔ BÓNG HỒNG SÁNG "TỎA SÁNG" */
+        }
+
 
         /* =================================================== */
         /* CÁC THÀNH PHẦN UI KHÁC (Nút, Input, Toast, Badge...) */
@@ -212,14 +282,11 @@
 
         .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; cursor: pointer; user-select: none; }
         .card.is-flipped { transform: rotateY(180deg); }
-        .card__face { position: absolute; top: 0; left: 0; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 20px; padding: 25px; box-sizing: border-box; background: var(--card-bg); overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; border: none !important; box-shadow: 0 15px 35px rgba(0,0,0,0.08) !important; }
-        .card__face--front { align-items: center; justify-content: center; text-align: center; }
         
         .vocab-front { font-size: clamp(26px, 8vw, 50px); color: var(--primary); margin: 0 0 10px 0; font-weight: 900; line-height: 1.3; width: 100%; word-break: normal; overflow-wrap: break-word; white-space: normal; }
         .type-front { font-size: clamp(18px, 5vw, 26px); color: var(--primary-dark); font-weight: 900; margin: 0 0 20px 0; }
         
         .card__face--back { transform: rotateY(180deg); justify-content: flex-start; text-align: left; }
-        .info-header { text-align: center; width: 100%; border-bottom: 1px solid rgba(150, 150, 150, 0.2) !important; padding-bottom: 15px; margin-bottom: 15px; flex-shrink: 0; border-top: none !important; }
         .info-vocab { color: var(--primary); margin: 0 0 5px 0; font-size: clamp(22px, 7vw, 35px); font-weight: 900; line-height: 1.3; word-break: normal; overflow-wrap: break-word; white-space: normal; }
         .info-ipa { font-size: clamp(16px, 4vw, 20px); color: var(--text-light); font-weight: 800; margin: 0; }
         
@@ -261,15 +328,6 @@
         .game-item.wrong { background: var(--danger); border-color: var(--danger); color: white; }
 
         .full-info-standalone { display: none; background: var(--card-bg); padding: 25px; border-radius: 20px; border: 2px solid var(--primary); margin-top: 15px; text-align: left; }
-
-        .typing-input-box { width: 100%; max-width: 350px; padding: 15px; font-size: clamp(18px, 5vw, 24px); font-family: 'Nunito', sans-serif; text-align: center; border: none !important; box-shadow: inset 0 4px 10px rgba(0,0,0,0.05) !important; border-radius: 15px; outline: none; background: var(--extra-bg) !important; color: var(--text-main); font-weight: 900; margin-bottom: 20px; transition: 0.3s; }
-        .typing-input-box:focus { box-shadow: 0 0 0 3px var(--primary) !important; }
-        .typing-input-box.correct { background: #E8F5E9 !important; color: #2E7D32 !important; }
-        .typing-input-box.wrong { background: #FFEBEE !important; color: #C62828 !important; animation: shake 0.4s; }
-        
-        #globalSearchInput { border: none !important; box-shadow: inset 0 4px 10px rgba(0,0,0,0.05) !important; background: var(--extra-bg) !important; }
-        #globalSearchInput:focus { box-shadow: 0 0 0 3px var(--primary) !important; }
-        #globalSearchResults { border: none !important; box-shadow: 0 15px 35px rgba(0,0,0,0.08) !important; }
 
         .history-chart { display: flex; justify-content: space-between; align-items: flex-end; gap: 4px; height: 150px; margin: 15px 0; border-bottom: 2px solid var(--border-color); padding-bottom: 5px; width: 100%; box-sizing: border-box; }
         .history-bar-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; cursor: pointer; flex: 1; position: relative; }
@@ -395,26 +453,6 @@
         }
         .dropdown-content a:hover { background-color: var(--extra-bg); color: var(--warning); padding-left: 20px; }
         .dropdown-content.show { display: block !important; animation: popCorrect 0.3s ease-out; }
-    /* ======================================================= */
-/* ĐIỀU CHỈNH ĐỔ BÓNG HỒNG ĐẬM/SÁNG CHO KHUNG THẺ TỪ VỰNG */
-/* ======================================================= */
-
-/* 1. Định nghĩa các biến màu đổ bóng mới */
-:root {
-    /* Chế độ Sáng: Bóng hồng đậm rõ rệt */
-    --flashcard-shadow-color: rgba(233, 110, 131, 0.35); 
-}
-
-body.dark-mode {
-    /* Chế độ Tối: Bóng hồng sáng rực rỡ/neon */
-    --flashcard-shadow-color: rgba(255, 182, 193, 0.65); 
-}
-
-/* 2. Áp dụng cho khung thẻ học từ vựng (#learningSpace) */
-#learningSpace {
-    /* Ghi đè bóng đổ cũ bằng biến mới, tăng alpha để rõ hơn */
-    box-shadow: 0 15px 40px var(--flashcard-shadow-color) !important;
-}
     </style>
 </head>
 <body>
