@@ -559,7 +559,7 @@
 
         <div id="dashboardArea" style="display: none;">
 
-            <div onclick="prepareModeSelection(1)" style="margin-top: 25px; background: linear-gradient(135deg, #FF9EAA, #FFB6C1); padding: 25px; border-radius: 25px; color: white; cursor: pointer; box-shadow: 0 10px 25px rgba(255,182,193,0.4); transition: 0.3s; margin-bottom: 25px; position: relative; overflow: hidden; text-align: left;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='none'">
+            <div id="tourTarget_review" onclick="prepareModeSelection(1)" style="margin-top: 25px; background: linear-gradient(135deg, #FF9EAA, #FFB6C1); padding: 25px; border-radius: 25px; color: white; cursor: pointer; box-shadow: 0 10px 25px rgba(255,182,193,0.4); transition: 0.3s; margin-bottom: 25px; position: relative; overflow: hidden; text-align: left;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='none'">
                 <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center;">
                     <div>
                         <div style="font-size: 13px; font-weight: 800; opacity: 0.9; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Nhiệm vụ ưu tiên</div>
@@ -582,10 +582,10 @@
             </div>
             <div id="choiceArea" style="text-align: center;">
                 <div class="choice-container" style="grid-template-columns: repeat(2, 1fr);">
-                    <button class="choice-btn" style="border-color: #A8E6CF;" onclick="prepareModeSelection(2)">
+                    <button id="tourTarget_learn" class="choice-btn" style="border-color: #A8E6CF;" onclick="prepareModeSelection(2)">
                         <span class="choice-icon">📚</span><p class="choice-title">Học Bài Mới</p><p class="choice-desc">Mở khóa chủ đề</p>
                     </button>
-                    <button class="choice-btn" style="border-color: #81D4FA;" onclick="openGrammarMenu()">
+                    <button id="tourTarget_grammar" class="choice-btn" style="border-color: #81D4FA;" onclick="openGrammarMenu()">
                         <span class="choice-icon">📝</span><p class="choice-title">Ngữ Pháp</p><p class="choice-desc">Lý thuyết & Bài tập</p>
                     </button>
                     <div class="choice-btn dropdown-trigger" style="border-color: #FFD54F;" onclick="toggleSavedDropdown()">
@@ -596,7 +596,7 @@
                             <a href="#" id="savedGrammarMenuText" onclick="openSavedGrammarMenu(); event.stopPropagation();">📝 Câu hỏi trắc nghiệm (0)</a>
                         </div>
                     </div>
-                    <button class="choice-btn" style="border-color: #FFB6C1;" onclick="openProfile()">
+                    <button id="tourTarget_profile" class="choice-btn" style="border-color: #FFB6C1;" onclick="openProfile()">
                         <span class="choice-icon">🏆</span><p class="choice-title">Hồ Sơ</p><p class="choice-desc">Thành tích & Lịch sử</p>
                     </button>
                 </div>
@@ -1056,62 +1056,6 @@
 
 <script>
     // ==========================================
-    // ==========================================
-    // HỆ THỐNG HƯỚNG DẪN TÂN BINH (ONBOARDING)
-    // ==========================================
-    const tutorialSteps = [
-        { icon: "👋", title: "Chào mừng Tân Binh!", desc: "Hệ thống luyện thi TOEIC Charnishere sẽ giúp bạn cày từ vựng và ngữ pháp mượt như lướt Tiktok. Cùng xem qua cách hoạt động nhé!" },
-        { icon: "🚀", title: "Thuật toán Chống Quên", desc: "Đừng lo học trước quên sau! Khối <b>'Ôn tập ngay'</b> sẽ tự động nhắc bạn ôn lại những từ hoặc câu ngữ pháp ngay trước khi não bộ chuẩn bị quên chúng." },
-        { icon: "🎮", title: "Vũ trụ Từ Vựng", desc: "Mục <b>'Học Bài Mới'</b> sở hữu 5 trạm rèn luyện: Lật thẻ Flashcard, Trắc nghiệm, Luyện gõ, Nghe audio và Game nối từ tốc độ cao." },
-        { icon: "📝", title: "Lò Luyện Ngữ Pháp", desc: "Làm sai không sợ không ai chỉ! Mục <b>'Ngữ Pháp'</b> có giải thích chi tiết cặn kẽ từng câu và có chế độ Thi Thử y như thật." },
-        { icon: "🔥", title: "Thăng Hạng & Huy Hiệu", desc: "Hãy học mỗi ngày để thắp sáng ngọn lửa Chuỗi Ngày (Streak) và cày cấp độ mở khóa kho Huy Hiệu cực ngầu trong <b>'Hồ Sơ'</b> nhé. Bắt đầu thôi!" }
-    ];
-    let currentTutorialStep = 0;
-
-    function checkAndShowTutorial() {
-        let hasSeen = localStorage.getItem(`charnishere_has_seen_tutorial_${studentID}`);
-        if (!hasSeen) {
-            currentTutorialStep = 0;
-            document.getElementById('tutorialOverlay').style.display = 'flex';
-            renderTutorialStep();
-        }
-    }
-
-    function renderTutorialStep() {
-        const step = tutorialSteps[currentTutorialStep];
-        document.getElementById('tutorialIcon').innerText = step.icon;
-        document.getElementById('tutorialTitle').innerText = step.title;
-        document.getElementById('tutorialDesc').innerHTML = step.desc;
-        
-        let dotsHTML = '';
-        for(let i=0; i<tutorialSteps.length; i++) {
-            let color = i === currentTutorialStep ? 'var(--primary)' : 'var(--border-color)';
-            dotsHTML += `<div style="width: 8px; height: 8px; border-radius: 50%; background: ${color}; transition: 0.3s;"></div>`;
-        }
-        document.getElementById('tutorialDots').innerHTML = dotsHTML;
-        
-        let nextBtn = document.getElementById('tutorialNextBtn');
-        if (currentTutorialStep === tutorialSteps.length - 1) {
-            nextBtn.innerText = "Chiến luôn! ⚔️";
-        } else {
-            nextBtn.innerText = "Tiếp tục ➔";
-        }
-    }
-
-    function nextTutorialStep() {
-        if (currentTutorialStep < tutorialSteps.length - 1) {
-            currentTutorialStep++;
-            renderTutorialStep();
-        } else {
-            skipTutorial(); // Đã đến bước cuối thì đóng lại
-        }
-    }
-
-    function skipTutorial() {
-        document.getElementById('tutorialOverlay').style.display = 'none';
-        localStorage.setItem(`charnishere_has_seen_tutorial_${studentID}`, 'true'); // Đánh dấu đã xem
-        showToast("🎉 Chúc bạn học tập thật hiệu quả!");
-    }
     // 🌐 CẤU HÌNH DỮ LIỆU GOOGLE SHEETS
     // ==========================================
     const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSPyDrjlrEZpuElt_nnQlh9Rg6eJ19daHP74k_g_XhyvmP0Dvv1H5Cm465ubWpzojocL_xsmSPrCVxf/pub?gid=1951662307&single=true&output=csv";
@@ -1143,7 +1087,108 @@
     function setText(id, text) { let el = document.getElementById(id); if (el) el.innerText = text; }
     function showToast(msg) { let t = document.getElementById('toastNotification'); if(t) { t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); } }
     function getDateKey(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0'); }
+    // ==========================================
+    // NÃO BỘ ĐIỀU KHIỂN BÓNG THOẠI HƯỚNG DẪN
+    // ==========================================
+    const tourSteps = [
+        {
+            target: 'tourTarget_review', icon: '🚀', title: 'Nhiệm vụ Ưu tiên', position: 'bottom',
+            text: 'Mỗi ngày vào app, hãy kiểm tra khối này đầu tiên. Thuật toán sẽ nhắc nhở các từ vựng bạn sắp quên để học lại ngay lập tức!'
+        },
+        {
+            target: 'globalSearchContainer', icon: '🔍', title: 'Từ điển Bỏ túi', position: 'bottom',
+            text: 'Gõ tiếng Anh hoặc tiếng Việt vào đây để tra cứu nhanh ngữ nghĩa và lưu thẳng vào "Từ vựng của tôi".'
+        },
+        {
+            target: 'tourTarget_learn', icon: '📚', title: 'Trạm Từ Vựng', position: 'top',
+            text: 'Mở khóa các chủ đề từ vựng BẮT BUỘC PHẢI BIẾT cùng các từ vựng của bộ đề ETS.'
+        },
+        {
+            target: 'tourTarget_grammar', icon: '📝', title: 'Lò Luyện Ngữ Pháp', position: 'top',
+            text: 'Làm bài tập trắc nghiệm chia theo từng dạng hoặc bật chế độ Luyện Thi ngẫu nhiên. Sai đến đâu giải thích đến đó!'
+        },
+        {
+            target: 'tourTarget_profile', icon: '🏆', title: 'Hồ Sơ Thành Tích', position: 'top',
+            text: 'Theo dõi chuỗi ngày học liên tục (Streak) và cày cấp độ để mở khóa 20+ Huy hiệu cực ngầu tại đây.'
+        }
+    ];
 
+    let currentTourIndex = 0;
+
+    function startProductTour() {
+        let hasSeen = localStorage.getItem(`charnishere_tour_v1_${studentID}`);
+        if (hasSeen) return; // Đã xem rồi thì không làm phiền nữa
+
+        document.getElementById('tourOverlay').style.display = 'block';
+        currentTourIndex = 0;
+        showTourStep();
+    }
+
+    function showTourStep() {
+        // Dọn dẹp highlight cũ
+        document.querySelectorAll('.tour-highlight').forEach(el => el.classList.remove('tour-highlight'));
+
+        if (currentTourIndex >= tourSteps.length) { endTour(); return; }
+
+        let step = tourSteps[currentTourIndex];
+        let targetEl = document.getElementById(step.target);
+        if (!targetEl) { currentTourIndex++; showTourStep(); return; }
+
+        // Cuộn màn hình đến phần tử đó một cách êm ái
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Đợi cuộn xong (300ms) rồi mới bật highlight và bóng thoại
+        setTimeout(() => {
+            targetEl.classList.add('tour-highlight');
+
+            document.getElementById('tourIcon').innerText = step.icon;
+            document.getElementById('tourTitle').innerText = step.title;
+            document.getElementById('tourText').innerHTML = step.text;
+            document.getElementById('tourStepIndicator').innerText = `${currentTourIndex + 1}/${tourSteps.length}`;
+            document.getElementById('tourNextBtn').innerText = currentTourIndex === tourSteps.length - 1 ? "Bắt đầu! ⚔️" : "Tiếp ➔";
+
+            let tooltip = document.getElementById('tourTooltip');
+            tooltip.style.display = 'block';
+
+            // Tính toán vị trí đè lên màn hình
+            let rect = targetEl.getBoundingClientRect();
+            let tooltipHeight = tooltip.offsetHeight || 250;
+            let arrow = document.getElementById('tourArrow');
+
+            let topPos = 0;
+            // Nếu bảo hiện ở dưới (bottom)
+            if (step.position === 'bottom') {
+                topPos = rect.bottom + 20;
+                arrow.className = 'tour-arrow top';
+            } else { // Hiện ở trên
+                topPos = rect.top - tooltipHeight - 20;
+                arrow.className = 'tour-arrow bottom';
+            }
+
+            // Chống tràn màn hình điện thoại
+            if (topPos < 10) { topPos = rect.bottom + 20; arrow.className = 'tour-arrow top'; }
+            if (topPos + tooltipHeight > window.innerHeight) { topPos = rect.top - tooltipHeight - 20; arrow.className = 'tour-arrow bottom'; }
+
+            tooltip.style.top = topPos + 'px';
+            setTimeout(() => tooltip.classList.add('show'), 50); // Mờ ảo hiện ra
+        }, 350);
+    }
+
+    function nextTourStep() {
+        document.getElementById('tourTooltip').classList.remove('show');
+        setTimeout(() => { currentTourIndex++; showTourStep(); }, 200);
+    }
+
+    function endTour() {
+        document.getElementById('tourOverlay').style.display = 'none';
+        document.getElementById('tourTooltip').style.display = 'none';
+        document.getElementById('tourTooltip').classList.remove('show');
+        document.querySelectorAll('.tour-highlight').forEach(el => el.classList.remove('tour-highlight'));
+        
+        // Đánh dấu vào bộ nhớ trình duyệt là đứa này đã học việc xong
+        localStorage.setItem(`charnishere_tour_v1_${studentID}`, 'true'); 
+        showToast("🎉 Chúc bạn học tập thật vui!");
+    }
     // ==========================================
     // KHỞI TẠO & ĐĂNG NHẬP
     // ==========================================
@@ -1171,7 +1216,7 @@
             loadDataFromLocal(); loadStats(); startTimer(); 
             await fetchDataFromGoogleSheets(false); // Chờ tải bộ từ vựng xong
             await pullFromCloud(); // Kéo tiến độ về ghép vào
-            checkAndShowTutorial();
+            startProductTour();
         } catch(e) { showToast("❌ Lỗi kết nối!"); loginBtn.innerText = oldText; loginBtn.disabled = false; }
     }
 // ==========================================
@@ -1215,7 +1260,7 @@
         loadDataFromLocal(); loadStats(); startTimer(); 
         await fetchDataFromGoogleSheets(false); 
         await pullFromCloud(); 
-        checkAndShowTutorial();
+        startProductTour();
     }
     async function fetchDataFromGoogleSheets(isManualSync) {
         setDisplay('dashboardArea', 'none'); setDisplay('loadingArea', 'block');
@@ -2774,7 +2819,7 @@ function nextGrammarQuestion() {
             loadDataFromLocal(); loadStats(); startTimer(); 
             await fetchDataFromGoogleSheets(false); 
             await pullFromCloud(); 
-            checkAndShowTutorial();
+            startProductTour();
         }
     }
 
@@ -3426,6 +3471,27 @@ function nextGrammarQuestion() {
                 </div>
             <button class="action-btn" id="tutorialNextBtn" onclick="nextTutorialStep()" style="background: var(--primary); color: white;">Tiếp tục ➔</button>
         </div>
+    </div>
+</div>
+    <style>
+    #tourOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.75); z-index: 9999990; display: none; transition: opacity 0.3s ease; }
+    .tour-highlight { position: relative !important; z-index: 9999991 !important; box-shadow: 0 0 0 4px white, 0 0 20px rgba(255, 182, 193, 0.9) !important; background: var(--card-bg) !important; pointer-events: none !important; border-radius: 25px; transition: 0.3s; }
+    #tourTooltip { position: fixed; z-index: 9999992; display: none; background: var(--card-bg); width: 320px; max-width: 90vw; padding: 20px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); border: 2px solid var(--primary); transition: top 0.4s ease-in-out, opacity 0.3s; opacity: 0; left: 50%; transform: translateX(-50%); text-align: center; }
+    #tourTooltip.show { opacity: 1; }
+    .tour-arrow { position: absolute; width: 0; height: 0; border-style: solid; left: 50%; transform: translateX(-50%); }
+    .tour-arrow.top { border-width: 0 12px 12px 12px; border-color: transparent transparent var(--primary) transparent; top: -14px; }
+    .tour-arrow.bottom { border-width: 12px 12px 0 12px; border-color: var(--primary) transparent transparent transparent; bottom: -14px; }
+</style>
+<div id="tourOverlay"></div>
+<div id="tourTooltip">
+    <div id="tourArrow" class="tour-arrow"></div>
+    <div style="font-size: 40px; margin-bottom: 5px; line-height: 1; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));" id="tourIcon">👋</div>
+    <h3 id="tourTitle" style="color: var(--primary); margin: 0 0 10px 0; font-weight: 900; font-size: 20px;">Tiêu đề</h3>
+    <p id="tourText" style="margin: 0 0 20px 0; font-size: 14.5px; font-weight: 800; color: var(--text-main); line-height: 1.5;">Nội dung hướng dẫn...</p>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <button onclick="endTour()" style="background: none; border: none; color: var(--text-light); font-weight: 900; font-family: 'Nunito'; cursor: pointer; outline: none; padding: 5px;">Bỏ qua</button>
+        <div id="tourStepIndicator" style="font-size: 13px; font-weight: 900; color: var(--text-light); background: var(--extra-bg); padding: 4px 12px; border-radius: 10px;">1/5</div>
+        <button id="tourNextBtn" onclick="nextTourStep()" class="action-btn" style="background: var(--primary); color: white; margin: 0; padding: 8px 20px; font-size: 15px;">Tiếp ➔</button>
     </div>
 </div>
 </body>
