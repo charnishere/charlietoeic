@@ -362,12 +362,20 @@
         /* ========================================= */
         
         /* 2. Khu vực Học Từ vựng (Flashcard, Typing) - Treo lên cao, căn giữa khung hình */
-       #learningSpace { 
+    #learningSpace { 
     height: auto !important; 
     min-height: 550px !important; 
     max-width: 650px !important; 
-    margin: 15px auto auto auto !important; /* <--- CẬP NHẬT DÒNG NÀY */
-    display: flex; flex-direction: column; 
+    
+    /* --- BẮT ĐẦU PHẦN SỬA LỀ --- */
+    margin-top: 15px !important;       /* Ép khoảng cách với thanh Charnishere là 15px */
+    margin-bottom: 50px !important;    /* Chừa khoảng trống phía dưới cùng */
+    margin-left: auto !important;      /* Tự động căn giữa màn hình */
+    margin-right: auto !important;     /* Tự động căn giữa màn hình */
+    /* --- KẾT THÚC PHẦN SỬA LỀ --- */
+    
+    display: flex; 
+    flex-direction: column; 
     justify-content: flex-start !important; 
     padding-bottom: 20px !important;
     box-sizing: border-box;
@@ -517,7 +525,7 @@
 
         <div id="dashboardArea" style="display: none;">
 
-            <div onclick="prepareModeSelection(1)" style="background: linear-gradient(135deg, #FF9EAA, #FFB6C1); padding: 25px; border-radius: 25px; color: white; cursor: pointer; box-shadow: 0 10px 25px rgba(255,182,193,0.4); transition: 0.3s; margin-bottom: 25px; position: relative; overflow: hidden; text-align: left;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='none'">
+            <div onclick="prepareModeSelection(1)" style="margin-top: 25px; background: linear-gradient(135deg, #FF9EAA, #FFB6C1); padding: 25px; border-radius: 25px; color: white; cursor: pointer; box-shadow: 0 10px 25px rgba(255,182,193,0.4); transition: 0.3s; margin-bottom: 25px; position: relative; overflow: hidden; text-align: left;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='none'">
                 <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center;">
                     <div>
                         <div style="font-size: 13px; font-weight: 800; opacity: 0.9; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Nhiệm vụ ưu tiên</div>
