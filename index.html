@@ -361,13 +361,21 @@
         /* GIAO DIỆN HỌC TẬP & MENU (BẢN CHUẨN CUỐI) */
         /* ========================================= */
         
-        /* 1. Bóp khung phòng học, căn giữa mượt mà */
-        #learningSpace, #grammarQuizScreen { 
+        /* 1. Bóp khung phòng học (Chỉ bóp Flashcard/Từ vựng cho gọn) */
+        #learningSpace { 
             max-width: 650px !important; 
             margin: 10px auto 40px auto !important; 
             display: flex; flex-direction: column; 
             padding-bottom: 30px;
             height: auto !important; min-height: unset !important;
+        }
+
+        /* 1.1 Trả lại không gian rộng rãi cho phòng Ngữ pháp để chia 2 cột Trái/Phải */
+        #grammarQuizScreen .panel-box {
+            max-width: 1000px !important; /* Đủ rộng để chứa câu hỏi bên trái, giải thích bên phải */
+            margin: 20px auto 40px auto !important;
+            height: auto !important; min-height: unset !important;
+            padding-bottom: 30px !important;
         }
 
         /* 2. Ép thẻ Flashcard không bị kéo giãn, chốt cứng chiều cao */
@@ -2307,17 +2315,39 @@ function nextGrammarQuestion() {
 
             let returnBtn = document.getElementById('quizResultReturnBtn');
             if (returnBtn) {
-                // logic reset cờ isSavedGrammarDirectMode = false;
-                    returnBtn.onclick = function() {
-                        // --- NẮN ĐƯỜNG VỀ CHO MỤC "CÂU HỎI ĐÃ LƯU" ---
-                        if (window.isSavedGrammarDirectMode) {
-                            window.isSavedGrammarDirectMode = false; // Reset cờ
-                            returnToMain(); // 🚀 Bắn thẳng về Trang chủ
-                            return; 
-                        }
-                        // logic thoát cũ
-                        startGrammarPractice(null);
-                    };
+                returnBtn.onclick = function() { 
+                    setDisplay('quizResultScreen', 'none');
+                    
+                    // --- 1. Nếu đang từ Tìm kiếm -> Về trang chủ bật lại ô Tìm kiếm
+                    if (window.isSearchModeActive) {
+                        window.isSearchModeActive = false;
+                        returnToMain();
+                        executeGlobalSearch();
+                        return;
+                    }
+                    // --- 2. Nếu đi từ mục "Đã Lưu" -> Về thẳng Trang chủ
+                    if (window.isSavedGrammarDirectMode) {
+                        window.isSavedGrammarDirectMode = false; 
+                        returnToMain(); 
+                        return; 
+                    }
+                    // --- 3. Nếu đang Ôn lại câu sai -> Về thẳng Trang chủ
+                    if (window.isGrammarReviewMode) {
+                        window.isGrammarReviewMode = false;
+                        returnToMain();
+                        return;
+                    }
+                    // --- 4. Nếu đang Luyện thi -> Về trang Chọn Luyện thi
+                    if (currentGrammarTestMode === 'exam') {
+                        setDisplay('grammarComprehensiveSetupScreen', 'flex');
+                        renderExamHistory();
+                        return;
+                    }
+                    
+                    // --- MẶC ĐỊNH: Làm bài tập xong -> Về trang "CHỌN CHỦ ĐỀ"
+                    setDisplay('grammarPracticeSetupScreen', 'flex');
+                    updateStatsDashboard();
+                };
             }
         }
     }
