@@ -289,6 +289,74 @@
             background-position: top left !important; 
             background-attachment: fixed !important;
         }
+        /* ========================================= */
+        /* CHIẾN LƯỢC 4: UI HIỆN ĐẠI (KHÔNG VIỀN & NỔI 3D) */
+        /* ========================================= */
+        
+        /* 1. Xóa viền đứt nét thô cứng ở các Panel chính, bo góc to hơn */
+        .panel-box {
+            border: none !important;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06) !important;
+            border-radius: 30px !important;
+        }
+        
+        /* 2. Các đường kẻ phân cách chuyển thành nét liền siêu mảnh */
+        .header, .info-header, #vocabListContainer {
+            border-bottom: 1px solid rgba(150, 150, 150, 0.2) !important;
+            border-top: none !important;
+        }
+        div[style*="dashed"] { 
+            border-color: rgba(150, 150, 150, 0.2) !important; 
+            border-style: solid !important; 
+            border-width: 1px !important; 
+        }
+
+        /* 3. Nút bấm Lưới Khám Phá: Nổi 3D và bay lên khi hover */
+        .choice-btn {
+            border: none !important;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05) !important;
+        }
+        .choice-btn:hover {
+            transform: translateY(-5px) !important;
+            box-shadow: 0 15px 30px rgba(255, 182, 193, 0.4) !important;
+        }
+
+        /* 4. Thẻ Flashcard & Khung tìm kiếm mượt mà */
+        .card__face, #globalSearchResults {
+            border: none !important;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08) !important;
+        }
+
+        /* 5. Input nhập liệu: Lõm sâu 3D (Neumorphism) */
+        #globalSearchInput, .typing-input-box {
+            border: none !important;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.05) !important;
+            background: var(--extra-bg) !important;
+        }
+        #globalSearchInput:focus, .typing-input-box:focus {
+            box-shadow: 0 0 0 3px var(--primary) !important; /* Hiệu ứng tỏa sáng (Glow) khi click vào gõ chữ */
+        }
+
+        /* 6. Các nút hành động, Trắc nghiệm & Game nối từ */
+        .action-btn, .grammar-menu-btn, .quiz-btn, .game-item {
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
+        }
+        .action-btn:hover, .grammar-menu-btn:hover, .quiz-btn:hover:not(:disabled) {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important;
+        }
+
+        /* 7. Tối ưu riêng cho Dark Mode (Đen sâu thẳm, viền khối trong suốt) */
+        body.dark-mode .panel-box, 
+        body.dark-mode .choice-btn, 
+        body.dark-mode .card__face, 
+        body.dark-mode #globalSearchResults {
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5) !important;
+            border: 1px solid rgba(255,255,255,0.05) !important; 
+        }
+        body.dark-mode div[style*="dashed"] { 
+            border-color: rgba(255, 255, 255, 0.1) !important; 
+        }
     </style>
 </head>
 <body>
