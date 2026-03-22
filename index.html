@@ -463,6 +463,15 @@
         body.dark-mode .grammar-topic-icon {
             background: rgba(255, 255, 255, 0.2) !important; /* Trả lại màu trắng trong suốt khi ở mode Tối */
         }
+    /* ======================================================= */
+        /* ĐỊNH DẠNG LẠI Ô THÔNG BÁO HOÀN THÀNH BÀI HỌC */
+        /* ======================================================= */
+        #allDoneScreen {
+            max-width: 850px !important; /* Khóa cứng chiều rộng bằng thanh Header */
+            width: 100% !important;
+            margin: 15px auto !important; /* Căn giữa màn hình */
+            box-sizing: border-box;
+        }
 </style>
 </head>
 <body>
@@ -729,7 +738,7 @@
 
     <div class="panel-box" id="allDoneScreen" style="display:none; text-align: center; padding: 40px 0;">
         <h1 style="font-size: 60px; margin: 0;">🎉</h1>
-        <h2 style="color: var(--success); font-weight: 900; font-size: 30px; margin: 15px 0;" id="doneTitle">Hoàn tất nhiệm vụ!</h2>
+        <h2 style="color: var(--success); font-weight: 900; font-size: 30px; margin: 15px 0;" id="doneTitle">Giỏi lắm!</h2>
         <button class="nav-arrow" style="margin-top: 20px;" onclick="backFromLearning()">&#10094;</button>
     </div>
 </div>
@@ -1403,9 +1412,11 @@
                 // --- TẠO NÚT: TỪ VỰNG CỦA TÔI ---
                 if (studentStats.savedVocab && studentStats.savedVocab.length > 0) {
                     let savedBtn = document.createElement('button');
-                    savedBtn.style.cssText = "background: var(--extra-bg); color: var(--text-main); border: 2px solid var(--warning); border-radius: 15px; padding: 15px 5px; font-family: 'Nunito', sans-serif; cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.2s; box-shadow: 0 4px 10px rgba(255,213,79,0.2);";
-                    savedBtn.onmouseover = () => { savedBtn.style.transform = "translateY(-3px)"; };
-                    savedBtn.onmouseout = () => { savedBtn.style.transform = "translateY(0)"; };
+                    // ĐỔI MÀU VIỀN & BÓNG SANG HỒNG (var(--primary))
+                    savedBtn.style.cssText = "background: var(--extra-bg); color: var(--text-main); border: 2px solid var(--primary); border-radius: 15px; padding: 15px 5px; font-family: 'Nunito', sans-serif; cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.2s; box-shadow: 0 4px 10px rgba(255, 182, 193, 0.2);";
+                    // THÊM ĐỔI MÀU NỀN HỒNG, CHỮ TRẮNG KHI HOVER
+                    savedBtn.onmouseover = () => { savedBtn.style.transform = "translateY(-3px)"; savedBtn.style.backgroundColor = "var(--primary)"; savedBtn.style.color = "white"; };
+                    savedBtn.onmouseout = () => { savedBtn.style.transform = "translateY(0)"; savedBtn.style.backgroundColor = "var(--extra-bg)"; savedBtn.style.color = "var(--text-main)"; };
                     savedBtn.innerHTML = `
                         <span style="font-size: 13px; margin-bottom: 5px; font-weight: 800;">💛 Yêu thích</span>
                         <span style="font-weight: 900; font-size: 16px; line-height: 1.3;">Từ vựng của tôi</span>
@@ -1430,9 +1441,13 @@
                 groups.forEach(g => {
                     let statusIcon = (g.total>0 && g.mastered===g.total) ? "✅ Hoàn thành" : (g.studied>0 ? "⏳ Đang học" : "⬜ Chưa học");
                     let btn = document.createElement('button');
-                    btn.style.cssText = "background: var(--card-bg); color: var(--text-main); border: 2px solid var(--warning); border-radius: 15px; padding: 15px 5px; font-family: 'Nunito', sans-serif; cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.2s; box-shadow: 0 4px 10px rgba(255,213,79,0.2);";
-                    btn.onmouseover = () => { btn.style.backgroundColor = "var(--warning)"; btn.style.color = "#222"; };
-                    btn.onmouseout = () => { btn.style.backgroundColor = "var(--card-bg)"; btn.style.color = "var(--text-main)"; };
+                    // ĐỔI MÀU VIỀN & BÓNG SANG HỒNG (var(--primary))
+                    btn.style.cssText = "background: var(--card-bg); color: var(--text-main); border: 2px solid var(--primary); border-radius: 15px; padding: 15px 5px; font-family: 'Nunito', sans-serif; cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.2s; box-shadow: 0 4px 10px rgba(255, 182, 193, 0.2);";
+                    
+                    // THÊM ĐỔI MÀU NỀN HỒNG, CHỮ TRẮNG, KÈM NẢY LÊN KHI HOVER
+                    btn.onmouseover = () => { btn.style.backgroundColor = "var(--primary)"; btn.style.color = "white"; btn.style.transform = "translateY(-3px)"; };
+                    btn.onmouseout = () => { btn.style.backgroundColor = "var(--card-bg)"; btn.style.color = "var(--text-main)"; btn.style.transform = "none"; };
+                    
                     btn.innerHTML = `
                         <span style="font-size: 13px; margin-bottom: 5px; font-weight: 800;">${statusIcon}</span>
                         <span style="font-weight: 900; font-size: 16px; line-height: 1.3;">${g.levelName}</span>
