@@ -394,40 +394,14 @@
             padding-right: 5px; 
         }
         /* ========================================= */
-        /* FIX LỖI GIẬT MÀN HÌNH & MENU ĐÃ LƯU BỊ CHE */
+        /* GIAO DIỆN HỌC TẬP THÔNG MINH (AUTO-FIT TẤT CẢ MÀN HÌNH) */
         /* ========================================= */
         
-        /* 1. Chốt chiều cao, bóp chiều rộng, căn giữa tuyệt đối phòng học */
-        #learningSpace { 
-            min-height: calc(100vh - 120px); 
-            max-width: 650px !important; 
-            margin: 10px auto 20px auto !important; 
-            display: flex; flex-direction: column; 
-            justify-content: center !important; 
-        }
-
-        #flashcardApp, #typingApp { 
-            width: 100%; flex: 1; display: flex; flex-direction: column; justify-content: center; 
-        }
-
-        /* 2. Ép thẻ Flashcard không bị kéo giãn, chốt cứng chiều cao */
-        .card-scene { 
-            width: 100%;
-            height: 420px !important; /* Chốt cứng chiều cao để không bị giật nhún */
-            min-height: unset !important; max-height: unset !important; 
-            margin: 0 auto 30px auto !important; /* Tạo khoảng trống để nút Đáp án không dính chặt */
-            perspective: 1000px;
-        }
-        .card__face {
-            height: 100% !important; /* Ép thẻ con cao bằng đúng thẻ cha */
-        }
-        .flashcard-main, .flashcard-back { overflow-y: auto !important; padding-right: 5px; }
-
-        /* 3. CSS Dropdown Menu: Đẩy lên trên (bottom) để không bị cắt chữ */
+        /* 1. Dropdown Menu Đã Lưu (Bắn lên trên để không bị che chữ) */
         .dropdown-trigger { position: relative; overflow: visible !important; }
         .dropdown-content {
             display: none; position: absolute; 
-            bottom: 110% !important; top: auto !important; /* Bắn ngược menu lên trên */
+            bottom: 110% !important; top: auto !important; 
             left: 50%; transform: translateX(-50%);
             background-color: var(--card-bg); min-width: 220px; box-shadow: 0px 10px 40px rgba(0,0,0,0.15);
             z-index: 99999; border-radius: 15px; border: 2px solid var(--warning); padding: 5px;
@@ -438,12 +412,48 @@
         }
         .dropdown-content a:hover { background-color: var(--extra-bg); color: var(--warning); padding-left: 20px; }
         .dropdown-content.show { display: block !important; animation: popCorrect 0.3s ease-out; }
+
+        /* 2. Khu vực Học Từ vựng (Flashcard, Typing) - Ép vừa khít 100% màn hình, không bị thòng lòng */
+        #learningSpace { 
+            height: calc(100vh - 80px) !important; /* Trừ lề để thẻ luôn nằm trọn trong màn hình */
+            max-height: 750px !important; /* Không cho phình quá to trên PC */
+            min-height: 500px !important; 
+            max-width: 650px !important; /* Bóp chiều ngang cho thanh thoát */
+            margin: 10px auto 20px auto !important; 
+            display: flex !important; flex-direction: column !important; 
+            padding-bottom: 20px !important;
+            box-sizing: border-box;
+        }
+
+        #flashcardApp, #typingApp { 
+            width: 100%; flex: 1; 
+            display: flex; flex-direction: column; 
+            justify-content: space-between; /* Lệnh quan trọng: Đẩy thanh tiến độ lên đỉnh, nút đáp án xuống đáy! */
+            overflow: hidden;
+        }
+
+        /* 3. Thẻ Flashcard - Tự động co giãn như lò xo (Flex: 1) */
+        .card-scene { 
+            width: 100%;
+            flex: 1; /* Thẻ sẽ tự động phình to hoặc thu nhỏ để lấp đầy khoảng trống dư thừa */
+            min-height: 250px !important; 
+            max-height: 380px !important; /* Chốt độ cao tối đa để thẻ không bị lù lù trên mặt */
+            margin: 15px auto 25px auto !important; /* Tạo khoảng trống thoải mái với nút bấm */
+            perspective: 1000px;
+        }
         
-        /* 4. Fix lỗi khung trắng bị kéo thòng lòng */
-        #grammarQuizScreen, #typingApp, #flashcardApp { height: auto !important; min-height: unset !important; }
-        #learningSpace .panel-box, #grammarQuizScreen .panel-box {
-            margin: 20px auto 40px auto !important;
-            height: auto !important; padding-bottom: 30px !important;
+        .card__face {
+            height: 100% !important; /* Thẻ mặt trước và sau luôn cao bằng nhau tuyệt đối */
+        }
+        
+        /* 4. Nội dung bên trong thẻ (Tự động xuất hiện thanh cuộn bên trong nếu chữ quá dài) */
+        .flashcard-main, .flashcard-back { overflow-y: auto !important; padding-right: 5px; }
+
+        /* 5. Giữ cho khu vực thi Ngữ pháp được trượt tự do (Vì ngữ pháp cần đọc đề dài) */
+        #grammarQuizScreen {
+            height: auto !important;
+            min-height: unset !important;
+            padding-bottom: 30px !important;
         }
     </style>
 </head>
