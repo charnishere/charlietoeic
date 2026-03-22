@@ -357,20 +357,42 @@
         body.dark-mode div[style*="dashed"] { 
             border-color: rgba(255, 255, 255, 0.1) !important; 
         }
-        /* ========================================= */
-        /* FIX LỖI GIẬT MÀN HÌNH VÀ MENU ĐÃ LƯU */
+/* ========================================= */
+        /* FIX LỖI GIẬT MÀN HÌNH & GIAO DIỆN HỌC TẬP */
         /* ========================================= */
         
-        /* Giữ cố định chiều cao khu vực học tập, thu hẹp bề ngang cho gọn gàng */
+        /* 1. Bóp chiều ngang, ghim nội dung lên TRESS (flex-start) thay vì tụt xuống đáy */
         #learningSpace { 
-            min-height: 550px; 
-            max-width: 850px !important; /* Bóp nhỏ khung lại, bạn có thể chỉnh số 750 tùy ý */
-            margin: 20px auto !important; /* Căn giữa khung vào giữa màn hình */
+            min-height: calc(100vh - 100px); /* Chiếm trọn màn hình trừ khoảng trống Header */
+            max-width: 650px !important; /* Bóp khung nhỏ lại gọn gàng hơn */
+            margin: 10px auto 40px auto !important; 
             display: flex; 
             flex-direction: column; 
+            justify-content: flex-start !important; /* Lệnh quan trọng: Ép thẻ dính sát lên trên! */
         }
-        #flashcardApp, #typingApp { width: 100%; flex: 1; display: flex; flex-direction: column; justify-content: center; }
 
+        /* 2. Đẩy nội dung Flashcard & Typing lên sát thanh Tiến độ */
+        #flashcardApp, #typingApp { 
+            width: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: flex-start !important; /* Ép lên trên */
+            margin-top: 15px; 
+        }
+
+        /* 3. Chốt cứng chiều cao thẻ Flashcard để không nhún nhảy khi lật thẻ */
+        .card-scene { 
+            height: 480px !important; /* Chốt cứng chiều cao, không dùng vh hay min-max nữa */
+            min-height: unset !important; 
+            max-height: unset !important; 
+            margin: 0 auto 20px auto !important;
+        }
+
+        /* Thêm thanh cuộn vào trong lòng thẻ nếu chữ quá dài */
+        .flashcard-main, .flashcard-back { 
+            overflow-y: auto !important; 
+            padding-right: 5px; 
+        }
         /* CSS cho Dropdown Menu Đã Lưu */
         .dropdown-trigger { position: relative; overflow: visible !important; }
         .dropdown-content {
@@ -2276,70 +2298,33 @@ function nextGrammarQuestion() {
 
             let returnBtn = document.getElementById('quizResultReturnBtn');
             if (returnBtn) {
-                returnBtn.onclick = () => { 
-                    setDisplay('quizResultScreen', 'none');
-                    // --- THÊM MỚI: Ưu tiên xử lý nếu đang ở chế độ Tìm kiếm ---
-                    if (window.isSearchModeActive) {
-                        window.isSearchModeActive = false;
-                        returnToMain();
-                        executeGlobalSearch(); // 🔍 Hiện lại ngay bảng tìm kiếm
-                        return; // Kết thúc lệnh tại đây
-                    }
-
-                    // --- NẮN ĐƯỜNG VỀ CHO MỤC "CÂU HỎI ĐÃ LƯU" ---
-                    if (window.isSavedGrammarDirectMode) {
-                        window.isSavedGrammarDirectMode = false;
-                        returnToMain(); // 🚀 Bắn thẳng về Trang chủ
-                        return; 
-                    }
-                    // --------------------------------------------------------
-                    if (window.isGrammarReviewMode) { 
-                        setDisplay('dashboardArea', 'block'); 
-                        setDisplay('choiceArea', 'flex'); 
-                        updateStatsDashboard();
-                        window.isGrammarReviewMode = false; // Reset trạng thái ôn tập
-                    } 
-                    else { 
-                        // Ép quay về trang Chọn Chủ Đề và làm mới dữ liệu
-                        openGrammarPracticeSetup(); 
-                    }
-                };
+                // logic reset cờ isSavedGrammarDirectMode = false;
+                    returnBtn.onclick = function() {
+                        // --- NẮN ĐƯỜNG VỀ CHO MỤC "CÂU HỎI ĐÃ LƯU" ---
+                        if (window.isSavedGrammarDirectMode) {
+                            window.isSavedGrammarDirectMode = false; // Reset cờ
+                            returnToMain(); // 🚀 Bắn thẳng về Trang chủ
+                            return; 
+                        }
+                        // logic thoát cũ
+                        startGrammarPractice(null);
+                    };
             }
         }
     }
 
-    function forceExitGrammarQuiz() { 
-        if (window.isSearchModeActive) {
-            window.isSearchModeActive = false;
-            setDisplay('grammarQuizScreen', 'none');
-            returnToMain();
-            executeGlobalSearch(); // 🔍 Hiện lại ngay bảng tìm kiếm
-            return;
-        }
+    // Lệnh thoát nhanh bằng nút Back mũi tên
+    function forceExitGrammarQuiz() {
+        // --- NẮN ĐƯỜNG VỀ CHO MỤC "CÂU HỎI ĐÃ LƯU" ---
         if (window.isSavedGrammarDirectMode) {
-            window.isSavedGrammarDirectMode = false;
+            window.isSavedGrammarDirectMode = false; // Reset cờ
             setDisplay('grammarQuizScreen', 'none');
             returnToMain(); // 🚀 Bắn thẳng về Trang chủ
             return;
         }
-        setDisplay('grammarQuizScreen', 'none'); 
-        if (window.isGrammarReviewMode) { 
-            setDisplay('dashboardArea', 'block'); 
-            setDisplay('choiceArea', 'flex'); 
-            window.isGrammarReviewMode = false;
-            updateStatsDashboard();
-        } 
-        else if (isGrammarPracticeMode) { 
-            setDisplay('grammarPracticeSetupScreen', 'flex'); 
-            updateStatsDashboard();
-        } 
-        else { 
-            // Về màn hình chọn Luyện tập/Luyện thi
-            setDisplay('grammarComprehensiveSetupScreen', 'flex'); 
-            renderExamHistory();
-        }
         
-        pushToCloud(); 
+        // Logic thoát cũ (ví dụ về trang lọc chủ đề)
+        document.getElementById('displaySubjectTitle').click();
     }
 
     // Hàm vẽ Lịch sử Luyện thi
@@ -2555,15 +2540,15 @@ function nextGrammarQuestion() {
     });
 
     // Mở nhanh phòng Thực hành Ngữ pháp từ Menu Đã lưu
-    // Mở nhanh phòng Thực hành Ngữ pháp từ Menu Đã lưu
     function openSavedGrammarMenu() {
         if (!studentStats.savedGrammar || studentStats.savedGrammar.length === 0) {
             showToast("⚠️ Bạn chưa lưu câu hỏi ngữ pháp nào!");
             return;
         }
-        document.getElementById("savedDropdown").classList.remove("show"); // Ẩn menu đi
         
-        window.isSavedGrammarDirectMode = true; // 🚩 Bật cờ đánh dấu xuất phát từ Trang chủ
+        document.getElementById("savedDropdown").classList.remove("show"); // Ẩn menu dropdown
+        
+        window.isSavedGrammarDirectMode = true; // 🚩 Cờ đánh dấu xuất phát từ Trang chủ
         startGrammarPractice('SAVED_QUESTIONS'); // Mượn hàm học chủ đề có sẵn
     }
     // Mở nhanh Từ vựng của tôi từ Trang chủ
@@ -2572,13 +2557,21 @@ function nextGrammarQuestion() {
             showToast("⚠️ Bạn chưa lưu từ vựng nào (Bấm 💛 để lưu)");
             return;
         }
+        
+        document.getElementById("savedDropdown").classList.remove("show"); // Ẩn menu dropdown
+        
         isSavedVocabMode = true; 
+        window.isSavedVocabDirectMode = true; // 🚩 Cờ đánh dấu xuất phát từ Trang chủ
+
         originalGroupSet = allData.filter(w => studentStats.savedVocab.includes(w.vocab));
         currentSet = [...originalGroupSet];
         
         setDisplay('dashboardArea', 'none');
         setText('modeHeaderTitle', `Từ vựng của tôi (${currentSet.length})`);
         setDisplay('modeSelectionArea', 'block'); 
+        
+        // --- CHÚ Ý QUAN TRỌNG: Ẩn nút mũi tên '<' khi học từ vựng đã lưu để học xong về thẳng Trang chủ
+        document.querySelector('#vocabListArea .back-btn').style.display = 'none';
         
         setDisplay('vocabListContainer', 'block');
         document.getElementById('shuffleListCheck').checked = false;
